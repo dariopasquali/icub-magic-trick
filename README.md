@@ -30,8 +30,10 @@ I tried two alternatives:
 * Oversample the class 1 (with the SMOTE algorithm)
 * Aggregate the class 0 by subject in order to balance the dataset
 
-## MODELS
----- SMOTE APPLIED to oversample the 1 class
+Another problem with the oversampling is the combined use of cross-validation.
+If I oversample the dataset before the cross-validation (the problem is bigger with the copying method, but still present with SMOTE) There is the risk to have the same data in multiple folds. Otherwise, with SMOTE I oversample, then split the data and pretend that value is not fabricated.
 
-### Decision Tree
+### The right way
+
+
 

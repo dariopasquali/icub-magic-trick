@@ -1,0 +1,97 @@
+import pandas as pd
+import numpy as np
+from scipy import stats
+import matplotlib.pyplot as plt
+pd.options.mode.chained_assignment = None  # default='warn'
+
+# PROJECT
+from data_cleaning import  *
+from annotation_reader import *
+from eye_reader import *
+
+
+annotations_in_temp = "data/{}annotations/s{}.csv"
+tobii_in_temp = "data/{}tobii/s{}.csv"
+subject_cards_file = "data/{}cards.csv"
+
+def annot_var_init():
+    root_pilot = "PILOT/"
+    root_front = ""
+    root = root_front
+
+    return root, root_pilot, root_front
+
+
+def getSubjectCard(subject, source="frontiers", cards_file=subject_cards_file):
+
+    root, root_pilot, root_front = annot_var_init()
+
+    root = root_front
+    if(source == "pilot"):
+        root = root_pilot
+
+    s_cards = pd.read_csv(cards_file.format(root), sep=';')
+    sub_name = "s" + str(subject)    
+    card = s_cards.loc[s_cards['subject'] == sub_name]
+    return card['card'].values[0]
+
+def loadTimeSeries(subject, card_names,
+                    source="frontiers",
+                    tobii_input_template=tobii_in_temp,
+                    annot_input_template=annotations_in_temp,
+                    sr_window=1500,
+                    clean=True,
+                    smooth=False):
+    
+    root, root_pilot, root_front = annot_var_init()
+    print("LOAD s{} from {}".format(subject, source))
+
+    root = root_front
+    if(source == "pilot"):
+        root = root_pilot
+
+    # Complete the files
+    eye_in = tobii_input_template.format(root, subject)
+    annot_in = annot_input_template.format(root, subject)
+    
+    # vector with temporal filtered data for each card
+    cards = []
+    cards_sr_early = []
+    cards_sr_late = []
+    
+    # load tobii data
+    eye = preprocessEye(eye_in, source)
+    
+    # load novelty annotations
+    annotations = preprocessAnnotations(annot_in, card_names)
+    
+    # filter eye data relative to overall novelty phase
+    overall = filterEyeData(eye, annotations[0], clean, smooth)
+    
+    # filter the baseline to rescale the pupil dilation data
+    baseline = filterBaseline(eye, annotations[0], window=5000)
+    
+    # single cards eye data overall and in the 1.5 sec after the stimulus
+    for i in range(1, len(annotations)):
+        c = filterEyeData(overall, annotations[i], clean=False, smooth=False)
+        
+        early = filterShortEyeResponse(overall,
+                                         annotations[i],
+                                         after_start=True,
+                                         before_end=False,
+                                         window=sr_window,
+                                         clean=False, smooth=False)
+        
+        late = filterShortEyeResponse(overall,
+                                         annotations[i],
+                                         after_start=False,
+                                         before_end=True,
+                                         window=sr_window,
+                                         clean=False, smooth=False)
+        
+        c['class'] = annotations[i]['class'].iloc[0]
+        cards.append(c)
+        cards_sr_early.append(early)
+        cards_sr_late.append(late)
+    
+    return eye, annotations, baseline, overall, cards, cards_sr_early, cards_sr_late

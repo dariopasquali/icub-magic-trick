@@ -23,6 +23,7 @@ class SubjectMagicFeatures:
     
     def __init__(self,
                  subject,
+                 source,
                  subject_card,
                  annot_dfs,
                  card_eye_dfs,
@@ -44,6 +45,7 @@ class SubjectMagicFeatures:
             # ==== TASK FEATURES =============
             
             self.subject = subject
+            self.source = source
             self.duration = annot_dfs[c+1]['duration_ms'].iloc[0]
             self.card_class = card_eye_dfs[c]['class'].iloc[0]
             
@@ -163,6 +165,7 @@ class SubjectMagicFeatures:
         return pd.DataFrame(
             data=[[
                 self.subject,
+                self.source,
                 self.duration,
                 self.card_class,
                 self.show_order,

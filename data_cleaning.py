@@ -6,33 +6,37 @@ pd.options.mode.chained_assignment = None  # default='warn'
 
 def cleanTimeSeries(time_series, tresh=5, col_right="diam_right", col_left="diam_left"):
     # Calc Zscore params
+
+    #print("Outlier Treshold {}".format(tresh))
+
     righ_mean = time_series[col_right].mean(skipna = True)
     righ_std = time_series[col_right].std(skipna = True)
     left_mean = time_series[col_left].mean(skipna = True)
     left_std = time_series[col_left].std(skipna = True)    
     
     #Filter Outliers    
-    time_series.loc[(np.abs((time_series[col_right] - righ_mean) / righ_std) >= tresh), col_left] = np.NaN
-    time_series.loc[(np.abs((time_series[col_right] - left_mean) / left_std) >= tresh), col_left] = np.NaN
+    time_series.loc[(np.abs((time_series[col_right] - righ_mean) / righ_std) >= tresh), col_right] = np.NaN
+    time_series.loc[(np.abs((time_series[col_left] - left_mean) / left_std) >= tresh), col_left] = np.NaN
+
     return time_series
 
-def resampleAndFill(time_series, resample=True, fill=True, smooth=True):
+def resampleAndFill(time_series, col_right="diam_right", col_left="diam_left", resample=True, fill=True, smooth=True):
     # RESAMPLE
     if(resample):
-        time_series['diam_right'] = \
-            time_series[['diam_right']].resample("ms").mean()
-        time_series['diam_left'] = \
-            time_series[['diam_left']].resample("ms").mean()   
+        time_series[col_right] = \
+            time_series[[col_right]].resample("ms").mean()
+        time_series[col_left] = \
+            time_series[[col_left]].resample("ms").mean()   
     
     # Fill NaN
     if(fill):
-        time_series["diam_right"] = time_series[["diam_right"]].fillna(method="ffill")
-        time_series["diam_left"] = time_series[["diam_left"]].fillna(method="ffill")
+        time_series[col_right] = time_series[[col_right]].fillna(method="ffill")
+        time_series[col_left] = time_series[[col_left]].fillna(method="ffill")
  
     # Smooth
     if(smooth): 
-        time_series["diam_right"] = time_series[['diam_right']].rolling(window=150).mean()
-        time_series["diam_left"] = time_series[['diam_left']].rolling(window=150).mean() 
+        time_series[col_right] = time_series[[col_right]].rolling(window=150).mean()
+        time_series[col_left] = time_series[[col_left]].rolling(window=150).mean() 
 
     return time_series
 

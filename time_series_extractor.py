@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from scipy import stats
+import glob 
 import matplotlib.pyplot as plt
 pd.options.mode.chained_assignment = None  # default='warn'
 
@@ -22,10 +23,42 @@ def annot_var_init():
     return root, root_pilot, root_front
 
 
+def extractMinSubjectSet(source="frontiers",
+                         annot_path=annotations_in_temp,
+                         eye_data_path=tobii_in_temp):
+
+    root, root_pilot, root_front = annot_var_init()
+    root = root_front
+    if(source == "pilot"):
+        root = root_pilot
+    
+    annot_path = annot_path.format(root, "*")
+    eye_path = eye_data_path.format(root, "*")
+
+    annot_glob = glob.glob(annot_path)
+    eye_glob = glob.glob(eye_path)
+
+    annot_subjects = []
+    eye_subjects = []
+    
+    for fn in annot_glob:
+        id = fn.split("/")[-1]
+        id = id.split(".")[0].replace('s', '')
+        annot_subjects.append(int(id))
+
+    for fn in eye_glob:
+        id =fn.split("/")[-1].split(".")[0].replace('s', '')
+        eye_subjects.append(int(id))
+
+    subjects = [s for s in annot_subjects if s in eye_subjects]
+    subjects.sort()
+    
+    return subjects
+
+
 def getSubjectCard(subject, source="frontiers", cards_file=subject_cards_file):
 
     root, root_pilot, root_front = annot_var_init()
-
     root = root_front
     if(source == "pilot"):
         root = root_pilot

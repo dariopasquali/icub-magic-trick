@@ -59,12 +59,12 @@ class SubjectMagicFeatures:
             # ==== EXTRACT CARDS ==========
             
             card = \
-                card_eye_dfs[c][['diam_right', 'diam_left', 'move_type']]
+                card_eye_dfs[c][['diam_right', 'diam_left', 'move_type', 'move_type_id']]
 
             sr_early_card = \
-                card_eye_sr_early_dfs[c][['diam_right', 'diam_left', 'move_type']]      
+                card_eye_sr_early_dfs[c][['diam_right', 'diam_left', 'move_type', 'move_type_id']]      
             sr_late_card = \
-                card_eye_sr_late_dfs[c][['diam_right', 'diam_left', 'move_type']]  
+                card_eye_sr_late_dfs[c][['diam_right', 'diam_left', 'move_type', 'move_type_id']]  
         
             # ==== EVENTS =============
             
@@ -134,29 +134,26 @@ class SubjectMagicFeatures:
                  p_mean_l, p_std_l, p_max_l, p_min_l
 
     def calcEventFeatures(self, data, time_window):
-        move_types = data[['move_type']]
-        move_types['count'] = 1
-        move_types = move_types.groupby('move_type').count()
-            
-        fix_num = move_types.loc[move_types.index == "Fixation"]
-        sacc_num = move_types.loc[move_types.index == "Saccade"]
-            
-        # Check if not empty
-        if not fix_num.empty:
-            fix_num = fix_num.iloc[0][0]
-        else:
-            fix_num = 0
-                
-        if not sacc_num.empty:
-            sacc_num = sacc_num.iloc[0][0]
-        else:
-            sacc_num = 0
-            
-        duration_sec = time_window / 1000            
+        move_types = data[['move_type', 'move_type_id']]
+        
+        fix_num = move_types.loc[move_types['move_type'] == "Fixation"]
+        sacc_num = move_types.loc[move_types['move_type'] == "Saccade"]
+
+        fix_num = len(fix_num.groupby('move_type_id').count().index)
+        sacc_num = len(sacc_num.groupby('move_type_id').count().index)
+        
+        #print("fix {}, sacc {}".format(fix_num, sacc_num))
+
+        duration_sec = time_window / 1000
+
+        #print("duration_sec {}".format(duration_sec))
+
         fix_freq = fix_num / duration_sec
         sacc_freq = sacc_num / duration_sec
 
         return fix_freq, sacc_freq
+
+        #return fix_num, sacc_num
 
     def getDataFrame(self):
         return self.features

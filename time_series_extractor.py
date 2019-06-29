@@ -73,6 +73,7 @@ def loadTimeSeries(subject, card_names,
                     tobii_input_template=tobii_in_temp,
                     annot_input_template=annotations_in_temp,
                     sr_window=1500,
+                    clean_mode="MAD",
                     clean=True,
                     smooth=False):
     
@@ -99,7 +100,7 @@ def loadTimeSeries(subject, card_names,
     annotations = preprocessAnnotations(annot_in, card_names)
     
     # filter eye data relative to overall novelty phase
-    overall = filterEyeData(eye, annotations[0], clean, smooth)
+    overall = filterEyeData(eye, annotations[0], clean, clean_mode, smooth)
     
     # filter the baseline to rescale the pupil dilation data
     baseline = filterBaseline(eye, annotations[0], window=5000)

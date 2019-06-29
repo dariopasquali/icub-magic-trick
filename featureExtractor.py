@@ -37,7 +37,7 @@ def extractFeatures(cols, cards, source="frontiers", short_resp=1500, ref_to_bas
     for sub in subjects:
         eye_df, annot_dfs, baseline, overall_eye_df, \
             cards_eye_dfs, early_sr_dfs, late_sr_dfs = \
-                loadTimeSeries(sub, cards, source=source, clean=True, smooth=False) 
+                loadTimeSeries(sub, cards, source=source, clean=True, clean_mode="MAD", smooth=False) 
         
         subject_card = getSubjectCard(sub, source, subject_cards_file)
         
@@ -56,11 +56,16 @@ def extractFeatures(cols, cards, source="frontiers", short_resp=1500, ref_to_bas
     return features  
 
 
-def extractAndSaveAll(column_names=column_names, card_names=card_names, out_file="features/all.csv", ref_to_base=True, mode="sub"):
-    frontiers = extractFeatures(column_names, card_names, source="frontiers", ref_to_base=ref_to_base, mode=mode)
-    pilot = extractFeatures(column_names, card_names, source="pilot", ref_to_base=ref_to_base, mode=mode)
-    pilot['subject'] = pilot['subject'] + 100
-    feats = frontiers.append(pilot, ignore_index=True)
-    feats.to_csv(out_file, columns=column_names, sep='\t', index=False)
+def extractAndSaveAll(column_names=column_names, card_names=card_names, out_file="features/all.csv", ref_to_base=True, mode="sub", short_resp=1500):
+    frontiers = extractFeatures(column_names, card_names, source="frontiers", ref_to_base=ref_to_base, mode=mode, short_resp=short_resp)
+    #pilot = extractFeatures(column_names, card_names, source="pilot", ref_to_base=ref_to_base, mode=mode, short_resp=short_resp)
+    #pilot['subject'] = pilot['subject'] + 100
+    #feats = frontiers.append(pilot, ignore_index=True)
+    #feats.to_csv(out_file, columns=column_names, sep='\t', index=False)
 
-    return feats
+    #return feats
+    return frontiers
+
+
+#features = extractAndSaveAll(out_file="features/all_{}.csv".format("sub"),
+#                            ref_to_base=True, mode="div", short_resp=500)

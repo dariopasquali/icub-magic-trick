@@ -3,44 +3,54 @@ import numpy as np
 from scipy import stats
 import matplotlib.pyplot as plt
 pd.options.mode.chained_assignment = None  # default='warn'
+from statsmodels.robust.scale import mad
 
-def cleanTimeSeries(time_series, tresh=5, col_right="diam_right", col_left="diam_left"):
+
+def cleanZscore(time_series, tresh=5, col="diam_right"):
     # Calc Zscore params
 
-    #print("Outlier Treshold {}".format(tresh))
+    #print("clean Z")
 
-    righ_mean = time_series[col_right].mean(skipna = True)
-    righ_std = time_series[col_right].std(skipna = True)
-    left_mean = time_series[col_left].mean(skipna = True)
-    left_std = time_series[col_left].std(skipna = True)    
-    
+    #print("Outlier Treshold {}".format(tresh))
+    mean = time_series[col].mean(skipna = True)
+    std = time_series[col].std(skipna = True)      
     #Filter Outliers    
-    time_series.loc[(np.abs((time_series[col_right] - righ_mean) / righ_std) >= tresh), col_right] = np.NaN
-    time_series.loc[(np.abs((time_series[col_left] - left_mean) / left_std) >= tresh), col_left] = np.NaN
+    time_series.loc[(np.abs((time_series[col] - mean) / std) >= tresh), col] = np.NaN
 
     return time_series
 
-def resampleAndFill(time_series, col_right="diam_right", col_left="diam_left", resample=True, fill=True, smooth=True):
+def cleanMAD(time_series, tresh=3.5, col="diam_right"):
+    
+    #print("clean MAD")
+    #https://medium.com/james-blogs/outliers-make-us-go-mad-univariate-outlier-detection-b3a72f1ea8c7
+    
+    df = time_series[[col]]
+    median = df[col].median()
+    df['dist'] = abs(df[col] - median)
+    mad = df['dist'].median()
+    df['modZ'] = (0.6754 * (df[col] - median)) / mad
+
+    df.loc[abs(df['modZ']) >= 3.5] = np.NaN    
+    time_series[col] = df[col]
+    
+    return time_series
+
+def resampleAndFill(time_series, col="diam_right", resample=True, fill=True, smooth=True):
     # RESAMPLE
     if(resample):
-        time_series[col_right] = \
-            time_series[[col_right]].resample("ms").mean()
-        time_series[col_left] = \
-            time_series[[col_left]].resample("ms").mean()   
+        time_series[col] = time_series[[col]].resample("ms").mean() 
     
     # Fill NaN
     if(fill):
-        time_series[col_right] = time_series[[col_right]].fillna(method="ffill")
-        time_series[col_left] = time_series[[col_left]].fillna(method="ffill")
+        time_series[col] = time_series[[col]].fillna(method="ffill")
  
     # Smooth
     if(smooth): 
-        time_series[col_right] = time_series[[col_right]].rolling(window=150).mean()
-        time_series[col_left] = time_series[[col_left]].rolling(window=150).mean() 
+        time_series[col] = time_series[[col]].rolling(window=150).mean()
 
     return time_series
 
-def filterEyeData(eyeDF, annot, clean=True, smooth=False):
+def filterEyeData(eyeDF, annot, clean=True, clean_mode="MAD", smooth=False):
     annot = annot.reset_index()
     start = annot.at[0, 'start_ms']
     stop = annot.at[0, 'stop_ms']
@@ -48,25 +58,33 @@ def filterEyeData(eyeDF, annot, clean=True, smooth=False):
         (eyeDF['timestamp'] >= start) & (eyeDF['timestamp'] <= stop)
     ]
 
+    cleaner = None
+    if(clean_mode == "MAD"):
+        cleaner = cleanMAD
+    else:
+        cleaner = cleanZscore
+
     # Clean the outliers
     if(clean):
-        novelty = cleanTimeSeries(novelty)
+        novelty = cleaner(novelty, col="diam_right")
+        novelty = cleaner(novelty, col="diam_left")
 
     # Resample, FillNaN and Smooth
     if(smooth):
-        novelty = resampleAndFill(novelty) 
+        novelty = resampleAndFill(novelty, col="diam_right")
+        novelty = resampleAndFill(novelty, col="diam_left") 
     
     return novelty
 
 
 def filterShortEyeResponse(eyeDF, annot, 
     after_start=False, before_end=False, window=1500,
-    clean=True, smooth=False):
+    clean=True, clean_mode="MAD", smooth=False):
 
     annot = annot.reset_index()
     start = annot.at[0, 'start_ms']
     stop = annot.at[0, 'stop_ms']    
-    
+
     if(after_start):
         # After Start
         short_stop = start + window
@@ -81,17 +99,25 @@ def filterShortEyeResponse(eyeDF, annot,
     short_response = \
         eyeDF.loc[(eyeDF['timestamp'] >= start) & (eyeDF['timestamp'] <= stop)]
 
+    cleaner = None
+    if(clean_mode == "MAD"):
+        cleaner = cleanMAD
+    else:
+        cleaner = cleanZscore
+
     # Clean the outliers
     if(clean):
-        novelty = cleanTimeSeries(novelty)
+        short_response = cleaner(short_response, col="diam_right")
+        short_response = cleaner(short_response, col="diam_left")
 
     # Resample, FillNaN and Smooth
     if(smooth):
-        novelty = resampleAndFill(novelty) 
+        short_response = resampleAndFill(short_response, col="diam_right")
+        short_response = resampleAndFill(short_response, col="diam_left") 
 
     return short_response
 
-def filterBaseline(eyeDF, annot, window=5000, clean=True, smooth=False):
+def filterBaseline(eyeDF, annot, window=5000, clean=True,clean_mode="MAD", smooth=False):
     annot = annot.reset_index()
     start = annot.at[0, 'start_ms']
     stop = annot.at[0, 'start_ms']
@@ -99,12 +125,20 @@ def filterBaseline(eyeDF, annot, window=5000, clean=True, smooth=False):
     early_start = start - window 
     baseline = eyeDF.loc[(eyeDF['timestamp'] >= early_start) & (eyeDF['timestamp'] <= stop)]
 
+    cleaner = None
+    if(clean_mode == "MAD"):
+        cleaner = cleanMAD
+    else:
+        cleaner = cleanZscore
+
     # Clean the outliers
     if(clean):
-        baseline = cleanTimeSeries(baseline)
+        baseline = cleaner(baseline, col="diam_right")
+        baseline = cleaner(baseline, col="diam_left")
 
     # Resample, FillNaN and Smooth
     if(smooth):
-        baseline = resampleAndFill(baseline) 
+        baseline = resampleAndFill(baseline, col="diam_right")
+        baseline = resampleAndFill(baseline, col="diam_left") 
 
     return baseline

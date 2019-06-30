@@ -107,10 +107,11 @@ def extractAndSaveAll(column_names=column_names, card_names=card_names, out_file
 
 mode = "sub"
 
-#features, frontiers, pilot = extractAndSaveAll(out_file="features/all_{}.csv".format(mode),
-#                            ref_to_base=True, mode=mode, short_resp=1000)
-                            
-#frontiers = pd.read_csv("features/all_frontiers.csv", sep='\t')
+mode = "none"
+print("================ MODE : {} ================".format(mode))
+features, frontiers, pilot = extractAndSaveAll(out_file="features/all_{}.csv".format(mode),
+                             ref_to_base=True, mode=mode, short_resp=1000)
 
-#plotByCards(frontiers, feat_cols, card_names, mode)
-#plt.show()
+features = frontiers
+plotComparisonHistogram(features, mode)
+plt.show()

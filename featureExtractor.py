@@ -6,6 +6,7 @@ pd.options.mode.chained_assignment = None  # default='warn'
 
 from time_series_extractor import *
 from SubjectMagicFeatures import *
+from plot_tools import *
 
 
 column_names = [
@@ -25,6 +26,42 @@ column_names = [
         'srl_pd_left_min','srl_pd_left_max',
         'label'
     ]
+
+feat_cols = [
+        'duration',
+        'fix_freq',
+        'sacc_freq',
+        'pd_right_mean',
+        'pd_right_std',
+        'pd_right_min',
+        'pd_right_max',
+        'pd_left_mean',
+        'pd_left_std',
+        'pd_left_min',
+        'pd_left_max',
+        'sre_fix_freq',
+        'sre_sacc_freq',
+        'sre_pd_right_mean',
+        'sre_pd_right_std',
+        'sre_pd_right_min',
+        'sre_pd_right_max',
+        'sre_pd_left_mean',
+        'sre_pd_left_std',
+        'sre_pd_left_min',
+        'sre_pd_left_max',
+        'srl_fix_freq',
+        'srl_sacc_freq',
+        'srl_pd_right_mean',
+        'srl_pd_right_std',
+        'srl_pd_right_min',
+        'srl_pd_right_max',
+        'srl_pd_left_mean',
+        'srl_pd_left_std',
+        'srl_pd_left_min',
+        'srl_pd_left_max',
+        'label'
+    ]
+
 
 sr_window = 1500
 card_names = ['unicorn', 'pepper', 'minion', 'pig', 'hedge', 'aliens']
@@ -58,14 +95,22 @@ def extractFeatures(cols, cards, source="frontiers", short_resp=1500, ref_to_bas
 
 def extractAndSaveAll(column_names=column_names, card_names=card_names, out_file="features/all.csv", ref_to_base=True, mode="sub", short_resp=1500):
     frontiers = extractFeatures(column_names, card_names, source="frontiers", ref_to_base=ref_to_base, mode=mode, short_resp=short_resp)
-    #pilot = extractFeatures(column_names, card_names, source="pilot", ref_to_base=ref_to_base, mode=mode, short_resp=short_resp)
-    #pilot['subject'] = pilot['subject'] + 100
-    #feats = frontiers.append(pilot, ignore_index=True)
-    #feats.to_csv(out_file, columns=column_names, sep='\t', index=False)
+    pilot = extractFeatures(column_names, card_names, source="pilot", ref_to_base=ref_to_base, mode=mode, short_resp=short_resp)
+    pilot['subject'] = pilot['subject'] + 100
+    feats = frontiers.append(pilot, ignore_index=True)
 
-    #return feats
-    return frontiers
+    feats.to_csv(out_file, columns=column_names, sep='\t', index=False)
+    pilot.to_csv("features/all_pilot.csv", columns=column_names, sep='\t', index=False)
+    frontiers.to_csv("features/all_fontiers.csv", columns=column_names, sep='\t', index=False)
 
+    return feats, frontiers, pilot
 
-#features = extractAndSaveAll(out_file="features/all_{}.csv".format("sub"),
-#                            ref_to_base=True, mode="div", short_resp=500)
+mode = "sub"
+
+#features, frontiers, pilot = extractAndSaveAll(out_file="features/all_{}.csv".format(mode),
+#                            ref_to_base=True, mode=mode, short_resp=1000)
+                            
+#frontiers = pd.read_csv("features/all_frontiers.csv", sep='\t')
+
+#plotByCards(frontiers, feat_cols, card_names, mode)
+#plt.show()

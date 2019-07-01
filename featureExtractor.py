@@ -6,6 +6,7 @@ pd.options.mode.chained_assignment = None  # default='warn'
 
 from time_series_extractor import *
 from SubjectMagicFeatures import *
+from LieFeatures import *
 from plot_tools import *
 
 
@@ -66,6 +67,30 @@ feat_cols = [
 sr_window = 1500
 card_names = ['unicorn', 'pepper', 'minion', 'pig', 'hedge', 'aliens']
 
+def extractLieFeatures(cols, cards, source="frontiers", ref_to_base=True, mode="sub"):
+
+    features = pd.DataFrame(columns=cols)
+    subjects = extractMinSubjectSet(source, annot_path=annotations_lie_in_temp)
+
+    for sub in subjects:
+
+        eye_df, annot_dfs, baseline, overall_eye_df, filtered_interaction_dfs = \
+                loadLieTimeSeries(sub, cards, source=source, clean=True, clean_mode="MAD", smooth=False) 
+        
+        mf = LieFeatures(sub, source,
+                              annot_dfs,
+                              filtered_interaction_dfs,
+                              cols=cols,
+                              refer_to_baseline=ref_to_base,
+                              baseline=baseline,
+                              refer_method=mode
+                             )
+        
+        features = features.append(mf.getDataFrame(), ignore_index=True)
+        
+    return features
+
+
 def extractFeatures(cols, cards, source="frontiers", short_resp=1500, ref_to_base=True, mode="sub"):
     
     features = pd.DataFrame(columns=cols)
@@ -105,13 +130,29 @@ def extractAndSaveAll(column_names=column_names, card_names=card_names, out_file
 
     return feats, frontiers, pilot
 
-mode = "sub"
 
 mode = "none"
 print("================ MODE : {} ================".format(mode))
-features, frontiers, pilot = extractAndSaveAll(out_file="features/all_{}.csv".format(mode),
-                             ref_to_base=True, mode=mode, short_resp=1000)
+#features, frontiers, pilot = extractAndSaveAll(out_file="features/all_{}.csv".format(mode),
+#                             ref_to_base=True, mode=mode, short_resp=1000)
 
-features = frontiers
-plotComparisonHistogram(features, mode)
-plt.show()
+
+sub = 8
+
+
+eye_df, annot_dfs, baseline, overall_eye_df, filtered_interaction_dfs = \
+                loadLieTimeSeries(sub, card_names, source="frontiers", clean=True, clean_mode="MAD", smooth=False) 
+        
+mf = LieFeatures(sub, "frontiers",
+                    annot_dfs,
+                    filtered_interaction_dfs,
+                    refer_to_baseline=True,
+                    baseline=baseline,
+                    refer_method=mode
+                )
+print(mf.getDataFrame())        
+
+
+#features = frontiers
+#plotComparisonHistogram(features, mode)
+#plt.show()

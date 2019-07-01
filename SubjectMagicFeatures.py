@@ -19,6 +19,24 @@ def referToBaseline(data, baseline, mode="sub"):
 
     return data 
 
+column_names = [
+        'subject','source','duration','card_class','show_order',
+        'fix_freq','sacc_freq',
+        'pd_right_mean','pd_right_std','pd_right_min','pd_right_max',
+        'pd_left_mean','pd_left_std','pd_left_min','pd_left_max',
+        'sre_fix_freq','sre_sacc_freq',
+        'sre_pd_right_mean','sre_pd_right_std',
+        'sre_pd_right_min','sre_pd_right_max',
+        'sre_pd_left_mean','sre_pd_left_std',
+        'sre_pd_left_min','sre_pd_left_max',
+        'srl_fix_freq','srl_sacc_freq',
+        'srl_pd_right_mean','srl_pd_right_std',
+        'srl_pd_right_min','srl_pd_right_max',
+        'srl_pd_left_mean','srl_pd_left_std',
+        'srl_pd_left_min','srl_pd_left_max',
+        'label'
+    ]
+
 class SubjectMagicFeatures:
     
     def __init__(self,
@@ -30,7 +48,7 @@ class SubjectMagicFeatures:
                  card_eye_sr_early_dfs,
                  card_eye_sr_late_dfs,
                  sr_window,
-                 cols,
+                 cols=column_names,
                  refer_to_baseline=False,
                  baseline=None,
                  refer_method='sub'):

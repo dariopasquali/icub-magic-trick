@@ -12,6 +12,7 @@ from eye_reader import *
 
 
 annotations_in_temp = "data/{}annotations/s{}.csv"
+annotations_lie_in_temp = "data/{}annotations_lie/s{}.csv"
 tobii_in_temp = "data/{}tobii/s{}.csv"
 subject_cards_file = "data/{}cards.csv"
 
@@ -54,7 +55,6 @@ def extractMinSubjectSet(source="frontiers",
     subjects.sort()
     
     return subjects
-
 
 def getSubjectCard(subject, source="frontiers", cards_file=subject_cards_file):
 
@@ -129,3 +129,56 @@ def loadTimeSeries(subject, card_names,
         cards_sr_late.append(late)
     
     return eye, annotations, baseline, overall, cards, cards_sr_early, cards_sr_late
+
+def loadLieTimeSeries(subject, card_names,
+                    source="frontiers",
+                    tobii_input_template=tobii_in_temp,
+                    annot_input_template=annotations_lie_in_temp,
+                    clean_mode="MAD",
+                    clean=True,
+                    smooth=False):
+    
+    root, root_pilot, root_front = annot_var_init()
+    print("LOAD s{} from {}".format(subject, source))
+
+    root = root_front
+    if(source == "pilot"):
+        root = root_pilot
+
+    # Complete the files
+    eye_in = tobii_input_template.format(root, subject)
+    annot_in = annot_input_template.format(root, subject)
+    
+    # vector with temporal filtered data for each card
+    filtered_interaction_dfs = []
+    
+    # load tobii data
+    eye = preprocessEye(eye_in, source)
+    
+    # load novelty annotations
+    # Use Lie One
+    annotations = preprocessLieAnnotations(annot_in, card_names)
+    
+    # filter eye data relative to overall novelty phase
+    overall = filterEyeData(eye, annotations[0], \
+        start_col="start", stop_col="stop", \
+        clean=clean, clean_mode=clean_mode, smooth=smooth)
+    
+    # filter the baseline to rescale the pupil dilation data
+    # Potentially could be the Novelty Medione
+    baseline = filterBaseline(eye, annotations[0], start_col="start", stop_col="stop", window=5000)
+    
+    # single cards eye data overall and in the 1.5 sec after the stimulus
+    for i in range(1, len(annotations)):
+        reaction_interval, point_reaction_interval, description_interval = \
+            lieDataFiltering(overall, annotations[i], clean=False, smooth=False)
+        
+        reaction_interval['card'] = annotations[i]['card'].iloc[0]
+        point_reaction_interval['card'] = annotations[i]['card'].iloc[0]
+        description_interval['card'] = annotations[i]['card'].iloc[0]
+
+        filtered_interaction_dfs.append(
+            (reaction_interval, point_reaction_interval, description_interval)
+        )
+    
+    return eye, annotations, baseline, overall, filtered_interaction_dfs

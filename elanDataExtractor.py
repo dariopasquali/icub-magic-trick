@@ -45,7 +45,7 @@ def darioTarget(cl):
         return 0
 
 
-def elanToLieDetection(fn, fout, mode="jonas", outmode="append"):
+def elanToLieDetection(fn, fout, mode="jonas", outmode=None):
     teen = pd.read_csv(fn, sep=',', names=['tire', 'remove', 'start', 'stop', 'class'])
     teen['start_jonas'] = teen['start'].apply(timeToJonas)
     teen['stop_jonas'] = teen['stop'].apply(timeToJonas)
@@ -105,6 +105,9 @@ def elanToLieDetection(fn, fout, mode="jonas", outmode="append"):
     teen.columns = colrename
     teen = teen[colorder]
 
+    if(outmode == None):
+        return teen
+
     if(outmode=="append"):
         with open(fout, 'a') as f:
             teen.to_csv(f, header=False, sep=",", index=False)
@@ -112,11 +115,12 @@ def elanToLieDetection(fn, fout, mode="jonas", outmode="append"):
         teen.to_csv(fout, header=False, sep=",", index=False)
 
     return teen
-    
 
-ff = "C:\\Users\\dpasquali\\Desktop\\PROJECTS\\MAGIC\\FRONTIERS\\annotation_lie\\s3.csv"
-fo = "C:\\Users\\dpasquali\\Desktop\\PROJECTS\\MAGIC\\FRONTIERS\\annotation_lie\\s3j.csv"
 
-jonny = elanToLieDetection(fn=ff, fout=fo, mode="dario")
-print(jonny)
-    
+
+
+elanToLieDetection("data/annotations_lie_raw/s3.csv","data/annotations_lie/s3.csv", mode="dario", outmode="write")
+elanToLieDetection("data/annotations_lie_raw/s8.csv","data/annotations_lie/s8.csv",  mode="dario", outmode="write")
+elanToLieDetection("data/annotations_lie_raw/s13.csv","data/annotations_lie/s13.csv",  mode="dario", outmode="write")
+elanToLieDetection("data/annotations_lie_raw/s16.csv","data/annotations_lie/s16.csv",  mode="dario", outmode="write")
+elanToLieDetection("data/annotations_lie_raw/s25.csv","data/annotations_lie/s25.csv",  mode="dario", outmode="write")

@@ -50,14 +50,7 @@ def resampleAndFill(time_series, col="diam_right", resample=True, fill=True, smo
 
     return time_series
 
-def filterEyeData(eyeDF, annot, clean=True, clean_mode="MAD", smooth=False):
-    annot = annot.reset_index()
-    start = annot.at[0, 'start_ms']
-    stop = annot.at[0, 'stop_ms']
-    novelty = eyeDF.loc[
-        (eyeDF['timestamp'] >= start) & (eyeDF['timestamp'] <= stop)
-    ]
-
+def dataCleaner(eyeDF, clean_mode="MAD", clean=True, smooth=False):
     cleaner = None
     if(clean_mode == "MAD"):
         cleaner = cleanMAD
@@ -66,24 +59,76 @@ def filterEyeData(eyeDF, annot, clean=True, clean_mode="MAD", smooth=False):
 
     # Clean the outliers
     if(clean):
-        novelty = cleaner(novelty, col="diam_right")
-        novelty = cleaner(novelty, col="diam_left")
+        eyeDF = cleaner(eyeDF, col="diam_right")
+        eyeDF = cleaner(eyeDF, col="diam_left")
 
     # Resample, FillNaN and Smooth
     if(smooth):
-        novelty = resampleAndFill(novelty, col="diam_right")
-        novelty = resampleAndFill(novelty, col="diam_left") 
-    
-    return novelty
+        eyeDF = resampleAndFill(eyeDF, col="diam_right")
+        eyeDF = resampleAndFill(eyeDF, col="diam_left")
 
+    return eyeDF
+
+def lieDataFiltering(eyeDF, annot, clean=True, clean_mode="MAD", smooth=False):
+
+    # 'start_p', 'stop_p', 'start_d', 'stop_d'
+    annot = annot.reset_index()
+    start_point = annot.at[0, 'start_p']
+    stop_point = annot.at[0, 'stop_p']
+    start_descr = annot.at[0, 'start_d']
+    stop_descr = annot.at[0, 'stop_d']
+
+    """
+    start_point = icub moves the eyes to point
+    stop_point = the subject touches the card
+    start_descr = the subject starts to talk
+    stop_descr = the subject finish to talk
+
+    reaction_time = (while the subject is looking at the card) = start_descr - stop_point
+    point_reaction_time = start_descr - start_point
+    description_time = stop_descr - start_descr
+    """
+
+    reaction_time = eyeDF.loc[
+        (eyeDF['timestamp'] >= stop_point) & (eyeDF['timestamp'] <= start_descr)
+    ]
+
+    point_reaction_time = eyeDF.loc[
+        (eyeDF['timestamp'] >= start_point) & (eyeDF['timestamp'] <= start_descr)
+    ]
+
+    description_time = eyeDF.loc[
+        (eyeDF['timestamp'] >= start_descr) & (eyeDF['timestamp'] <= stop_descr)
+    ]
+
+    if(clean or smooth):
+        reaction_time = dataCleaner(reaction_time, clean, clean_mode, smooth)
+        point_reaction_time = dataCleaner(point_reaction_time, clean, clean_mode, smooth)
+        description_time = dataCleaner(description_time, clean, clean_mode, smooth)
+
+    return reaction_time, point_reaction_time, description_time
+
+def filterEyeData(eyeDF, annot, clean=True, start_col="start_ms", stop_col="stop_ms", clean_mode="MAD", smooth=False):
+    annot = annot.reset_index()
+    start = annot.at[0, start_col]
+    stop = annot.at[0, stop_col]
+    novelty = eyeDF.loc[
+        (eyeDF['timestamp'] >= start) & (eyeDF['timestamp'] <= stop)
+    ]
+
+    if(clean or smooth):
+        novelty = dataCleaner(novelty, clean, clean_mode, smooth)
+
+    return novelty
 
 def filterShortEyeResponse(eyeDF, annot, 
     after_start=False, before_end=False, window=1500,
+    start_col="start_ms", stop_col="stop_ms",
     clean=True, clean_mode="MAD", smooth=False):
 
     annot = annot.reset_index()
-    start = annot.at[0, 'start_ms']
-    stop = annot.at[0, 'stop_ms']    
+    start = annot.at[0, start_col]
+    stop = annot.at[0, stop_col]    
 
     if(after_start):
         # After Start
@@ -99,46 +144,20 @@ def filterShortEyeResponse(eyeDF, annot,
     short_response = \
         eyeDF.loc[(eyeDF['timestamp'] >= start) & (eyeDF['timestamp'] <= stop)]
 
-    cleaner = None
-    if(clean_mode == "MAD"):
-        cleaner = cleanMAD
-    else:
-        cleaner = cleanZscore
-
-    # Clean the outliers
-    if(clean):
-        short_response = cleaner(short_response, col="diam_right")
-        short_response = cleaner(short_response, col="diam_left")
-
-    # Resample, FillNaN and Smooth
-    if(smooth):
-        short_response = resampleAndFill(short_response, col="diam_right")
-        short_response = resampleAndFill(short_response, col="diam_left") 
+    if(clean or smooth):
+        short_response = dataCleaner(short_response, clean, clean_mode, smooth)
 
     return short_response
 
-def filterBaseline(eyeDF, annot, window=5000, clean=True,clean_mode="MAD", smooth=False):
+def filterBaseline(eyeDF, annot, window=5000, start_col="start_ms", stop_col="stop_ms", clean=True, clean_mode="MAD", smooth=False):
     annot = annot.reset_index()
-    start = annot.at[0, 'start_ms']
-    stop = annot.at[0, 'start_ms']
+    start = annot.at[0, start_col]
+    stop = annot.at[0, stop_col]
     
     early_start = start - window 
     baseline = eyeDF.loc[(eyeDF['timestamp'] >= early_start) & (eyeDF['timestamp'] <= stop)]
 
-    cleaner = None
-    if(clean_mode == "MAD"):
-        cleaner = cleanMAD
-    else:
-        cleaner = cleanZscore
-
-    # Clean the outliers
-    if(clean):
-        baseline = cleaner(baseline, col="diam_right")
-        baseline = cleaner(baseline, col="diam_left")
-
-    # Resample, FillNaN and Smooth
-    if(smooth):
-        baseline = resampleAndFill(baseline, col="diam_right")
-        baseline = resampleAndFill(baseline, col="diam_left") 
+    if(clean or smooth):
+        baseline = dataCleaner(baseline, clean, clean_mode, smooth)
 
     return baseline

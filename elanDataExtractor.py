@@ -45,7 +45,7 @@ def darioTarget(cl):
         return 0
 
 
-def elanToLieDetection(fn, fout, mode="jonas", outmode=None):
+def readDFWindows(fn):
     teen = pd.read_csv(fn, sep=',', names=['tire', 'remove', 'start', 'stop', 'class'])
     teen['start_jonas'] = teen['start'].apply(timeToJonas)
     teen['stop_jonas'] = teen['stop'].apply(timeToJonas)
@@ -55,6 +55,33 @@ def elanToLieDetection(fn, fout, mode="jonas", outmode=None):
 
     teen = teen.drop(['tire', 'start', 'stop', 'remove', 'class'], axis=1)   
     teen = teen.dropna()
+
+    return teen
+
+
+def readDFLinux(fn):
+    teen = pd.read_csv(fn, sep=',', names=['tire', 'r0', 'start', 'r1', 'stop','r2', 'duration', 'r3', 'class'])
+    teen['start_jonas'] = teen['start'].apply(timeToJonas)
+    teen['stop_jonas'] = teen['stop'].apply(timeToJonas)
+    teen["shift_start"] = teen["start_jonas"].shift(-1)
+    teen["shift_stop"] = teen["stop_jonas"].shift(-1)
+    teen["shift_class"] = teen["class"].shift(-1)
+
+    teen = teen.drop(['tire', 'start', 'stop', 'r0', 'r1', 'r2', 'r3', 'class', 'duration'], axis=1)   
+    teen = teen.dropna()
+
+    return teen
+
+
+def elanToLieDetection(fn, fout, mode="jonas", source="win", outmode=None):
+
+    print("Convert {} to {}".format(fn, fout))
+    
+    teen = None
+    if(source == "win"):
+        teen = readDFWindows(fn)
+    else:
+        teen = readDFLinux(fn)
 
     colrename = []
 
@@ -119,8 +146,8 @@ def elanToLieDetection(fn, fout, mode="jonas", outmode=None):
 
 
 
-elanToLieDetection("data/annotations_lie_raw/s3.csv","data/annotations_lie/s3.csv", mode="dario", outmode="write")
-elanToLieDetection("data/annotations_lie_raw/s8.csv","data/annotations_lie/s8.csv",  mode="dario", outmode="write")
-elanToLieDetection("data/annotations_lie_raw/s13.csv","data/annotations_lie/s13.csv",  mode="dario", outmode="write")
-elanToLieDetection("data/annotations_lie_raw/s16.csv","data/annotations_lie/s16.csv",  mode="dario", outmode="write")
-elanToLieDetection("data/annotations_lie_raw/s25.csv","data/annotations_lie/s25.csv",  mode="dario", outmode="write")
+elanToLieDetection("data/annotations_lie_raw/s4.csv","data/annotations_lie/s4.csv",  source="linux", mode="dario", outmode="write")
+elanToLieDetection("data/annotations_lie_raw/s5.csv","data/annotations_lie/s5.csv",  source="linux", mode="dario", outmode="write")
+elanToLieDetection("data/annotations_lie_raw/s10.csv","data/annotations_lie/s10.csv",  source="linux", mode="dario", outmode="write")
+elanToLieDetection("data/annotations_lie_raw/s18.csv","data/annotations_lie/s18.csv",  source="linux", mode="dario", outmode="write")
+elanToLieDetection("data/annotations_lie_raw/s20.csv","data/annotations_lie/s20.csv",  source="win", mode="dario", outmode="write")

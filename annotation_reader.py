@@ -80,6 +80,6 @@ def preprocessLieAnnotations(annotation_file, card_names):
 
 
 #card_names = ["unicorn", "pepper", "hedge", "pig", "minion", "aliens"]
-#fin = "data/annotations_lie/s3.csv"
+#fin = "data/annotations_lie/s8.csv"
 #annot = preprocessLieAnnotations(fin, card_names)
 #print(annot)

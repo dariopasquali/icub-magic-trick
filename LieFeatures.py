@@ -10,9 +10,20 @@ lie_feat_cols = [
         'source',
         'card_class',
         'show_order',
+        'duration',
         'react_dur',
         'point_react_dur',
         'descr_dur',
+        'fix_freq',
+        'sacc_freq',
+        'right_mean',
+        'right_std',
+        'right_min',
+        'right_max',
+        'left_mean',
+        'left_std',
+        'left_min',
+        'left_max',
         'react_fix_freq',
         'react_sacc_freq',
         'react_right_mean',
@@ -79,7 +90,7 @@ class LieFeatures:
         self.features = pd.DataFrame(columns=cols)
         
         # Process Each card and compose the dataframe
-        for c, (reaction, point_reaction, description) in enumerate(filtered_interaction_dfs):
+        for c, (whole, reaction, point_reaction, description) in enumerate(filtered_interaction_dfs):
         
             annot = annot_dfs[c+1]
 
@@ -90,23 +101,28 @@ class LieFeatures:
 
             # ==== TIMING AND ANNOTATION FEATURES =============
 
-            self.point_dur = annot['stop_p'] - annot['start_p']
-            self.description_dur = annot['stop_d'] - annot['start_d']
-            self.reaction_dur = annot['start_d'] - annot['stop_p']
-            self.point_reaction_dur = annot['start_d'] - annot['start_p']
+            self.duration = (annot['stop_d'] - annot['start_p']).iloc[0]
+            self.point_dur = (annot['stop_p'] - annot['start_p']).iloc[0]
+            self.description_dur = (annot['stop_d'] - annot['start_d']).iloc[0]
+            self.reaction_dur = (annot['start_d'] - annot['stop_p']).iloc[0]
+            self.point_reaction_dur = (annot['start_d'] - annot['start_p']).iloc[0]
             self.card_class = annot['card'].iloc[0]
-            self.label = annot['label']
+            self.label = annot['label'].iloc[0]
                 
             self.show_order = annot['show_order'].iloc[0]        
         
             # ==== EXTRACT TIME INTERVAL ==========
             
+            whole = whole[['diam_right', 'diam_left', 'move_type', 'move_type_id']]
             reaction = reaction[['diam_right', 'diam_left', 'move_type', 'move_type_id']]
             point_reaction = point_reaction[['diam_right', 'diam_left', 'move_type', 'move_type_id']]
             description = description[['diam_right', 'diam_left', 'move_type', 'move_type_id']]  
         
             # ==== EVENTS =============
             
+            # Reaction Interval
+            self.fix_freq, self.sacc_freq = self.calcEventFeatures(whole, self.reaction_dur)
+
             # Reaction Interval
             self.react_fix_freq, self.react_sacc_freq = self.calcEventFeatures(reaction, self.reaction_dur)
 
@@ -118,11 +134,21 @@ class LieFeatures:
 
             # ==== RESCALE DATA TO BASELINE =============
             if(refer_to_baseline):
+                whole = referToBaseline(whole, baseline, refer_method)
                 reaction = referToBaseline(reaction, baseline, refer_method)
                 point_reaction = referToBaseline(point_reaction, baseline, refer_method)
                 description = referToBaseline(description , baseline, refer_method)
-             
-            # ==== SINGLE CARD PUPIL FEATURES =============
+            
+            # ==== WHOLE PUPIL FEATURES =============
+
+            self.right_mean, self.right_std, \
+                self.right_min, self.right_max, \
+                    self.left_mean, self.left_std, \
+                        self.left_min, self.left_max \
+                             = self.computePupilFeatures(whole)
+
+
+            # ==== REACTION PUPIL FEATURES =============
 
             self.react_right_mean, self.react_right_std, \
                 self.react_right_min, self.react_right_max, \
@@ -130,7 +156,7 @@ class LieFeatures:
                         self.react_left_min, self.react_left_max \
                              = self.computePupilFeatures(reaction)
 
-            # ==== EARLY SHORT RESPONSE =============
+            # ==== POINT REACTION PUPIL FEATURES =============
             
             self.point_react_right_mean, self.point_react_right_std, \
                 self.point_react_right_min, self.point_react_right_max, \
@@ -138,7 +164,7 @@ class LieFeatures:
                         self.point_react_left_min, self.point_react_left_max \
                              = self.computePupilFeatures(point_reaction)
             
-            # ==== LATE SHORT RESPONSE =============
+            # ==== DESCRIPTION PUPIL FEATURESE =============
             
             self.descr_right_mean, self.descr_right_std, \
                 self.descr_right_min, self.descr_right_max, \
@@ -201,9 +227,20 @@ class LieFeatures:
                 self.source,
                 self.card_class,
                 self.show_order,
+                self.duration,
                 self.reaction_dur,
                 self.point_reaction_dur,
                 self.description_dur,
+                self.react_fix_freq,
+                self.sacc_freq,
+                self.right_mean,
+                self.right_std,
+                self.right_min,
+                self.right_max,
+                self.left_mean,
+                self.left_std,
+                self.left_min,
+                self.left_max,
                 self.react_fix_freq,
                 self.react_sacc_freq,
                 self.react_right_mean,

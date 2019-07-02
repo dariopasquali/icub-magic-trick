@@ -88,6 +88,9 @@ def lieDataFiltering(eyeDF, annot, clean=True, clean_mode="MAD", smooth=False):
     point_reaction_time = start_descr - start_point
     description_time = stop_descr - start_descr
     """
+    whole_time = eyeDF.loc[
+        (eyeDF['timestamp'] >= start_point) & (eyeDF['timestamp'] <= stop_descr)
+    ]
 
     reaction_time = eyeDF.loc[
         (eyeDF['timestamp'] >= stop_point) & (eyeDF['timestamp'] <= start_descr)
@@ -102,11 +105,12 @@ def lieDataFiltering(eyeDF, annot, clean=True, clean_mode="MAD", smooth=False):
     ]
 
     if(clean or smooth):
+        whole_time = dataCleaner(whole_time, clean, clean_mode, smooth)
         reaction_time = dataCleaner(reaction_time, clean, clean_mode, smooth)
         point_reaction_time = dataCleaner(point_reaction_time, clean, clean_mode, smooth)
         description_time = dataCleaner(description_time, clean, clean_mode, smooth)
 
-    return reaction_time, point_reaction_time, description_time
+    return whole_time, reaction_time, point_reaction_time, description_time
 
 def filterEyeData(eyeDF, annot, clean=True, start_col="start_ms", stop_col="stop_ms", clean_mode="MAD", smooth=False):
     annot = annot.reset_index()

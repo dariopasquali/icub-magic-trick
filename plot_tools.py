@@ -82,16 +82,18 @@ def bigAggregation(features, sub, cols, aggrZeros, aggrOnes):
     
     return aggrZeros, aggrOnes
 
-def plotBySubject(features, feat_cols, mode):
+def plotBySubject(features, mode, feat_cols=plot_column_names, save=True):
     
-    aggrZeros = pd.DataFrame(columns=plot_column_names)
-    aggrOnes = pd.DataFrame(columns=plot_column_names)
+    plot_cols = feat_cols[1:]
+
+    aggrZeros = pd.DataFrame(columns=plot_cols)
+    aggrOnes = pd.DataFrame(columns=plot_cols)
 
     markers=[',','1','v','^','<','>','8','s','p','P','*','h','H','+','x','X','D','d','|','_','o','2','3','4','.']
     subjects = features.groupby('subject').count().index.values
 
     for sub in subjects:
-        aggrZeros, aggrOnes = bigAggregation(features, sub, plot_column_names, aggrZeros, aggrOnes)    
+        aggrZeros, aggrOnes = bigAggregation(features, sub, plot_cols, aggrZeros, aggrOnes)    
 
     sub_z = aggrZeros['subject'].values
     sub_o = aggrOnes['subject'].values
@@ -156,7 +158,7 @@ def plotBySubject(features, feat_cols, mode):
         minY = aggrOnes[f].min()
         maxY = aggrOnes[f].max()       
         minXY = min(minX, minY)
-        maxXY = max(maxY, maxY)        
+        maxXY = max(maxX, maxY)        
 
         mn = (maxXY + minXY) / 20
 
@@ -177,7 +179,8 @@ def plotBySubject(features, feat_cols, mode):
                 yerr=pallY_ste)
 
         axs.plot(lims, lims, alpha=0.75, zorder=100)
-        fig.savefig("plots/{}/subject/nTvsT_{}".format(mode, f))
+        if(save):
+            fig.savefig("plots/{}/subject/nTvsT_{}".format(mode, f))
 
 
     plt.show()

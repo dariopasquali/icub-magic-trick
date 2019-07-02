@@ -100,7 +100,7 @@ def loadTimeSeries(subject, card_names,
     annotations = preprocessAnnotations(annot_in, card_names)
     
     # filter eye data relative to overall novelty phase
-    overall = filterEyeData(eye, annotations[0], clean, clean_mode, smooth)
+    overall = filterEyeData(eye, annotations[0], clean=clean, clean_mode=clean_mode, smooth=smooth)
     
     # filter the baseline to rescale the pupil dilation data
     baseline = filterBaseline(eye, annotations[0], window=5000)
@@ -134,6 +134,7 @@ def loadLieTimeSeries(subject, card_names,
                     source="frontiers",
                     tobii_input_template=tobii_in_temp,
                     annot_input_template=annotations_lie_in_temp,
+                    refer_to_baseline=True, refer_mode='sub',
                     clean_mode="MAD",
                     clean=True,
                     smooth=False):
@@ -159,17 +160,26 @@ def loadLieTimeSeries(subject, card_names,
     # Use Lie One
     annotations = preprocessLieAnnotations(annot_in, card_names)
     
-    # filter eye data relative to overall novelty phase
+    # filter eye data relative to the entire phase
     overall = filterEyeData(eye, annotations[0], \
         start_col="start", stop_col="stop", \
         clean=clean, clean_mode=clean_mode, smooth=smooth)
+
+    # Extract the baseline to rescale the pupil dilation data
+    baseline = filterBaseline(eye, annotations[0], \
+        start_col="start", stop_col="stop", \
+        clean=clean, clean_mode=clean_mode, smooth=smooth, window=5000)
+
+    if(refer_to_baseline):
+        # Refer the Pupil data to the baseline
+        overall = referToBaseline(overall, baseline, mode=refer_mode,
+        source_cols=['diam_right'], baseline_col='diam_right')
+
+        overall = referToBaseline(overall, baseline, mode=refer_mode,
+        source_cols=['diam_left'], baseline_col='diam_left')
     
-    # filter the baseline to rescale the pupil dilation data
-    # Potentially could be the Novelty Medione
-    baseline = filterBaseline(eye, annotations[0], start_col="start", stop_col="stop", window=5000)
-    
-    # single cards eye data overall and in the 1.5 sec after the stimulus
     for i in range(1, len(annotations)):
+
         whole_interval, reaction_interval, point_reaction_interval, description_interval = \
             lieDataFiltering(overall, annotations[i], clean=False, smooth=False)
         

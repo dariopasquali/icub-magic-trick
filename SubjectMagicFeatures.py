@@ -4,20 +4,7 @@ from scipy import stats
 import matplotlib.pyplot as plt
 pd.options.mode.chained_assignment = None  # default='warn'
 
-def referToBaseline(data, baseline, mode="sub"):
-
-    base_right_mean = baseline['diam_right'].mean(skipna = True)
-    base_left_mean = baseline['diam_left'].mean(skipna = True)
-
-    if(mode == 'sub'):
-        data['diam_right'] = data['diam_right'] - base_right_mean
-        data['diam_left'] = data['diam_left'] - base_left_mean
-                    
-    if(mode == 'div'):
-        data['diam_right'] = data['diam_right'] / base_right_mean
-        data['diam_left'] = data['diam_left'] / base_left_mean
-
-    return data 
+from eye_feature_tools import *
 
 column_names = [
         'subject','source','duration','card_class','show_order',
@@ -48,12 +35,9 @@ class SubjectMagicFeatures:
                  card_eye_sr_early_dfs,
                  card_eye_sr_late_dfs,
                  sr_window,
-                 cols=column_names,
-                 refer_to_baseline=False,
-                 baseline=None,
-                 refer_method='sub'):
+                 cols=column_names):
         
-        # ==== CALCULATE THE BASELINE =============
+        # ==== INIT AGGREGATOR =============
            
         self.features = pd.DataFrame(columns=cols)
         
@@ -87,22 +71,13 @@ class SubjectMagicFeatures:
             # ==== EVENTS =============
             
             # Whole card
-            self.fix_freq, self.sacc_freq = \
-                self.calcEventFeatures(card, self.duration)
+            self.fix_freq, self.sacc_freq = calcEventFeatures(card, self.duration)
 
             # Early
-            self.sre_fix_freq, self.sre_sacc_freq = \
-                self.calcEventFeatures(sr_early_card, sr_window)
+            self.sre_fix_freq, self.sre_sacc_freq = calcEventFeatures(sr_early_card, sr_window)
 
             # Late
-            self.srl_fix_freq, self.srl_sacc_freq = \
-                self.calcEventFeatures(sr_late_card, sr_window)
-
-            # ==== RESCALE DATA TO BASELINE =============
-            if(refer_to_baseline):
-                card = referToBaseline(card, baseline, refer_method)
-                sr_early_card = referToBaseline(sr_early_card, baseline, refer_method)
-                sr_late_card = referToBaseline(sr_late_card , baseline, refer_method)
+            self.srl_fix_freq, self.srl_sacc_freq = calcEventFeatures(sr_late_card, sr_window)
              
             # ==== SINGLE CARD PUPIL FEATURES =============
 
@@ -110,7 +85,7 @@ class SubjectMagicFeatures:
                 self.right_min, self.right_max, \
                     self.left_mean, self.left_std, \
                         self.left_min, self.left_max \
-                             = self.computePupilFeatures(card)
+                             = computePupilFeatures(card)
 
             # ==== EARLY SHORT RESPONSE =============
             
@@ -118,7 +93,7 @@ class SubjectMagicFeatures:
                 self.sre_right_min, self.sre_right_max, \
                     self.sre_left_mean, self.sre_left_std, \
                         self.sre_left_min, self.sre_left_max \
-                             = self.computePupilFeatures(sr_early_card)
+                             = computePupilFeatures(sr_early_card)
             
             # ==== LATE SHORT RESPONSE =============
             
@@ -126,52 +101,14 @@ class SubjectMagicFeatures:
                 self.srl_right_min, self.srl_right_max, \
                     self.srl_left_mean, self.srl_left_std, \
                         self.srl_left_min, self.srl_left_max \
-                             = self.computePupilFeatures(sr_late_card)
+                             = computePupilFeatures(sr_late_card)
 
 
             # ==== AGGREGATE =============
 
             self.column_names = cols            
             self.features = self.features.append(self.aggregate(), ignore_index=True)
-            
-
-    def computePupilFeatures(self, data):
-        # Right Eye
-        p_mean_r = data["diam_right"].mean(skipna = True)
-        p_std_r = data["diam_right"].std(skipna = True)
-        p_max_r = data["diam_right"].min(skipna = True)
-        p_min_r = data["diam_right"].max(skipna = True)
-
-        # Left Eye
-        p_mean_l = data["diam_left"].mean(skipna = True)
-        p_std_l = data["diam_left"].std(skipna = True)
-        p_max_l = data["diam_left"].min(skipna = True)
-        p_min_l = data["diam_left"].max(skipna = True)
-
-        return p_mean_r, p_std_r, p_max_r, p_min_r, \
-                 p_mean_l, p_std_l, p_max_l, p_min_l
-
-    def calcEventFeatures(self, data, time_window):
-        move_types = data[['move_type', 'move_type_id']]
         
-        fix_num = move_types.loc[move_types['move_type'] == "Fixation"]
-        sacc_num = move_types.loc[move_types['move_type'] == "Saccade"]
-
-        fix_num = len(fix_num.groupby('move_type_id').count().index)
-        sacc_num = len(sacc_num.groupby('move_type_id').count().index)
-        
-        #print("fix {}, sacc {}".format(fix_num, sacc_num))
-
-        duration_sec = time_window / 1000
-
-        #print("duration_sec {}".format(duration_sec))
-
-        fix_freq = fix_num / duration_sec
-        sacc_freq = sacc_num / duration_sec
-
-        return fix_freq, sacc_freq
-
-        #return fix_num, sacc_num
 
     def getDataFrame(self):
         return self.features

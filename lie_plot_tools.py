@@ -4,6 +4,7 @@ from scipy import stats
 import matplotlib.pyplot as plt
 pd.options.mode.chained_assignment = None  # default='warn'
 
+from eye_feature_tools import *
 
 lie_feat_cols = [
         'subject',
@@ -57,31 +58,18 @@ lie_feat_cols = [
         'label'
     ]
 
-def lie_bigAggregation(features, sub, cols, aggrZeros, aggrOnes):
-    data = features[cols].loc[features['subject'] == sub]
-    zeros = data.loc[features['label'] == 0].drop(['card_class'], axis=1)
-    ones = data.loc[features['label'] == 1]
-
-    for col in zeros.columns:
-        zeros[col] = zeros[col].mean()
-    zeros = zeros.head(1)
-    zeros['card_class'] = "avg"
-    
-    aggrZeros = aggrZeros.append(zeros, ignore_index=True)
-    aggrOnes = aggrOnes.append(ones, ignore_index=True)
-    
-    return aggrZeros, aggrOnes
-
 def lie_plotBySubject(features, mode, feat_cols=lie_feat_cols, save=True):
     
     aggrZeros = pd.DataFrame(columns=lie_feat_cols)
     aggrOnes = pd.DataFrame(columns=lie_feat_cols)
 
-    markers=[',','1','v','^','<','>','8','s','p','P','*','h','H','+','x','X','D','d','|','_','o','2','3','4','.']
+    markers=[',','1','v','^','<','>','8','s','p','P','*','h','H','+','x',
+        'X','D','d','|','_','o','2','3','4','.']
+
     subjects = features.groupby('subject').count().index.values
 
     for sub in subjects:
-        aggrZeros, aggrOnes = lie_bigAggregation(features, sub, feat_cols, aggrZeros, aggrOnes)    
+        aggrZeros, aggrOnes = aggregate_target_nontarget(features, sub, feat_cols, aggrZeros, aggrOnes)    
 
     sub_z = aggrZeros['subject'].values
     sub_o = aggrOnes['subject'].values
@@ -101,7 +89,6 @@ def lie_plotBySubject(features, mode, feat_cols=lie_feat_cols, save=True):
         pallX_ste = aggrZeros[f].sem()    
         pallY = aggrOnes[f].mean()
         pallY_ste = aggrOnes[f].sem()
-
 
         for i, sub in enumerate(subjects):
 
@@ -180,6 +167,7 @@ def lie_plotBySubject(features, mode, feat_cols=lie_feat_cols, save=True):
 
 # Average Histogram of Target (old) vs nonTarget (new) for each feature
 def lie_plotComparBars(features, baseline_right, baseline_left, mode, save=True):
+
     feat_comparison = [
         ('fix_freq', 'react_fix_freq', 'point_react_fix_freq', 'descr_fix_freq'),
         ('sacc_freq', 'react_sacc_freq', 'point_react_sacc_freq', 'descr_sacc_freq'),
@@ -202,59 +190,59 @@ def lie_plotComparBars(features, baseline_right, baseline_left, mode, save=True)
     subjects = features.groupby('subject').count().index.values
 
     for sub in subjects:
-        aggrZeros, aggrOnes = lie_bigAggregation(features, sub, lie_feat_cols, aggrZeros, aggrOnes)    
+        aggrZeros, aggrOnes = aggregate_target_nontarget(features, sub, lie_feat_cols, aggrZeros, aggrOnes)    
 
     plot_cols = lie_feat_cols.copy()
     plot_cols.remove('subject')
     plot_cols.remove('card_class')
 
-    for data in feat_comparison:
+    br_mean = np.mean(baseline_right)
+
+    for (whole, react, point_react, descr) in feat_comparison:
 
         fig, axs = plt.subplots(1, figsize=(10, 5))
 
-        new_all_mean = aggrZeros[data[0]].mean()
-        new_react_mean = aggrZeros[data[1]].mean()
-        new_point_react_mean = aggrZeros[data[2]].mean()
-        new_descr_mean = aggrZeros[data[3]].mean()
+        new_all_mean = aggrZeros[whole].mean()
+        new_react_mean = aggrZeros[react].mean()
+        new_point_react_mean = aggrZeros[point_react].mean()
+        new_descr_mean = aggrZeros[descr].mean()
         
-        new_all_ste = aggrZeros[data[0]].sem()
-        new_react_ste = aggrZeros[data[1]].sem()
-        new_point_react_ste = aggrZeros[data[2]].sem()
-        new_descr_ste = aggrZeros[data[3]].sem()
+        new_all_ste = aggrZeros[whole].sem(axis = 0)
+        new_react_ste = aggrZeros[react].sem(axis = 0)
+        new_point_react_ste = aggrZeros[point_react].sem(axis = 0)
+        new_descr_ste = aggrZeros[descr].sem(axis = 0)
 
-        old_all_mean = aggrOnes[data[0]].mean()
-        old_react_mean = aggrOnes[data[1]].mean()
-        old_point_react_mean = aggrOnes[data[2]].mean()
-        old_descr_mean = aggrOnes[data[3]].mean()
+        old_all_mean = aggrOnes[whole].mean()
+        old_react_mean = aggrOnes[react].mean()
+        old_point_react_mean = aggrOnes[point_react].mean()
+        old_descr_mean = aggrOnes[descr].mean()
         
-        old_all_ste = aggrOnes[data[0]].sem()
-        old_react_ste = aggrOnes[data[1]].sem()
-        old_point_react_ste = aggrOnes[data[2]].sem()
-        old_descr_ste = aggrOnes[data[3]].sem()
+        old_all_ste = aggrOnes[whole].sem(axis = 0)
+        old_react_ste = aggrOnes[react].sem(axis = 0)
+        old_point_react_ste = aggrOnes[point_react].sem(axis = 0)
+        old_descr_ste = aggrOnes[descr].sem(axis = 0)
 
         x_pos = np.arange(len(labels))
 
         br_mean = np.mean(baseline_right)
         bl_mean = np.mean(baseline_left)
 
-        if(mode=="none" and "right_mean" in data[0]):
+        if(mode=="none" and "right_mean" in whole):
             y_values_old = [br_mean, old_all_mean, old_react_mean, old_point_react_mean, old_descr_mean]
             y_values_new = [br_mean, new_all_mean, new_react_mean, new_point_react_mean, new_descr_mean]
             old_errors = [0, old_all_ste, old_react_ste, old_point_react_ste, old_descr_ste]
             new_errors = [0, new_all_ste, new_react_ste, new_point_react_ste, new_descr_ste]
 
             labels = ['baseline', 'all', 'react', 'point_react', 'descr']
-            x_pos = np.arange(len(labels))
 
         
-        elif(mode=="none" and "left_mean" in data[0]):
+        elif(mode=="none" and "left_mean" in whole):
             y_values_old = [bl_mean, old_all_mean, old_react_mean, old_point_react_mean, old_descr_mean]
             y_values_new = [bl_mean, new_all_mean, new_react_mean, new_point_react_mean, new_descr_mean]
             old_errors = [0, old_all_ste, old_react_ste, old_point_react_ste, old_descr_ste]
             new_errors = [0, new_all_ste, new_react_ste, new_point_react_ste, new_descr_ste]
 
             labels = ['baseline', 'all', 'react', 'point_react', 'descr']
-            x_pos = np.arange(len(labels))
 
         else:
             y_values_old = [ old_all_mean, old_react_mean, old_point_react_mean, old_descr_mean]
@@ -263,9 +251,8 @@ def lie_plotComparBars(features, baseline_right, baseline_left, mode, save=True)
             new_errors = [new_all_ste, new_react_ste, new_point_react_ste, new_descr_ste]
 
             labels = ['all', 'react', 'point_react', 'descr']
-            x_pos = np.arange(len(labels))
             
-
+        x_pos = np.arange(len(labels))
         axs.bar(x_pos, y_values_old,
                 yerr=old_errors,
                 color='g', align='center',
@@ -280,14 +267,12 @@ def lie_plotComparBars(features, baseline_right, baseline_left, mode, save=True)
         axs.set_xticklabels(labels)
 
 
-        axs.set_title('{}'.format(data[0]))
+        axs.set_title('{}'.format(whole))
         if(save):
-            fig.savefig("plots/XXX/hist/{}".format(data[0]))
+            fig.savefig("plots/XXX/hist/{}".format(whole))
 
 
-
-
-def plotLieTimeSeries(subject, card_names, annotations, overall_eye, filtered_inter_dfs):
+def lie_plotTimeSeries(subject, card_names, annotations, overall_eye, filtered_inter_dfs, baseline=None):
     
     subject_card = annotations[0]['subject_card'].values[0]
     cards_plot_features = []
@@ -301,7 +286,7 @@ def plotLieTimeSeries(subject, card_names, annotations, overall_eye, filtered_in
             annotations[i]['stop_d'].max(), #stop descr
             annotations[i]['card'].values[0]
             
-        ])    
+        ])
 
     cards_plot_features.sort() 
 
@@ -312,6 +297,13 @@ def plotLieTimeSeries(subject, card_names, annotations, overall_eye, filtered_in
         
     ass[0].scatter(overall_eye['timestamp'],overall_eye['diam_right'], s=1, c='r')
     ass[1].scatter(overall_eye['timestamp'],overall_eye['diam_left'], s=1, c='b')
+
+    if(baseline != None):
+        start_base = baseline['timestamp'].min()
+        stop_base = baseline['timestamp'].max() 
+        # plot baseline
+        ass[0].scatter(baseline['timestamp'],baseline['diam_right'], s=1, c='r')
+        ass[1].scatter(baseline['timestamp'],baseline['diam_left'], s=1, c='b')
 
 
     for sections in cards_plot_features:    
@@ -331,6 +323,13 @@ def plotLieTimeSeries(subject, card_names, annotations, overall_eye, filtered_in
                         linewidth=1, color=color, alpha=alp)
         ass[1].axvspan(sections[2], sections[3],
                         linewidth=1, color=color, alpha=alp)
+
+        if(baseline != None):
+            #color the baseline
+            ass[0].axvspan(start_base, stop_base,
+                            linewidth=1, color="red", alpha=0.1)
+            ass[1].axvspan(start_base, stop_base,
+                            linewidth=1, color="red", alpha=0.1)
     
-    #%matplotlib notebook
+    
     return fig

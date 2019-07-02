@@ -4,6 +4,7 @@ from scipy import stats
 import matplotlib.pyplot as plt
 pd.options.mode.chained_assignment = None  # default='warn'
 
+from eye_feature_tools import *
 
 plot_column_names = [
         'subject',
@@ -67,21 +68,6 @@ def plotPupilDilationTimeSeries(subject, card_names, subject_card, overall_eye, 
 
     return fig
 
-def bigAggregation(features, sub, cols, aggrZeros, aggrOnes):
-    data = features[cols].loc[features['subject'] == sub]
-    zeros = data.loc[features['label'] == 0].drop(['card_class'], axis=1)
-    ones = data.loc[features['label'] == 1]
-
-    for col in zeros.columns:
-        zeros[col] = zeros[col].mean()
-    zeros = zeros.head(1)
-    zeros['card_class'] = "avg"
-    
-    aggrZeros = aggrZeros.append(zeros, ignore_index=True)
-    aggrOnes = aggrOnes.append(ones, ignore_index=True)
-    
-    return aggrZeros, aggrOnes
-
 def plotBySubject(features, mode, feat_cols=plot_column_names, save=True):
     
     plot_cols = feat_cols[1:]
@@ -89,11 +75,12 @@ def plotBySubject(features, mode, feat_cols=plot_column_names, save=True):
     aggrZeros = pd.DataFrame(columns=plot_cols)
     aggrOnes = pd.DataFrame(columns=plot_cols)
 
-    markers=[',','1','v','^','<','>','8','s','p','P','*','h','H','+','x','X','D','d','|','_','o','2','3','4','.']
+    markers=[',','1','v','^','<','>','8','s','p','P','*',
+    'h','H','+','x','X','D','d','|','_','o','2','3','4','.']
     subjects = features.groupby('subject').count().index.values
 
     for sub in subjects:
-        aggrZeros, aggrOnes = bigAggregation(features, sub, plot_cols, aggrZeros, aggrOnes)    
+        aggrZeros, aggrOnes = aggregate_target_nontarget(features, sub, plot_cols, aggrZeros, aggrOnes)    
 
     sub_z = aggrZeros['subject'].values
     sub_o = aggrOnes['subject'].values
@@ -280,7 +267,7 @@ def plotByCards(features, feat_cols, card_names, mode):
         fig2.savefig("plots/{}/card/nTvsT_{}".format(mode, f))
 
 # Average Histogram of Target (old) vs nonTarget (new) for each feature
-def plotComparisonHistogram(features, mode):
+def plotComparisonHistogram(features, mode, save=False):
     feat_comparison = [
         ('fix_freq', 'sre_fix_freq', 'srl_fix_freq'),
         ('sacc_freq', 'sre_sacc_freq', 'srl_sacc_freq'),
@@ -303,32 +290,28 @@ def plotComparisonHistogram(features, mode):
     subjects = features.groupby('subject').count().index.values
 
     for sub in subjects:
-        aggrZeros, aggrOnes = bigAggregation(features, sub, plot_column_names, aggrZeros, aggrOnes)    
+        aggrZeros, aggrOnes = aggregate_target_nontarget(features, sub, plot_column_names, aggrZeros, aggrOnes)    
 
 
-    for triple in feat_comparison:
+    for (whole, early, late) in feat_comparison:
 
         fig, axs = plt.subplots(1, figsize=(10, 5))
 
-        new_all_mean = aggrZeros[triple[0]].mean()
-        new_early_mean = aggrZeros[triple[1]].mean()
-        new_late_mean = aggrZeros[triple[2]].mean()
-        new_all_ste = aggrZeros[triple[0]].sem()
-        new_early_ste = aggrZeros[triple[1]].sem()
-        new_late_ste = aggrZeros[triple[2]].sem()
+        new_all_mean = aggrZeros[whole].mean()
+        new_early_mean = aggrZeros[early].mean()
+        new_late_mean = aggrZeros[late].mean()
 
-        old_all_mean = aggrOnes[triple[0]].mean()
-        old_early_mean = aggrOnes[triple[1]].mean()
-        old_late_mean = aggrOnes[triple[2]].mean()
-        old_all_ste = aggrOnes[triple[0]].sem()
-        old_early_ste = aggrOnes[triple[1]].sem()
-        old_late_ste = aggrOnes[triple[2]].sem()
+        new_all_ste = aggrZeros[whole].sem()
+        new_early_ste = aggrZeros[early].sem()
+        new_late_ste = aggrZeros[late].sem()
 
+        old_all_mean = aggrOnes[whole].mean()
+        old_early_mean = aggrOnes[early].mean()
+        old_late_mean = aggrOnes[late].mean()
 
-        #new_mean = aggrZeros[c].mean()
-        #new_ste = aggrZeros[c].sem()
-        #old_mean = aggrOnes[c].mean()
-        #old_ste = aggrOnes[c].sem()
+        old_all_ste = aggrOnes[whole].sem()
+        old_early_ste = aggrOnes[early].sem()
+        old_late_ste = aggrOnes[late].sem()
 
         x_pos = np.arange(len(labels))
 
@@ -346,9 +329,11 @@ def plotComparisonHistogram(features, mode):
                 yerr=new_errors,
                 color='b', align='center',
                 width=bar_width, label='nonTarget (NEW)', alpha=0.8)
+
         axs.legend(loc='center left', bbox_to_anchor=(1, 0.5))
         axs.set_xticks(x_pos)
         axs.set_xticklabels(labels)
+        axs.set_title('{}'.format(whole))
 
-        axs.set_title('{}'.format(triple[0]))
-        fig.savefig("plots/{}/hist/{}".format(mode, triple[0]))
+        if(save):
+            fig.savefig("plots/{}/hist/{}".format(mode, whole))

@@ -5,6 +5,20 @@ import matplotlib.pyplot as plt
 pd.options.mode.chained_assignment = None  # default='warn'
 from statsmodels.robust.scale import mad
 
+# refer an array of eye data to the mean of the baseline
+def referToBaseline(data, baseline, mode="sub", source_cols=['diam_right'], baseline_col='diam_right'):
+
+    # this way I can use it in both contexts
+
+    baseline_mean = baseline[baseline_col].mean(skipna = True)
+    for c in source_cols:
+        if(mode == 'sub'):
+            data[c] = data[c] - baseline_mean
+                        
+        if(mode == 'div'):
+            data[c] = data[c] / baseline_mean
+
+    return data 
 
 def cleanZscore(time_series, tresh=5, col="diam_right"):
     # Calc Zscore params
@@ -159,7 +173,7 @@ def filterBaseline(eyeDF, annot, window=5000, start_col="start_ms", stop_col="st
     stop = annot.at[0, stop_col]
     
     early_start = start - window 
-    baseline = eyeDF.loc[(eyeDF['timestamp'] >= early_start) & (eyeDF['timestamp'] <= stop)]
+    baseline = eyeDF.loc[(eyeDF['timestamp'] >= early_start) & (eyeDF['timestamp'] <= start)]
 
     if(clean or smooth):
         baseline = dataCleaner(baseline, clean, clean_mode, smooth)

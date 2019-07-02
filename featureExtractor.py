@@ -92,37 +92,82 @@ feat_cols = [
 sr_window = 1500
 card_names = ['unicorn', 'pepper', 'minion', 'pig', 'hedge', 'aliens']
 
-def extractLieFeatures(cols=lie_column_names, cards=card_names, source="frontiers", ref_to_base=True, mode="sub"):
+def extractLieFeatures(subject=None, cols=lie_column_names, cards=card_names, source="frontiers", ref_to_base="time", mode="sub", plot=False):
+
+    # refer_to_base = [time, feat, None]
 
     features = pd.DataFrame(columns=cols)
-    subjects = extractMinSubjectSet(source, annot_path=annotations_lie_in_temp)
+
+    subjects = []
+
+    if(subject != None):
+        subjects = [subject]
+    else:
+        subjects = extractMinSubjectSet(source, annot_path=annotations_lie_in_temp)
 
     baseline_right = []
     baseline_left = []
 
+    ref_time = ref_to_base == 'time'
+    ref_features = ref_to_base == 'feat'
+
     for sub in subjects:
 
         eye_df, annot_dfs, baseline, overall_eye_df, filtered_interaction_dfs = \
-                loadLieTimeSeries(sub, card_names, source="frontiers", clean=True, clean_mode="MAD", smooth=False) 
+                loadLieTimeSeries(
+                    sub, card_names, source="frontiers", 
+                    refer_to_baseline=ref_time, refer_mode=mode,
+                    clean=True, clean_mode="MAD", smooth=False) 
         
         mf = LieFeatures(sub, "frontiers",
                             annot_dfs,
-                            filtered_interaction_dfs,
-                            refer_to_baseline=True,
-                            baseline=baseline,
-                            refer_method=mode
-                        )
+                            filtered_interaction_dfs)
+
         baseline_right.append(baseline['diam_right'].mean(skipna = True))
         baseline_left.append(baseline['diam_left'].mean(skipna = True)) 
-        features = features.append(mf.getDataFrame(), ignore_index=True)
         
+        sub_features = mf.getDataFrame()
+
+        if(ref_features):
+            print(">> refer features to baseline")
+
+            lie_right_feats = [
+                    'right_mean', 'right_min','right_max',
+                    'react_right_mean', 'react_right_min', 'react_right_max',
+                    'point_react_right_mean', 'point_react_right_min','point_react_right_max',
+                    'descr_right_mean', 'descr_right_min','descr_right_max'
+                ]
+
+            lie_left_feats = [
+                    'left_mean', 'left_min','left_max',
+                    'react_left_mean', 'react_left_min', 'react_left_max',
+                    'point_react_left_mean', 'point_react_left_min','point_react_left_max',
+                    'descr_left_mean', 'descr_left_min','descr_left_max'
+                ]
+
+            sub_features = referEyeFeaturesToBaseline(sub_features, baseline, lie_right_feats, lie_left_feats)
+
+
+        features = features.append(sub_features, ignore_index=True)
+
+        if(plot):
+            lie_plotTimeSeries(sub, cards, annot_dfs, overall_eye_df, filtered_interaction_dfs)
+            #, baseline)
+
+
     return features, baseline_right, baseline_left
 
 
-def extractFeatures(cols, cards, source="frontiers", short_resp=1500, ref_to_base=True, mode="sub"):
+def extractFeatures(subject=None, cols=column_names, cards=card_names, source="frontiers", short_resp=1500, ref_to_base=True, mode="sub", plot=False):
     
     features = pd.DataFrame(columns=cols)
-    subjects = extractMinSubjectSet(source)
+
+    subjects = []
+
+    if(subject != None):
+        subjects = [subject]
+    else:
+        subjects = extractMinSubjectSet(source)
 
     baseline_right = []
     baseline_left = []
@@ -138,15 +183,15 @@ def extractFeatures(cols, cards, source="frontiers", short_resp=1500, ref_to_bas
                               annot_dfs,
                               cards_eye_dfs, early_sr_dfs, late_sr_dfs,
                               short_resp,
-                              cols=cols,
-                              refer_to_baseline=ref_to_base,
-                              baseline=baseline,
-                              refer_method=mode
-                             )
+                              cols=cols
+                            )
 
         baseline_right.append(baseline['diam_right'].mean(skipna = True))
-        baseline_left.append(baseline['diam_left'].mean(skipna = True))        
+        baseline_left.append(baseline['diam_left'].mean(skipna = True))
         features = features.append(mf.getDataFrame(), ignore_index=True)
+
+        if(plot):
+            plotPupilDilationTimeSeries(sub, subject_card, cards, overall_eye_df, cards_eye_dfs)
         
     return features, baseline_right, baseline_left
 
@@ -163,3 +208,23 @@ def extractAndSaveAll(column_names=column_names, card_names=card_names, out_file
 
     return feats, frontiers, pilot
 """
+
+
+#mode = "none"
+#pone_features, pone_base_right, pone_base_left = extractFeatures(mode=mode, plot=False)
+#plotComparisonHistogram(pone_features, mode=mode, save=False)
+#%matplotlib notebook
+#plt.show()
+
+#mode = "none"
+#print("================== MODE {} =====================".format(mode))
+#lie_features, lie_base_right, lie_base_left = extractLieFeatures(mode=mode, plot=True)
+#lie_plotComparBars(lie_features, lie_base_right, lie_base_left, mode=mode, save=False)
+
+mode = "sub"
+print("================== MODE {} =====================".format(mode))
+lie_features, lie_base_right, lie_base_left = extractLieFeatures(mode=mode, ref_to_base=None, plot=False)
+lie_plotComparBars(lie_features, lie_base_right, lie_base_left, mode=mode, save=False)
+
+#%matplotlib notebook
+plt.show()

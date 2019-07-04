@@ -180,15 +180,16 @@ def loadLieTimeSeries(subject, card_names,
     
     for i in range(1, len(annotations)):
 
-        whole_interval, reaction_interval, point_reaction_interval, description_interval = \
+        whole_interval, point_interaction, reaction_interval, point_reaction_interval, description_interval = \
             lieDataFiltering(overall, annotations[i], clean=False, smooth=False)
         
+        point_interaction['card'] = annotations[i]['card'].iloc[0]
         reaction_interval['card'] = annotations[i]['card'].iloc[0]
         point_reaction_interval['card'] = annotations[i]['card'].iloc[0]
         description_interval['card'] = annotations[i]['card'].iloc[0]
 
         filtered_interaction_dfs.append(
-            (whole_interval, reaction_interval, point_reaction_interval, description_interval)
+            (whole_interval, point_interaction, reaction_interval, point_reaction_interval, description_interval)
         )
     
     return eye, annotations, baseline, overall, filtered_interaction_dfs

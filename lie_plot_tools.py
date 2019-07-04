@@ -5,71 +5,66 @@ import matplotlib.pyplot as plt
 pd.options.mode.chained_assignment = None  # default='warn'
 
 from eye_feature_tools import *
+from evaluation import *
 
 lie_feat_cols = [
         'subject',
         #'source',
         'card_class',
         #'show_order',
-        'duration',
-        'react_dur',
-        'point_react_dur',
-        'descr_dur',
-        'fix_freq',
-        'sacc_freq',
+        #'duration',
+        #'react_dur',
+        #'point_dur',
+        #'descr_dur',
+        #'fix_freq',
+        #'sacc_freq',
         'right_mean',
-        'right_std',
-        'right_min',
-        'right_max',
+        #'right_std',
+        #'right_min',
+        #'right_max',
         'left_mean',
-        'left_std',
-        'left_min',
-        'left_max',
-        'react_fix_freq',
-        'react_sacc_freq',
+        #'left_std',
+        #'left_min',
+        #'left_max',
+        #'react_fix_freq',
+        #'react_sacc_freq',
         'react_right_mean',
-        'react_right_std',
-        'react_right_min',
-        'react_right_max',
+        #'react_right_std',
+        #'react_right_min',
+        #'react_right_max',
         'react_left_mean',
-        'react_left_std',
-        'react_left_min',
-        'react_left_max',
-        'point_react_fix_freq',
-        'point_react_sacc_freq',
-        'point_react_right_mean',
-        'point_react_right_std',
-        'point_react_right_min',
-        'point_react_right_max',
-        'point_react_left_mean',
-        'point_react_left_std',
-        'point_react_left_min',
-        'point_react_left_max',
-        'descr_fix_freq',
-        'descr_sacc_freq',
+        #'react_left_std',
+        #'react_left_min',
+        #'react_left_max',
+        #'point_fix_freq',
+        #'point_sacc_freq',
+        'point_right_mean',
+        #'point_right_std',
+        #'point_right_min',
+        #'point_right_max',
+        'point_left_mean',
+        #'point_left_std',
+        #'point_left_min',
+        #'point_left_max',
+        #'descr_fix_freq',
+        #'descr_sacc_freq',
         'descr_right_mean',
-        'descr_right_std',
-        'descr_right_min',
-        'descr_right_max',
+        #'descr_right_std',
+        #'descr_right_min',
+        #'descr_right_max',
         'descr_left_mean',
-        'descr_left_std',
-        'descr_left_min',
-        'descr_left_max',
+        #'descr_left_std',
+        #'descr_left_min',
+        #'descr_left_max',
         'label'
     ]
 
 def lie_plotBySubject(features, mode, feat_cols=lie_feat_cols, save=True):
     
-    aggrZeros = pd.DataFrame(columns=lie_feat_cols)
-    aggrOnes = pd.DataFrame(columns=lie_feat_cols)
-
     markers=[',','1','v','^','<','>','8','s','p','P','*','h','H','+','x',
         'X','D','d','|','_','o','2','3','4','.']
 
-    subjects = features.groupby('subject').count().index.values
-
-    for sub in subjects:
-        aggrZeros, aggrOnes = aggregate_target_nontarget(features, sub, feat_cols, aggrZeros, aggrOnes)    
+    aggrZeros, aggrOnes, TnT = aggregate_target_nontarget(features, lie_feat_cols)
 
     sub_z = aggrZeros['subject'].values
     sub_o = aggrOnes['subject'].values
@@ -82,13 +77,13 @@ def lie_plotBySubject(features, mode, feat_cols=lie_feat_cols, save=True):
     plot_cols.remove('card_class')
 
     for f in plot_cols:
-        fig, axs = plt.subplots(1, figsize=(9, 9))
+        fig, axs = plt.subplots(1, figsize=(9, 9), num="x{}".format(f))
         labels = []
 
-        pallX = aggrZeros[f].mean()
-        pallX_ste = aggrZeros[f].sem()    
-        pallY = aggrOnes[f].mean()
-        pallY_ste = aggrOnes[f].sem()
+        pallX = aggrZeros[f].mean(skipna=True)
+        pallX_ste = aggrZeros[f].sem(skipna=True)    
+        pallY = aggrOnes[f].mean(skipna=True)
+        pallY_ste = aggrOnes[f].sem(skipna=True)
 
         for i, sub in enumerate(subjects):
 
@@ -161,116 +156,196 @@ def lie_plotBySubject(features, mode, feat_cols=lie_feat_cols, save=True):
         if(save):
             fig.savefig("plots/{}/subject/nTvsT_{}".format(mode, f))
 
-
-    plt.show()
-
-
-# Average Histogram of Target (old) vs nonTarget (new) for each feature
-def lie_plotComparBars(features, baseline_right, baseline_left, mode, save=True):
+def lie_plotTnTratioMean(features, save=True):
 
     feat_comparison = [
-        ('fix_freq', 'react_fix_freq', 'point_react_fix_freq', 'descr_fix_freq'),
-        ('sacc_freq', 'react_sacc_freq', 'point_react_sacc_freq', 'descr_sacc_freq'),
-        ('right_mean', 'react_right_mean', 'point_react_right_mean', 'descr_right_mean'),
-        ('right_std', 'react_right_std', 'point_react_right_std', 'descr_right_std'),
-        ('right_min', 'react_right_min', 'point_react_right_min', 'descr_right_min'),
-        ('right_max', 'react_right_max', 'point_react_right_max', 'descr_right_max'),
-        ('left_mean', 'react_left_mean', 'point_react_left_mean', 'descr_left_mean'),
-        ('left_std', 'react_left_std', 'point_react_left_std', 'descr_left_std'),
-        ('left_min', 'react_left_min', 'point_react_left_min', 'descr_left_min'),
-        ('left_max', 'react_left_max', 'point_react_left_max', 'descr_left_max')
+        #('duration', 'react_dur', 'point_dur', 'descr_dur'),
+        #('fix_freq', 'point_fix_freq', 'react_fix_freq', 'descr_fix_freq'),
+        #('sacc_freq', 'point_sacc_freq', 'react_sacc_freq', 'descr_sacc_freq'),
+        ('right_mean', 'point_right_mean', 'react_right_mean', 'descr_right_mean'),
+        #('right_std', 'point_right_std', 'react_right_std', 'descr_right_std'),
+        #('right_min', 'point_right_min', 'react_right_min', 'descr_right_min'),
+        #('right_max', 'point_right_max', 'react_right_max', 'descr_right_max'),
+        ('left_mean', 'point_left_mean', 'react_left_mean', 'descr_left_mean'),
+        #('left_std', 'point_left_std', 'react_left_std', 'descr_left_std'),
+        #('left_min', 'point_left_min', 'react_left_min', 'descr_left_min'),
+        #('left_max', 'point_left_max', 'react_left_max', 'descr_left_max')
     ]
 
-    labels = ['all', 'react', 'point_react', 'descr']
-    bar_width = 0.25
-
-    aggrZeros = pd.DataFrame(columns=lie_feat_cols)
-    aggrOnes = pd.DataFrame(columns=lie_feat_cols)
+    nonTargets = pd.DataFrame(columns=lie_feat_cols)
+    targets = pd.DataFrame(columns=lie_feat_cols)
 
     subjects = features.groupby('subject').count().index.values
 
     for sub in subjects:
-        aggrZeros, aggrOnes = aggregate_target_nontarget(features, sub, lie_feat_cols, aggrZeros, aggrOnes)    
+        nonTargets, targets = extract_target_nontarget(features, sub, lie_feat_cols, nonTargets, targets)    
 
-    plot_cols = lie_feat_cols.copy()
-    plot_cols.remove('subject')
-    plot_cols.remove('card_class')
+    labels = ['point', 'reaction', 'description']
+    x_pos = np.arange(len(labels))
 
-    br_mean = np.mean(baseline_right)
+    fig, axs = plt.subplots(1, figsize=(15, 10), num='TnT ratio')
 
-    for (whole, react, point_react, descr) in feat_comparison:
+    for (feat_name, point, react, descr) in feat_comparison:
 
-        fig, axs = plt.subplots(1, figsize=(10, 5))
+        nonTarget_react_mean = nonTargets[react].mean(skipna=True)
+        nonTarget_point_mean = nonTargets[point].mean(skipna=True)
+        nonTarget_descr_mean = nonTargets[descr].mean(skipna=True)
 
-        new_all_mean = aggrZeros[whole].mean()
-        new_react_mean = aggrZeros[react].mean()
-        new_point_react_mean = aggrZeros[point_react].mean()
-        new_descr_mean = aggrZeros[descr].mean()
+        target_react_mean = targets[react].mean(skipna=True)
+        target_point_mean = targets[point].mean(skipna=True)
+        target_descr_mean = targets[descr].mean(skipna=True)
         
-        new_all_ste = aggrZeros[whole].sem(axis = 0)
-        new_react_ste = aggrZeros[react].sem(axis = 0)
-        new_point_react_ste = aggrZeros[point_react].sem(axis = 0)
-        new_descr_ste = aggrZeros[descr].sem(axis = 0)
+        tnt_point = np.abs(target_point_mean - nonTarget_point_mean)
+        tnt_react = np.abs(target_react_mean - nonTarget_react_mean)
+        tnt_descr = np.abs(target_descr_mean - nonTarget_descr_mean)
 
-        old_all_mean = aggrOnes[whole].mean()
-        old_react_mean = aggrOnes[react].mean()
-        old_point_react_mean = aggrOnes[point_react].mean()
-        old_descr_mean = aggrOnes[descr].mean()
-        
-        old_all_ste = aggrOnes[whole].sem(axis = 0)
-        old_react_ste = aggrOnes[react].sem(axis = 0)
-        old_point_react_ste = aggrOnes[point_react].sem(axis = 0)
-        old_descr_ste = aggrOnes[descr].sem(axis = 0)
+        #tnt_point = (target_point_mean - nonTarget_point_mean)
+        #tnt_react = (target_react_mean - nonTarget_react_mean)
+        #tnt_descr = (target_descr_mean - nonTarget_descr_mean)
 
-        x_pos = np.arange(len(labels))
-
-        br_mean = np.mean(baseline_right)
-        bl_mean = np.mean(baseline_left)
-
-        if(mode=="none" and "right_mean" in whole):
-            y_values_old = [br_mean, old_all_mean, old_react_mean, old_point_react_mean, old_descr_mean]
-            y_values_new = [br_mean, new_all_mean, new_react_mean, new_point_react_mean, new_descr_mean]
-            old_errors = [0, old_all_ste, old_react_ste, old_point_react_ste, old_descr_ste]
-            new_errors = [0, new_all_ste, new_react_ste, new_point_react_ste, new_descr_ste]
-
-            labels = ['baseline', 'all', 'react', 'point_react', 'descr']
+        y_values = [ tnt_point, tnt_react, tnt_descr]
 
         
-        elif(mode=="none" and "left_mean" in whole):
-            y_values_old = [bl_mean, old_all_mean, old_react_mean, old_point_react_mean, old_descr_mean]
-            y_values_new = [bl_mean, new_all_mean, new_react_mean, new_point_react_mean, new_descr_mean]
-            old_errors = [0, old_all_ste, old_react_ste, old_point_react_ste, old_descr_ste]
-            new_errors = [0, new_all_ste, new_react_ste, new_point_react_ste, new_descr_ste]
+        axs.plot(labels, y_values, '-o', label=feat_name)
 
-            labels = ['baseline', 'all', 'react', 'point_react', 'descr']
+    axs.legend()
+    return fig
 
-        else:
-            y_values_old = [ old_all_mean, old_react_mean, old_point_react_mean, old_descr_mean]
-            y_values_new = [ new_all_mean, new_react_mean, new_point_react_mean, new_descr_mean]
-            old_errors = [old_all_ste, old_react_ste, old_point_react_ste, old_descr_ste]
-            new_errors = [new_all_ste, new_react_ste, new_point_react_ste, new_descr_ste]
+def lie_plotTnTratioBySubject(features, feature, save=True):
 
-            labels = ['all', 'react', 'point_react', 'descr']
+    #feat_comparison_R = (0, 'right_mean', 'point_right_mean', 'react_right_mean', 'descr_right_mean')
+
+    fig, axs = plt.subplots(2, figsize=(15, 10), num='TnT {}'.format(feature))
+    labels = ['point', 'reaction', 'description']
+
+    tnt_scores, subjects = coumpute_TnT_scores(features, lie_feat_cols, feature, abs_ratio=False)
+    tnt_scores_norm, subjects = coumpute_TnT_scores(features, lie_feat_cols, feature, abs_ratio=False, norm_to_point=True)
+
+    for sub in subjects:
+        score = tnt_scores.loc[tnt_scores['subject'] == sub]
+        score_norm = tnt_scores_norm.loc[tnt_scores_norm['subject'] == sub]
+        
+        point = score["point_ratio"].values[0]
+        react = score["react_ratio"].values[0]
+        descr = score["descr_ratio"].values[0]
+
+        point_norm = score_norm["point_ratio"].values[0]
+        react_norm = score_norm["react_ratio"].values[0]
+        descr_norm = score_norm["descr_ratio"].values[0]
+
+        y_values = [ point, react, descr]
+        y_values_norm = [ point_norm, react_norm, descr_norm]
+
+        axs[0].plot(labels, y_values, '-o', label=sub)
+        axs[1].plot(labels, y_values_norm, '-o', label=sub)
+
+    axs[0].legend(loc='center left', bbox_to_anchor=(1, 0.5))
+    #axs[1].legend(loc='center right', bbox_to_anchor=(1, 0.5))
+    axs[0].set_title("Differenza tra T e nonT")
+    axs[1].set_title("Differenza normalizata a Point")
+    
+    return fig
+
+def lie_plotTnTstem(features, feature, save=True):
+
+    fig, axs = plt.subplots(2, figsize=(15, 10), num='STEM TnT {}'.format(feature))
+
+    tnt_scores, subjects = coumpute_TnT_scores(features, lie_feat_cols, feature, abs_ratio=False)
+    tnt_scores_norm, subjects = coumpute_TnT_scores(features, lie_feat_cols, feature, abs_ratio=False, norm_to_point=True)
+    
+
+    tnt_scores = tnt_scores.sort_values(by=['descr_ratio'])
+    tnt_scores_norm = tnt_scores_norm.sort_values(by=['descr_ratio'])
+
+    labels = tnt_scores['subject'].values
+    labels_norm = tnt_scores_norm['subject'].values
+
+    x_pos = np.arange(len(labels))
+    x_pos_norm = np.arange(len(labels_norm))
+
+    axs[0].stem(labels, tnt_scores['descr_ratio'], linefmt='green', markerfmt='X', label="DESCR")
+    axs[0].stem(labels, tnt_scores['react_ratio'], linefmt='grey', markerfmt='D', label="REACT")
+    axs[0].set_xticks(labels)
+    axs[0].set_xticklabels(labels)
+
+    axs[1].stem(labels_norm, tnt_scores_norm['descr_ratio'], linefmt='green', markerfmt='X', label="DESCR")
+    axs[1].stem(labels_norm, tnt_scores_norm['react_ratio'], linefmt='grey', markerfmt='D', label="REACT")
+    axs[1].set_xticks(labels_norm)
+    axs[1].set_xticklabels(labels_norm)
+
+    axs[0].legend()
+    axs[1].legend()
+    #axs[1].legend(loc='center right', bbox_to_anchor=(1, 0.5))
+    
+    return fig
+
+# Average Histogram of Target (old) vs nonTarget (new) for each feature
+def lie_plotComparBars(features, save=True):
+
+    feat_comparison = [
+        #('duration', 'react_dur', 'point_dur', 'descr_dur'),
+        #('fix_freq', 'point_fix_freq', 'react_fix_freq', 'descr_fix_freq'),
+        #('sacc_freq', 'point_sacc_freq', 'react_sacc_freq', 'descr_sacc_freq'),
+        ('right_mean', 'point_right_mean', 'react_right_mean', 'descr_right_mean'),
+        #('right_std', 'point_right_std', 'react_right_std', 'descr_right_std'),
+        #('right_min', 'point_right_min', 'react_right_min', 'descr_right_min'),
+        #('right_max', 'point_right_max', 'react_right_max', 'descr_right_max'),
+        ('left_mean', 'point_left_mean', 'react_left_mean', 'descr_left_mean'),
+        #('left_std', 'point_left_std', 'react_left_std', 'descr_left_std'),
+        #('left_min', 'point_left_min', 'react_left_min', 'descr_left_min'),
+        #('left_max', 'point_left_max', 'react_left_max', 'descr_left_max')
+    ]
+
+    nonTargets, targets, TnT = aggregate_target_nontarget(features, lie_feat_cols)
+
+    bar_width = 0.25   
+    labels = ['point', 'react', 'descr']
+    x_pos = np.arange(len(labels))
+
+    for (whole, point, react, descr) in feat_comparison:
+
+        fig, axs = plt.subplots(1, figsize=(15, 10), num='{}'.format(whole))
+        fig.suptitle('{}'.format(whole), fontsize=16)
+
+        nT_react_mean = nonTargets[react].mean(skipna=True)
+        nT_point_mean = nonTargets[point].mean(skipna=True)
+        nT_descr_mean = nonTargets[descr].mean(skipna=True)
+        
+        nT_react_ste = nonTargets[react].sem(skipna=True)
+        nT_point_ste = nonTargets[point].sem(skipna=True)
+        nT_descr_ste = nonTargets[descr].sem(skipna=True)
+
+        T_react_mean = targets[react].mean(skipna=True)
+        T_point_mean = targets[point].mean(skipna=True)
+        T_descr_mean = targets[descr].mean(skipna=True)
+        
+        T_react_ste = targets[react].sem(skipna=True)
+        T_point_ste = targets[point].sem(skipna=True)
+        T_descr_ste = targets[descr].sem(skipna=True)        
+
+
+        y_values_T = [ T_point_mean, T_react_mean, T_descr_mean]
+        y_values_nT = [ nT_point_mean, nT_react_mean, nT_descr_mean]
+        T_errors = [ T_point_ste, T_react_ste, T_descr_ste]
+        nT_errors = [ nT_point_ste, nT_react_ste, nT_descr_ste] 
             
         x_pos = np.arange(len(labels))
-        axs.bar(x_pos, y_values_old,
-                yerr=old_errors,
+        axs.bar(x_pos, y_values_T,
+                yerr=T_errors,
                 color='g', align='center',
                 width=bar_width, label='Target (OLD)', alpha=0.8)
 
-        axs.bar(x_pos+bar_width, y_values_new,
-                yerr=new_errors,
+        axs.bar(x_pos+bar_width, y_values_nT,
+                yerr=nT_errors,
                 color='b', align='center',
                 width=bar_width, label='nonTarget (NEW)', alpha=0.8)
         axs.legend(loc='center left', bbox_to_anchor=(1, 0.5))
         axs.set_xticks(x_pos)
         axs.set_xticklabels(labels)
-
-
         axs.set_title('{}'.format(whole))
+
         if(save):
             fig.savefig("plots/XXX/hist/{}".format(whole))
-
 
 def lie_plotTimeSeries(subject, card_names, annotations, overall_eye, filtered_inter_dfs, baseline=None):
     
@@ -333,3 +408,5 @@ def lie_plotTimeSeries(subject, card_names, annotations, overall_eye, filtered_i
     
     
     return fig
+
+

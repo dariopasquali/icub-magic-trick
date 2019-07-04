@@ -13,7 +13,7 @@ lie_feat_cols = [
         'show_order',
         'duration',
         'react_dur',
-        'point_react_dur',
+        'point_dur',
         'descr_dur',
         'fix_freq',
         'sacc_freq',
@@ -35,16 +35,16 @@ lie_feat_cols = [
         'react_left_std',
         'react_left_min',
         'react_left_max',
-        'point_react_fix_freq',
-        'point_react_sacc_freq',
-        'point_react_right_mean',
-        'point_react_right_std',
-        'point_react_right_min',
-        'point_react_right_max',
-        'point_react_left_mean',
-        'point_react_left_std',
-        'point_react_left_min',
-        'point_react_left_max',
+        'point_fix_freq',
+        'point_sacc_freq',
+        'point_right_mean',
+        'point_right_std',
+        'point_right_min',
+        'point_right_max',
+        'point_left_mean',
+        'point_left_std',
+        'point_left_min',
+        'point_left_max',
         'descr_fix_freq',
         'descr_sacc_freq',
         'descr_right_mean',
@@ -73,7 +73,7 @@ class LieFeatures:
         self.features = pd.DataFrame(columns=cols)
         
         # Process Each card and compose the dataframe
-        for c, (whole, reaction, point_reaction, description) in enumerate(filtered_interaction_dfs):
+        for c, (whole, point, reaction, point_reaction, description) in enumerate(filtered_interaction_dfs):
         
             annot = annot_dfs[c+1]
 
@@ -98,7 +98,7 @@ class LieFeatures:
             
             whole = whole[['diam_right', 'diam_left', 'move_type', 'move_type_id']]
             reaction = reaction[['diam_right', 'diam_left', 'move_type', 'move_type_id']]
-            point_reaction = point_reaction[['diam_right', 'diam_left', 'move_type', 'move_type_id']]
+            point = point[['diam_right', 'diam_left', 'move_type', 'move_type_id']]
             description = description[['diam_right', 'diam_left', 'move_type', 'move_type_id']]  
         
             # ==== EVENTS =============
@@ -110,7 +110,7 @@ class LieFeatures:
             self.react_fix_freq, self.react_sacc_freq = calcEventFeatures(reaction, self.reaction_dur)
 
             # Point + Reaction Interval
-            self.point_react_fix_freq, self.point_react_sacc_freq = calcEventFeatures(point_reaction, self.point_reaction_dur)
+            self.point_fix_freq, self.point_sacc_freq = calcEventFeatures(point, self.point_reaction_dur)
 
             # Description Interval
             self.descr_fix_freq, self.descr_sacc_freq = calcEventFeatures(description, self.description_dur)
@@ -135,11 +135,11 @@ class LieFeatures:
 
             # ==== POINT REACTION PUPIL FEATURES =============
             
-            self.point_react_right_mean, self.point_react_right_std, \
-                self.point_react_right_min, self.point_react_right_max, \
-                    self.point_react_left_mean, self.point_react_left_std, \
-                        self.point_react_left_min, self.point_react_left_max \
-                             = computePupilFeatures(point_reaction)
+            self.point_right_mean, self.point_right_std, \
+                self.point_right_min, self.point_right_max, \
+                    self.point_left_mean, self.point_left_std, \
+                        self.point_left_min, self.point_left_max \
+                             = computePupilFeatures(point)
             
             # ==== DESCRIPTION PUPIL FEATURESE =============
             
@@ -190,16 +190,16 @@ class LieFeatures:
                 self.react_left_std,
                 self.react_left_min,
                 self.react_left_max,
-                self.point_react_fix_freq,
-                self.point_react_sacc_freq,
-                self.point_react_right_mean,
-                self.point_react_right_std,
-                self.point_react_right_min,
-                self.point_react_right_max,
-                self.point_react_left_mean,
-                self.point_react_left_std,
-                self.point_react_left_min,
-                self.point_react_left_max,
+                self.point_fix_freq,
+                self.point_sacc_freq,
+                self.point_right_mean,
+                self.point_right_std,
+                self.point_right_min,
+                self.point_right_max,
+                self.point_left_mean,
+                self.point_left_std,
+                self.point_left_min,
+                self.point_left_max,
                 self.descr_fix_freq,
                 self.descr_sacc_freq,
                 self.descr_right_mean,

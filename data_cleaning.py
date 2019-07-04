@@ -52,7 +52,7 @@ def cleanMAD(time_series, tresh=3.5, col="diam_right"):
 def resampleAndFill(time_series, col="diam_right", resample=True, fill=True, smooth=True):
     # RESAMPLE
     if(resample):
-        time_series[col] = time_series[[col]].resample("ms").mean() 
+        time_series[col] = time_series[[col]].resample("ms").mean(skipna=True) 
     
     # Fill NaN
     if(fill):
@@ -60,7 +60,7 @@ def resampleAndFill(time_series, col="diam_right", resample=True, fill=True, smo
  
     # Smooth
     if(smooth): 
-        time_series[col] = time_series[[col]].rolling(window=150).mean()
+        time_series[col] = time_series[[col]].rolling(window=150).mean(skipna=True)
 
     return time_series
 
@@ -98,12 +98,17 @@ def lieDataFiltering(eyeDF, annot, clean=True, clean_mode="MAD", smooth=False):
     start_descr = the subject starts to talk
     stop_descr = the subject finish to talk
 
+    point_time = stop_point - start_point
     reaction_time = (while the subject is looking at the card) = start_descr - stop_point
     point_reaction_time = start_descr - start_point
     description_time = stop_descr - start_descr
     """
     whole_time = eyeDF.loc[
         (eyeDF['timestamp'] >= start_point) & (eyeDF['timestamp'] <= stop_descr)
+    ]
+
+    point_time = eyeDF.loc[
+        (eyeDF['timestamp'] >= start_point) & (eyeDF['timestamp'] <= stop_point)
     ]
 
     reaction_time = eyeDF.loc[
@@ -119,12 +124,13 @@ def lieDataFiltering(eyeDF, annot, clean=True, clean_mode="MAD", smooth=False):
     ]
 
     if(clean or smooth):
+        point_time = dataCleaner(point_time, clean, clean_mode, smooth)
         whole_time = dataCleaner(whole_time, clean, clean_mode, smooth)
         reaction_time = dataCleaner(reaction_time, clean, clean_mode, smooth)
         point_reaction_time = dataCleaner(point_reaction_time, clean, clean_mode, smooth)
         description_time = dataCleaner(description_time, clean, clean_mode, smooth)
 
-    return whole_time, reaction_time, point_reaction_time, description_time
+    return whole_time, point_time, reaction_time, point_reaction_time, description_time
 
 def filterEyeData(eyeDF, annot, clean=True, start_col="start_ms", stop_col="stop_ms", clean_mode="MAD", smooth=False):
     annot = annot.reset_index()

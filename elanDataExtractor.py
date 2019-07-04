@@ -146,7 +146,4 @@ def elanToLieDetection(fn, fout, mode="jonas", source="win", outmode=None):
 
 
 
-elanToLieDetection("data/annotations_lie_raw/s6.csv","data/annotations_lie/s6.csv",  source="linux", mode="dario", outmode="write")
-elanToLieDetection("data/annotations_lie_raw/s11.csv","data/annotations_lie/s11.csv",  source="linux", mode="dario", outmode="write")
-elanToLieDetection("data/annotations_lie_raw/s14.csv","data/annotations_lie/s14.csv",  source="linux", mode="dario", outmode="write")
-elanToLieDetection("data/annotations_lie_raw/s24.csv","data/annotations_lie/s24.csv",  source="linux", mode="dario", outmode="write")
+elanToLieDetection("data/annotations_lie_raw/s7.csv","data/annotations_lie/s7.csv",  source="linux", mode="dario", outmode="write")

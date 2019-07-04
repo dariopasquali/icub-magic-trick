@@ -80,7 +80,7 @@ def plotBySubject(features, mode, feat_cols=plot_column_names, save=True):
     subjects = features.groupby('subject').count().index.values
 
     for sub in subjects:
-        aggrZeros, aggrOnes = aggregate_target_nontarget(features, sub, plot_cols, aggrZeros, aggrOnes)    
+        aggrZeros, aggrOnes = extract_target_nontarget(features, sub, plot_cols, aggrZeros, aggrOnes)    
 
     sub_z = aggrZeros['subject'].values
     sub_o = aggrOnes['subject'].values
@@ -92,10 +92,10 @@ def plotBySubject(features, mode, feat_cols=plot_column_names, save=True):
         fig, axs = plt.subplots(1, figsize=(9, 9))
         labels = []
 
-        pallX = aggrZeros[f].mean()
-        pallX_ste = aggrZeros[f].sem()    
-        pallY = aggrOnes[f].mean()
-        pallY_ste = aggrOnes[f].sem()
+        pallX = aggrZeros[f].mean(skipna=True)
+        pallX_ste = aggrZeros[f].sem(skipna=True)    
+        pallY = aggrOnes[f].mean(skipna=True)
+        pallY_ste = aggrOnes[f].sem(skipna=True)
 
 
         for i, sub in enumerate(subjects):
@@ -181,8 +181,8 @@ def aggregateByCard(features, card, aggrZeros, aggrOnes):
     w = len(ones.index)
     
     for col in zeros.columns:
-        zeros[col] = zeros[col].mean()
-        ones[col] = ones[col].mean()
+        zeros[col] = zeros[col].mean(skipna=True)
+        ones[col] = ones[col].mean(skipna=True)
         
     zeros = zeros.head(1)
     zeros['card_class'] = card
@@ -290,28 +290,28 @@ def plotComparisonHistogram(features, mode, save=False):
     subjects = features.groupby('subject').count().index.values
 
     for sub in subjects:
-        aggrZeros, aggrOnes = aggregate_target_nontarget(features, sub, plot_column_names, aggrZeros, aggrOnes)    
+        aggrZeros, aggrOnes = extract_target_nontarget(features, sub, plot_column_names, aggrZeros, aggrOnes)    
 
 
     for (whole, early, late) in feat_comparison:
 
         fig, axs = plt.subplots(1, figsize=(10, 5))
 
-        new_all_mean = aggrZeros[whole].mean()
-        new_early_mean = aggrZeros[early].mean()
-        new_late_mean = aggrZeros[late].mean()
+        new_all_mean = aggrZeros[whole].mean(skipna=True)
+        new_early_mean = aggrZeros[early].mean(skipna=True)
+        new_late_mean = aggrZeros[late].mean(skipna=True)
 
-        new_all_ste = aggrZeros[whole].sem()
-        new_early_ste = aggrZeros[early].sem()
-        new_late_ste = aggrZeros[late].sem()
+        new_all_ste = aggrZeros[whole].sem(skipna=True)
+        new_early_ste = aggrZeros[early].sem(skipna=True)
+        new_late_ste = aggrZeros[late].sem(skipna=True)
 
-        old_all_mean = aggrOnes[whole].mean()
-        old_early_mean = aggrOnes[early].mean()
-        old_late_mean = aggrOnes[late].mean()
+        old_all_mean = aggrOnes[whole].mean(skipna=True)
+        old_early_mean = aggrOnes[early].mean(skipna=True)
+        old_late_mean = aggrOnes[late].mean(skipna=True)
 
-        old_all_ste = aggrOnes[whole].sem()
-        old_early_ste = aggrOnes[early].sem()
-        old_late_ste = aggrOnes[late].sem()
+        old_all_ste = aggrOnes[whole].sem(skipna=True)
+        old_early_ste = aggrOnes[early].sem(skipna=True)
+        old_late_ste = aggrOnes[late].sem(skipna=True)
 
         x_pos = np.arange(len(labels))
 

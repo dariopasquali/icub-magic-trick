@@ -9,7 +9,7 @@ from SubjectMagicFeatures import *
 from LieFeatures import *
 from plot_tools import *
 from lie_plot_tools import *
-
+from evaluation import *
 
 column_names = [
         'subject','source','duration','card_class','show_order',
@@ -36,7 +36,7 @@ lie_column_names = [
         'show_order',
         'duration',
         'react_dur',
-        'point_react_dur',
+        'point_dur',
         'descr_dur',
         'fix_freq','sacc_freq',
         'right_mean','right_std','right_min','right_max',
@@ -44,9 +44,9 @@ lie_column_names = [
         'react_fix_freq', 'react_sacc_freq',
         'react_right_mean', 'react_right_std', 'react_right_min', 'react_right_max',
         'react_left_mean', 'react_left_std', 'react_left_min', 'react_left_max',
-        'point_react_fix_freq', 'point_react_sacc_freq',
-        'point_react_right_mean', 'point_react_right_std','point_react_right_min','point_react_right_max',
-        'point_react_left_mean','point_react_left_std','point_react_left_min','point_react_left_max',
+        'point_fix_freq', 'point_sacc_freq',
+        'point_right_mean', 'point_right_std','point_right_min','point_right_max',
+        'point_left_mean','point_left_std','point_left_min','point_left_max',
         'descr_fix_freq','descr_sacc_freq',
         'descr_right_mean','descr_right_std','descr_right_min','descr_right_max',
         'descr_left_mean','descr_left_std','descr_left_min','descr_left_max',
@@ -92,17 +92,13 @@ feat_cols = [
 sr_window = 1500
 card_names = ['unicorn', 'pepper', 'minion', 'pig', 'hedge', 'aliens']
 
-def extractLieFeatures(subject=None, cols=lie_column_names, cards=card_names, source="frontiers", ref_to_base="time", mode="sub", plot=False):
+def extractLieFeatures(subjects=[], cols=lie_column_names, cards=card_names, source="frontiers", ref_to_base="time", mode="sub", plot=False, print_pupil=False):
 
     # refer_to_base = [time, feat, None]
 
     features = pd.DataFrame(columns=cols)
 
-    subjects = []
-
-    if(subject != None):
-        subjects = [subject]
-    else:
+    if(len(subjects) == 0):
         subjects = extractMinSubjectSet(source, annot_path=annotations_lie_in_temp)
 
     baseline_right = []
@@ -125,7 +121,7 @@ def extractLieFeatures(subject=None, cols=lie_column_names, cards=card_names, so
 
         baseline_right.append(baseline['diam_right'].mean(skipna = True))
         baseline_left.append(baseline['diam_left'].mean(skipna = True)) 
-        
+
         sub_features = mf.getDataFrame()
 
         if(ref_features):
@@ -134,29 +130,35 @@ def extractLieFeatures(subject=None, cols=lie_column_names, cards=card_names, so
             lie_right_feats = [
                     'right_mean', 'right_min','right_max',
                     'react_right_mean', 'react_right_min', 'react_right_max',
-                    'point_react_right_mean', 'point_react_right_min','point_react_right_max',
+                    'point_right_mean', 'point_right_min','point_right_max',
                     'descr_right_mean', 'descr_right_min','descr_right_max'
                 ]
 
             lie_left_feats = [
                     'left_mean', 'left_min','left_max',
                     'react_left_mean', 'react_left_min', 'react_left_max',
-                    'point_react_left_mean', 'point_react_left_min','point_react_left_max',
+                    'point_left_mean', 'point_left_min','point_left_max',
                     'descr_left_mean', 'descr_left_min','descr_left_max'
                 ]
 
             sub_features = referEyeFeaturesToBaseline(sub_features, baseline, lie_right_feats, lie_left_feats)
 
+        
+        if(print_pupil):
+            print(annot_dfs[0])
+            for card in card_names:
+                print("card {} {}".format(card, sub_features.loc[sub_features['card_class'] == card]['descr_right_mean'].values[0]))
+            print("=======================================")
+        
 
         features = features.append(sub_features, ignore_index=True)
 
         if(plot):
             lie_plotTimeSeries(sub, cards, annot_dfs, overall_eye_df, filtered_interaction_dfs)
-            #, baseline)
+            #, baseline)            
 
 
     return features, baseline_right, baseline_left
-
 
 def extractFeatures(subject=None, cols=column_names, cards=card_names, source="frontiers", short_resp=1500, ref_to_base=True, mode="sub", plot=False):
     
@@ -195,36 +197,22 @@ def extractFeatures(subject=None, cols=column_names, cards=card_names, source="f
         
     return features, baseline_right, baseline_left
 
-"""
-def extractAndSaveAll(column_names=column_names, card_names=card_names, out_file="features/all.csv", ref_to_base=True, mode="sub", short_resp=1500):
-    frontiers = extractFeatures(column_names, card_names, source="frontiers", ref_to_base=ref_to_base, mode=mode, short_resp=short_resp)
-    pilot = extractFeatures(column_names, card_names, source="pilot", ref_to_base=ref_to_base, mode=mode, short_resp=short_resp)
-    pilot['subject'] = pilot['subject'] + 100
-    feats = frontiers.append(pilot, ignore_index=True)
-
-    feats.to_csv(out_file, columns=column_names, sep='\t', index=False)
-    pilot.to_csv("features/all_pilot.csv", columns=column_names, sep='\t', index=False)
-    frontiers.to_csv("features/all_fontiers.csv", columns=column_names, sep='\t', index=False)
-
-    return feats, frontiers, pilot
-"""
 
 
-#mode = "none"
-#pone_features, pone_base_right, pone_base_left = extractFeatures(mode=mode, plot=False)
-#plotComparisonHistogram(pone_features, mode=mode, save=False)
-#%matplotlib notebook
-#plt.show()
-
-#mode = "none"
-#print("================== MODE {} =====================".format(mode))
-#lie_features, lie_base_right, lie_base_left = extractLieFeatures(mode=mode, plot=True)
-#lie_plotComparBars(lie_features, lie_base_right, lie_base_left, mode=mode, save=False)
 
 mode = "sub"
 print("================== MODE {} =====================".format(mode))
-lie_features, lie_base_right, lie_base_left = extractLieFeatures(mode=mode, ref_to_base=None, plot=False)
-lie_plotComparBars(lie_features, lie_base_right, lie_base_left, mode=mode, save=False)
+lie_features, lie_base_right, lie_base_left = \
+    extractLieFeatures(subjects=[], mode=mode, ref_to_base="time", plot=False, print_pupil=False)
+#lie_features.to_csv("lie_features.csv", index=False)
+
+#lie_plotComparBars(lie_features, lie_base_right, lie_base_left, save=False)
+#lie_plotBySubject(lie_features, mode=mode, save=False)
+#lie_plotTnTratioMean(lie_features, save=False)
+#lie_plotTnTstem(lie_features, feature="left_mean", save=False)
+
+paired_t_test(lie_features, lie_column_names, print_result=True)
 
 #%matplotlib notebook
 plt.show()
+ 

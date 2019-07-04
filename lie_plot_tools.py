@@ -59,7 +59,7 @@ lie_feat_cols = [
         'label'
     ]
 
-def lie_plotBySubject(features, mode, feat_cols=lie_feat_cols, save=True):
+def lie_plotBySubject(features, mode, feat_cols=lie_feat_cols, save_root="plots/LIE/points_{}.png", save=True):
     
     markers=[',','1','v','^','<','>','8','s','p','P','*','h','H','+','x',
         'X','D','d','|','_','o','2','3','4','.']
@@ -87,9 +87,6 @@ def lie_plotBySubject(features, mode, feat_cols=lie_feat_cols, save=True):
 
         for i, sub in enumerate(subjects):
 
-            if(sub == 4):
-                continue
-
             axs.set_title("{}".format(f))
             axs.set_xlabel("Not Target avg")
             axs.set_ylabel("Target")
@@ -98,27 +95,27 @@ def lie_plotBySubject(features, mode, feat_cols=lie_feat_cols, save=True):
             if(aggrOnes.loc[aggrOnes['subject'] == sub]["card_class"].values[0] == "pig"):
                 size=200
                 color = "r"
-                labels.append("pig{}".format(sub))
+                labels.append("{}".format(sub))
             elif(aggrOnes.loc[aggrOnes['subject'] == sub]["card_class"].values[0] == "unicorn"):
                 size=100
                 color = "b"
-                labels.append("uni{}".format(sub))
+                labels.append("{}".format(sub))
             elif(aggrOnes.loc[aggrOnes['subject'] == sub]["card_class"].values[0] == "pepper"):
                 size=100
                 color = "k"
-                labels.append("pep{}".format(sub))
+                labels.append("{}".format(sub))
             elif(aggrOnes.loc[aggrOnes['subject'] == sub]["card_class"].values[0] == "minion"):
                 size=100
                 color = "g"
-                labels.append("min{}".format(sub))
+                labels.append("{}".format(sub))
             elif(aggrOnes.loc[aggrOnes['subject'] == sub]["card_class"].values[0] == "hedge"):
                 size=100
                 color = "c"
-                labels.append("hed{}".format(sub))
+                labels.append("{}".format(sub))
             elif(aggrOnes.loc[aggrOnes['subject'] == sub]["card_class"].values[0] == "aliens"):
                 size=100
                 color = "y"
-                labels.append("ali{}".format(sub))
+                labels.append("{}".format(sub))
 
             axs.scatter(aggrZeros.loc[aggrZeros['subject'] == sub][f],
                         aggrOnes.loc[aggrOnes['subject'] == sub][f],
@@ -154,7 +151,7 @@ def lie_plotBySubject(features, mode, feat_cols=lie_feat_cols, save=True):
 
         axs.plot(lims, lims, alpha=0.75, zorder=100)
         if(save):
-            fig.savefig("plots/{}/subject/nTvsT_{}".format(mode, f))
+            fig.savefig(save_root.format(f))
 
 def lie_plotTnTratioMean(features, save=True):
 
@@ -211,7 +208,7 @@ def lie_plotTnTratioMean(features, save=True):
     axs.legend()
     return fig
 
-def lie_plotTnTratioBySubject(features, feature, save=True):
+def lie_plotTnTratioBySubject(features, feature, save_root="plots/LIE/profile_{}.png", save=True):
 
     #feat_comparison_R = (0, 'right_mean', 'point_right_mean', 'react_right_mean', 'descr_right_mean')
 
@@ -241,12 +238,15 @@ def lie_plotTnTratioBySubject(features, feature, save=True):
 
     axs[0].legend(loc='center left', bbox_to_anchor=(1, 0.5))
     #axs[1].legend(loc='center right', bbox_to_anchor=(1, 0.5))
-    axs[0].set_title("Differenza tra T e nonT")
-    axs[1].set_title("Differenza normalizata a Point")
+    axs[0].set_title("Diff {} T and nonT".format(feature))
+    axs[1].set_title("Diff {} norm to POINT".format(feature))
+
+    if(save):
+        fig.savefig(save_root.format(feature))
     
     return fig
 
-def lie_plotTnTstem(features, feature, save=True):
+def lie_plotTnTstem(features, feature, save_root="plots/LIE/Stem_{}.png", save=True):
 
     fig, axs = plt.subplots(2, figsize=(15, 10), num='STEM TnT {}'.format(feature))
 
@@ -257,30 +257,35 @@ def lie_plotTnTstem(features, feature, save=True):
     tnt_scores = tnt_scores.sort_values(by=['descr_ratio'])
     tnt_scores_norm = tnt_scores_norm.sort_values(by=['descr_ratio'])
 
-    labels = tnt_scores['subject'].values
-    labels_norm = tnt_scores_norm['subject'].values
+    labels = [str(lab) for lab in tnt_scores['subject'].values]
+    labels_norm = [str(lab) for lab in tnt_scores_norm['subject'].values]
 
     x_pos = np.arange(len(labels))
     x_pos_norm = np.arange(len(labels_norm))
 
-    axs[0].stem(labels, tnt_scores['descr_ratio'], linefmt='green', markerfmt='X', label="DESCR")
-    axs[0].stem(labels, tnt_scores['react_ratio'], linefmt='grey', markerfmt='D', label="REACT")
-    axs[0].set_xticks(labels)
+    axs[0].stem(x_pos, tnt_scores['descr_ratio'], linefmt='green', markerfmt='X', label="DESCR")
+    axs[0].stem(x_pos, tnt_scores['react_ratio'], linefmt='grey', markerfmt='D', label="REACT")
+    axs[0].set_xticks(x_pos)
     axs[0].set_xticklabels(labels)
 
-    axs[1].stem(labels_norm, tnt_scores_norm['descr_ratio'], linefmt='green', markerfmt='X', label="DESCR")
-    axs[1].stem(labels_norm, tnt_scores_norm['react_ratio'], linefmt='grey', markerfmt='D', label="REACT")
-    axs[1].set_xticks(labels_norm)
+    axs[1].stem(x_pos_norm, tnt_scores_norm['descr_ratio'], linefmt='green', markerfmt='X', label="DESCR")
+    axs[1].stem(x_pos_norm, tnt_scores_norm['react_ratio'], linefmt='grey', markerfmt='D', label="REACT")
+    axs[1].set_xticks(x_pos_norm)
     axs[1].set_xticklabels(labels_norm)
 
     axs[0].legend()
     axs[1].legend()
+    axs[0].set_title("Diff {} T and nonT".format(feature))
+    axs[1].set_title("Diff {} norm to POINT".format(feature))
     #axs[1].legend(loc='center right', bbox_to_anchor=(1, 0.5))
+
+    if(save):
+        fig.savefig(save_root.format(feature))
     
     return fig
 
 # Average Histogram of Target (old) vs nonTarget (new) for each feature
-def lie_plotComparBars(features, save=True):
+def lie_plotComparBars(features, save_root="plots/LIE/Bars_{}.png", save=True):
 
     feat_comparison = [
         #('duration', 'react_dur', 'point_dur', 'descr_dur'),
@@ -345,7 +350,7 @@ def lie_plotComparBars(features, save=True):
         axs.set_title('{}'.format(whole))
 
         if(save):
-            fig.savefig("plots/XXX/hist/{}".format(whole))
+            fig.savefig(save_root.format(whole))
 
 def lie_plotTimeSeries(subject, card_names, annotations, overall_eye, filtered_inter_dfs, baseline=None):
     

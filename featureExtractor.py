@@ -89,6 +89,15 @@ feat_cols = [
     ]
 
 
+lie_ML_cols = [
+        'right_mean',
+        'left_mean',
+        'react_right_mean', 'react_right_std',
+        'react_left_mean', 'react_left_std',
+        'descr_right_mean','descr_right_std',
+        'descr_left_mean','descr_left_std',
+    ]
+
 sr_window = 1500
 card_names = ['unicorn', 'pepper', 'minion', 'pig', 'hedge', 'aliens']
 
@@ -147,7 +156,7 @@ def extractLieFeatures(subjects=[], cols=lie_column_names, cards=card_names, sou
         if(print_pupil):
             print(annot_dfs[0])
             for card in card_names:
-                print("card {} {}".format(card, sub_features.loc[sub_features['card_class'] == card]['descr_right_mean'].values[0]))
+                print("card {} {}".format(card, sub_features.loc[sub_features['card_class'] == card]['descr_left_mean'].values[0]))
             print("=======================================")
         
 
@@ -198,21 +207,54 @@ def extractFeatures(subject=None, cols=column_names, cards=card_names, source="f
     return features, baseline_right, baseline_left
 
 
+significant_cols = [
+    #'react_right_mean','react_left_mean',
+    #'descr_right_max',
+    'descr_right_mean','descr_left_mean',
+    #'right_mean', 'left_mean', 'left_std'
+    ]
 
 
 mode = "sub"
 print("================== MODE {} =====================".format(mode))
-lie_features, lie_base_right, lie_base_left = \
-    extractLieFeatures(subjects=[], mode=mode, ref_to_base="time", plot=False, print_pupil=False)
+#lie_features, lie_base_right, lie_base_left = \
+#    extractLieFeatures(subjects=[], mode=mode, ref_to_base="time", plot=False, print_pupil=False)
 #lie_features.to_csv("lie_features.csv", index=False)
 
-#lie_plotComparBars(lie_features, lie_base_right, lie_base_left, save=False)
-#lie_plotBySubject(lie_features, mode=mode, save=False)
-#lie_plotTnTratioMean(lie_features, save=False)
-#lie_plotTnTstem(lie_features, feature="left_mean", save=False)
+lie_features = pd.read_csv("lie_features.csv", sep=',')
+lie_features = lie_features.fillna(0)
+#decisionTreeHyperTuning(lie_features, significant_cols)
+randomForestHyperTuning(lie_features, significant_cols)
+#trainMLP(lie_features, significant_cols)
 
-paired_t_test(lie_features, lie_column_names, print_result=True)
+
+#o_cols = lie_column_names.copy()
+#o_cols.remove("source")
+#o_cols.remove("show_order")
+
+#tt_significant_cols = ['subject', 'label', 'card_class', 'react_right_mean','react_left_mean','descr_right_mean','descr_left_mean']
+
+#tt_cols = tt_significant_cols.copy()
+#tt_cols.remove("card_class")
+#tt_cols.remove("label")
+#tt_cols.remove("subject")
+
+#take_max_classifier(lie_features, tt_cols, print_result=True, only_rel=False)
+
+
+
+
+"""
+lie_plotComparBars(lie_features, save=True)
+lie_plotBySubject(lie_features, mode=mode, save=True)
+#lie_plotTnTratioMean(lie_features, save=False)
+
+for col in ['right_mean','left_mean']:
+    lie_plotTnTratioBySubject(lie_features, feature=col, save=True)
+    lie_plotTnTstem(lie_features, feature=col, save=True)
+
+
 
 #%matplotlib notebook
 plt.show()
- 
+"""

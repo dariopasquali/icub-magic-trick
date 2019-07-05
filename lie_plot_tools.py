@@ -7,6 +7,9 @@ pd.options.mode.chained_assignment = None  # default='warn'
 from eye_feature_tools import *
 from evaluation import *
 
+markers=[',','1','v','^','<','>','8','s','p','P','*','h','H','+','x',
+        'X','D','d','|','_','o','2','3','4','.']
+
 lie_feat_cols = [
         'subject',
         #'source',
@@ -61,9 +64,6 @@ lie_feat_cols = [
 
 def lie_plotBySubject(features, mode, feat_cols=lie_feat_cols, save_root="plots/LIE/points_{}.png", save=True):
     
-    markers=[',','1','v','^','<','>','8','s','p','P','*','h','H','+','x',
-        'X','D','d','|','_','o','2','3','4','.']
-
     aggrZeros, aggrOnes, TnT = aggregate_target_nontarget(features, lie_feat_cols)
 
     sub_z = aggrZeros['subject'].values
@@ -212,7 +212,7 @@ def lie_plotTnTratioBySubject(features, feature, save_root="plots/LIE/profile_{}
 
     #feat_comparison_R = (0, 'right_mean', 'point_right_mean', 'react_right_mean', 'descr_right_mean')
 
-    fig, axs = plt.subplots(2, figsize=(15, 10), num='TnT {}'.format(feature))
+    fig, axs = plt.subplots(1, figsize=(15, 10), num='TnT {}'.format(feature))
     labels = ['point', 'reaction', 'description']
 
     tnt_scores, subjects = coumpute_TnT_scores(features, lie_feat_cols, feature, abs_ratio=False)
@@ -233,56 +233,58 @@ def lie_plotTnTratioBySubject(features, feature, save_root="plots/LIE/profile_{}
         y_values = [ point, react, descr]
         y_values_norm = [ point_norm, react_norm, descr_norm]
 
-        axs[0].plot(labels, y_values, '-o', label=sub)
-        axs[1].plot(labels, y_values_norm, '-o', label=sub)
+        axs.plot(labels, y_values, '-o', label=sub)
+        #axs[1].plot(labels, y_values_norm, '-o', label=sub)
 
-    axs[0].legend(loc='center left', bbox_to_anchor=(1, 0.5))
+    axs.legend(loc='center left', bbox_to_anchor=(1, 0.5))
     #axs[1].legend(loc='center right', bbox_to_anchor=(1, 0.5))
-    axs[0].set_title("Diff {} T and nonT".format(feature))
-    axs[1].set_title("Diff {} norm to POINT".format(feature))
+    axs.set_title("Diff {} T and nonT".format(feature))
+    #axs[1].set_title("Diff {} norm to POINT".format(feature))
 
     if(save):
         fig.savefig(save_root.format(feature))
     
     return fig
 
-def lie_plotTnTstem(features, feature, save_root="plots/LIE/Stem_{}.png", save=True):
+def lie_plotTnTPremedIndex(features, feature, save_root="plots/LIE/Premed_{}.png", save=True):
 
-    fig, axs = plt.subplots(2, figsize=(15, 10), num='STEM TnT {}'.format(feature))
+    fig0, axs0 = plt.subplots(1, figsize=(15, 10), num='STEM TnT {}'.format(feature))
+    fig1, axs1 = plt.subplots(1, figsize=(15, 10), num='Premed Index TnT {}'.format(feature))
 
-    tnt_scores, subjects = coumpute_TnT_scores(features, lie_feat_cols, feature, abs_ratio=False)
-    tnt_scores_norm, subjects = coumpute_TnT_scores(features, lie_feat_cols, feature, abs_ratio=False, norm_to_point=True)
-    
-
+    tnt_scores, subjects = coumpute_TnT_scores(features, lie_feat_cols, feature, abs_ratio=False)    
     tnt_scores = tnt_scores.sort_values(by=['descr_ratio'])
-    tnt_scores_norm = tnt_scores_norm.sort_values(by=['descr_ratio'])
-
     labels = [str(lab) for lab in tnt_scores['subject'].values]
-    labels_norm = [str(lab) for lab in tnt_scores_norm['subject'].values]
+    x_pos = np.arange(len(labels))    
 
-    x_pos = np.arange(len(labels))
-    x_pos_norm = np.arange(len(labels_norm))
+    axs0.stem(x_pos, tnt_scores['descr_ratio'], linefmt='green', markerfmt='X', label="DESCR")
+    #axs0.stem(x_pos, tnt_scores['react_ratio'], linefmt='grey', markerfmt='D', label="REACT")
+    axs0.set_xticks(x_pos)
+    axs0.set_xticklabels(labels)
 
-    axs[0].stem(x_pos, tnt_scores['descr_ratio'], linefmt='green', markerfmt='X', label="DESCR")
-    axs[0].stem(x_pos, tnt_scores['react_ratio'], linefmt='grey', markerfmt='D', label="REACT")
-    axs[0].set_xticks(x_pos)
-    axs[0].set_xticklabels(labels)
+    tnt_scores = tnt_scores.sort_values(by=['premed_index'])
 
-    axs[1].stem(x_pos_norm, tnt_scores_norm['descr_ratio'], linefmt='green', markerfmt='X', label="DESCR")
-    axs[1].stem(x_pos_norm, tnt_scores_norm['react_ratio'], linefmt='grey', markerfmt='D', label="REACT")
-    axs[1].set_xticks(x_pos_norm)
-    axs[1].set_xticklabels(labels_norm)
+    labels1 = [str(lab) for lab in tnt_scores['subject'].values]
+    x_pos1 = np.arange(len(labels))
 
-    axs[0].legend()
-    axs[1].legend()
-    axs[0].set_title("Diff {} T and nonT".format(feature))
-    axs[1].set_title("Diff {} norm to POINT".format(feature))
+    axs1.bar(x_pos1, tnt_scores['premed_index'],
+                color='dodgerblue', align='center',
+                width=0.35, alpha=0.8)
+
+    axs1.axhline(y=0)
+    axs1.axhline(y=75, color="limegreen")
+    axs1.axhline(y=100, color="orange")
+    axs1.set_xticks(x_pos1)
+    axs1.set_xticklabels(labels1)
+
+    axs0.legend()
+    axs0.set_title("Diff {} T and nonT".format(feature))
+    axs1.set_title("{} Premeditation Index %".format(feature))
     #axs[1].legend(loc='center right', bbox_to_anchor=(1, 0.5))
 
     if(save):
-        fig.savefig(save_root.format(feature))
+        fig1.savefig(save_root.format(feature))
     
-    return fig
+    return fig0, fig1
 
 # Average Histogram of Target (old) vs nonTarget (new) for each feature
 def lie_plotComparBars(features, save_root="plots/LIE/Bars_{}.png", save=True):
@@ -414,4 +416,40 @@ def lie_plotTimeSeries(subject, card_names, annotations, overall_eye, filtered_i
     
     return fig
 
+def lie_plotQuestRegression(lie_features, quest_ans, slope, intersect, index_col, TnT_score_feature="right_mean"):
 
+    lie_subs = lie_features.groupby('subject').count().index.values
+    quest_subs = quest_ans.groupby('subject').count().index.values
+
+    tnt_scores, subjects = coumpute_TnT_scores(lie_features, lie_feat_cols, TnT_score_feature, abs_ratio=False) 
+
+    subjects = [s for s in lie_subs if s in quest_subs]
+    quest_cols = quest_ans.columns
+
+    for col in quest_cols:
+        
+        fig, axs = plt.subplots(1, figsize=(9, 9), num="lr {}".format(col))
+        labels = []
+
+        for i, sub in enumerate(subjects):
+
+            labels.append("{}".format(sub))
+
+            axs.set_title("{} x {}".format(col, index_col))
+            axs.set_ylabel("{}".format(index_col))
+            axs.set_xlabel("{}".format(col))
+            axs.set_label("{}".format(sub))
+
+            axs.scatter(quest_ans.loc[quest_ans['subject'] == sub][col],
+                        tnt_scores.loc[tnt_scores['subject'] == sub][index_col],
+                        s=200,
+                        marker=markers[i])
+        
+        plt.legend(labels, loc='center left', bbox_to_anchor=(1, 0.5))
+
+        minX = quest_ans[col].min()
+        maxX = quest_ans[col].max()
+        minY = slope * minX + intersect
+        maxY = slope * maxX + intersect        
+
+        axs.plot([minX, maxX], [minY, maxY], alpha=0.75, zorder=100)

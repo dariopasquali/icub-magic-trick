@@ -120,4 +120,6 @@ def coumpute_TnT_scores(features, cols, score_col, norm_to_point=False, abs_rati
         scr = pd.DataFrame(data=[[sub, point_ratio, react_ratio, descr_ratio]], columns=score_columns)
         scores = scores.append(scr, ignore_index=True)
 
+    scores['premed_index'] = 100 * (scores['react_ratio'] / scores['descr_ratio'])
+
     return scores, subjects

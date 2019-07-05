@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 from scipy import stats
 pd.options.mode.chained_assignment = None  # default='warn'
 
+import statsmodels.api as sm
+
 # ========= MACHINE LEARNING ========================
 from imblearn.over_sampling import SMOTE, ADASYN
 from imblearn.pipeline import Pipeline
@@ -34,9 +36,9 @@ from sklearn.utils.multiclass import unique_labels
 from sklearn.metrics import classification_report
 
 # Importing libraries for building the neural network
-from keras.models import Sequential
+"""from keras.models import Sequential
 from keras.layers import Dense
-from keras.wrappers.scikit_learn import KerasClassifier
+from keras.wrappers.scikit_learn import KerasClassifier"""
 from sklearn.model_selection import StratifiedKFold
 from sklearn.model_selection import cross_val_score
 
@@ -78,6 +80,8 @@ def paired_t_test(features, origin_cols, features_to_test, print_result=False, o
         res = pd.DataFrame(data=[[col, t, p, is_rel]], columns=["feature", 't-score', 'p', 'is_sign'])
         results = results.append(res, ignore_index=True)
 
+    results = results.sort_values(by=['p'], ascending=False)
+
     if(print_result):
         print("===== PAIRED T-test RESULTS =====")
         for index, row in results.iterrows():
@@ -90,7 +94,6 @@ def paired_t_test(features, origin_cols, features_to_test, print_result=False, o
                 ))
 
     return results
-
 
 def max_mean_heuristic(features, features_to_test, print_result=False, only_rel=False):
 
@@ -107,16 +110,20 @@ def max_mean_heuristic(features, features_to_test, print_result=False, only_rel=
             sub_feats = feat_restricted.loc[feat_restricted['subject'] == sub]
             sub_card = sub_feats.loc[sub_feats['label'] == 1]['card_class'].values[0]
             
-            diffs = []
+            max_card = ""
+            max_diff = None
 
-            for card in cards:
-
+            for card_out in cards:
+                acc = 0
+                for card in cards:
+                    if(card != card_out):
+                        acc += sub_feats.loc[sub_feats['card_class'] == card][col].values[0]
                 
-
-
-            max_f = sub_feats[col].max()
-            max_card = sub_feats.loc[sub_feats[col] == max_f]['card_class'].values[0]
-
+                diff = sub_feats.loc[sub_feats['card_class'] == card_out][col].values[0] - acc/5
+                if(max_card == "" or diff > max_diff):
+                    max_diff = diff
+                    max_card = card_out
+            
             if(sub_card == max_card):
                 count += 1
 
@@ -127,10 +134,10 @@ def max_mean_heuristic(features, features_to_test, print_result=False, only_rel=
         results = results.append(res, ignore_index=True)
 
 
-    results = results.sort_values(by=['accuracy'], ascending=True)
+    results = results.sort_values(by=['accuracy'])
 
     if(print_result):
-        print("===== TAKE MAX RESULTS =====")
+        print("===== MAX MEAN RESULTS =====")
         for index, row in results.iterrows():
 
             if(only_rel and not row['is_sign']):
@@ -139,9 +146,6 @@ def max_mean_heuristic(features, features_to_test, print_result=False, only_rel=
             print("{} acc:{}   {}".format(
                 row['feature'], row['accuracy'], row['is_sign']
                 ))
-
-
-
 
 def take_max_heuristic(features, features_to_test, print_result=False, only_rel=False):
 
@@ -170,7 +174,7 @@ def take_max_heuristic(features, features_to_test, print_result=False, only_rel=
         results = results.append(res, ignore_index=True)
 
 
-    results = results.sort_values(by=['accuracy'], ascending=True)
+    results = results.sort_values(by=['accuracy'])
 
     if(print_result):
         print("===== TAKE MAX RESULTS =====")
@@ -183,6 +187,33 @@ def take_max_heuristic(features, features_to_test, print_result=False, only_rel=
                 row['feature'], row['accuracy'], row['is_sign']
                 ))
 
+def linear_regression_quest_scores(tnt_scores, quest_ans, score="premed_index"):
+
+    X = quest_ans
+    y = tnt_scores[score]
+    # with statsmodels
+    X = sm.add_constant(X) # adding a constant
+    
+    reg = LinearRegression()
+    reg.fit(X, y)
+
+    #To retrieve the intercept:
+    #print(reg.intercept_)
+    #For retrieving the slope:
+    #print(reg.coef_)
+
+
+    X = sm.add_constant(X) # adding a constant
+    model = sm.OLS(y, X).fit()
+    #predictions = model.predict(X) 
+    
+    print_model = model.summary()
+    #print(print_model)
+
+    #print(model.pvalues[1])
+    #print(model.rsquared)
+
+    return reg.intercept_, reg.coef_, model.rsquared, model.pvalues[1]
 
 # =================== MACHINE LEARNING MODELS ======================
 # Wrappers to put the defined Hyper-params
@@ -235,16 +266,6 @@ def gradientBoostingFactory(n_estim=1000, classes=[0,1]):
     
     return trainGradientBoosting
 
-def linearRegressionFactory(n_estim=1000, classes=[0,1]):
-    
-    def trainLinearRegression(Xtr, Xte, Ytr, Yte, feat_cols, print_metrics=False):
-
-        model = LinearRegression()  
-        model.fit(Xtr, Ytr)
-        y_pred = model.predict(Xte)
-        return calcMetrics(Yte, y_pred, classes, model, norm=True, cols=feat_cols, print_metrics=print_metrics), model
-    
-    return trainLinearRegression
 
 
 def crossValSMOTE(X_sub, y_sub, train_features, cols, model_names, train_eval_methods, N=5, split_mode='stratified', oversample="ADASYN"):
@@ -381,7 +402,7 @@ def evaluate_random_forest(features, feature_cols, N=4, oversample="SMOTE"):
     print('\nParameters currently in use:\n')
     pprint(model.get_params())
     plt.show()
-
+"""
 def trainMLP(features, feature_cols, oversample=None):
 
 
@@ -412,7 +433,7 @@ def trainMLP(features, feature_cols, oversample=None):
 
     preds = model.predict_classes(X_test_0)
     print (classification_report(y_test_0, preds))
-
+"""
 
 """def hyperParamTuning(features, feature_cols, oversample="ADASYN", param_grid):
     # GET DATA

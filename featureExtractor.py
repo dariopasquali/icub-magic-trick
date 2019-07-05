@@ -4,6 +4,7 @@ from scipy import stats
 import matplotlib.pyplot as plt
 pd.options.mode.chained_assignment = None  # default='warn'
 
+from quest_reader import *
 from time_series_extractor import *
 from SubjectMagicFeatures import *
 from LieFeatures import *
@@ -96,6 +97,56 @@ lie_ML_cols = [
         'react_left_mean', 'react_left_std',
         'descr_right_mean','descr_right_std',
         'descr_left_mean','descr_left_std',
+    ]
+
+lie_feat_cols = [
+        'subject',
+        'card_class',
+        'label',
+        'duration',
+        'react_dur',
+        'point_dur',
+        'descr_dur',
+        'fix_freq',
+        'sacc_freq',
+        'right_mean',
+        'right_std',
+        'right_min',
+        'right_max',
+        'left_mean',
+        'left_std',
+        'left_min',
+        'left_max',
+        'react_fix_freq',
+        'react_sacc_freq',
+        'react_right_mean',
+        'react_right_std',
+        'react_right_min',
+        'react_right_max',
+        'react_left_mean',
+        'react_left_std',
+        'react_left_min',
+        'react_left_max',
+        'point_fix_freq',
+        'point_sacc_freq',
+        'point_right_mean',
+        'point_right_std',
+        'point_right_min',
+        'point_right_max',
+        'point_left_mean',
+        'point_left_std',
+        'point_left_min',
+        'point_left_max',
+        'descr_fix_freq',
+        'descr_sacc_freq',
+        'descr_right_mean',
+        'descr_right_std',
+        'descr_right_min',
+        'descr_right_max',
+        'descr_left_mean',
+        'descr_left_std',
+        'descr_left_min',
+        'descr_left_max',
     ]
 
 sr_window = 1500
@@ -216,15 +267,15 @@ significant_cols = [
 
 
 mode = "sub"
-print("================== MODE {} =====================".format(mode))
+print("================== MODE SMOOTH {} =====================".format(mode))
 #lie_features, lie_base_right, lie_base_left = \
 #    extractLieFeatures(subjects=[], mode=mode, ref_to_base="time", plot=False, print_pupil=False)
 #lie_features.to_csv("lie_features.csv", index=False)
 
 lie_features = pd.read_csv("lie_features.csv", sep=',')
-lie_features = lie_features.fillna(0)
+#lie_features = lie_features.fillna(0)
 #decisionTreeHyperTuning(lie_features, significant_cols)
-randomForestHyperTuning(lie_features, significant_cols)
+#randomForestHyperTuning(lie_features, significant_cols)
 #trainMLP(lie_features, significant_cols)
 
 
@@ -232,29 +283,68 @@ randomForestHyperTuning(lie_features, significant_cols)
 #o_cols.remove("source")
 #o_cols.remove("show_order")
 
-#tt_significant_cols = ['subject', 'label', 'card_class', 'react_right_mean','react_left_mean','descr_right_mean','descr_left_mean']
+tt_significant_cols = ['subject', 'label', 'card_class', 'react_right_mean','react_left_mean','descr_right_mean','descr_left_mean']
 
-#tt_cols = tt_significant_cols.copy()
-#tt_cols.remove("card_class")
-#tt_cols.remove("label")
-#tt_cols.remove("subject")
+tt_cols = lie_feat_cols.copy()
+tt_cols.remove("card_class")
+tt_cols.remove("label")
+tt_cols.remove("subject")
 
-#take_max_classifier(lie_features, tt_cols, print_result=True, only_rel=False)
+#paired_t_test(lie_features, lie_feat_cols, tt_cols, print_result=True)
 
+lie_features['descr_mean_rl'] = (lie_features['descr_right_mean'] + lie_features['descr_left_mean'])/2
+#take_max_heuristic(lie_features, ['descr_mean_rl', 'descr_right_mean', 'descr_left_mean'], print_result=True, only_rel=False)
+#max_mean_heuristic(lie_features, lie_ML_cols, print_result=True, only_rel=False)
 
-
-
-"""
-lie_plotComparBars(lie_features, save=True)
-lie_plotBySubject(lie_features, mode=mode, save=True)
+#lie_plotComparBars(lie_features, save=True)
+#lie_plotBySubject(lie_features, mode=mode, save=True)
 #lie_plotTnTratioMean(lie_features, save=False)
 
-for col in ['right_mean','left_mean']:
-    lie_plotTnTratioBySubject(lie_features, feature=col, save=True)
-    lie_plotTnTstem(lie_features, feature=col, save=True)
+quest_ans = preprocessQuest("data/personality_raw.csv")
+tnt_scores, subjects = coumpute_TnT_scores(lie_features, lie_feat_cols, "right_mean", abs_ratio=False)
+quest_ans = quest_ans.loc[quest_ans['subject'].isin(subjects)]
+
+tnt_scores = tnt_scores.reset_index()
+quest_ans = quest_ans.reset_index()
+#quest_ans = quest_ans.drop(['index', 'subject'], axis=1)
+
+#qa = quest_ans[['histrionic', 'extraversion','agreeableness ','conscientiousness ','neuroticism ','openness','narci' ]]
+qa = quest_ans[['histrionic']]
+#qa = quest_ans[['NARS_S1','NARS_S2','NARS_S3','NARS_TOTAL']]
+#qa = quest_ans[['MAC_Negative_Interpersonal_Tactics','MAC_Positive_Interpersonal_Tactics','MAC_Cynical_view_human_nature','MAC_Positive_view_human_nature','MAC_TOTAL']]
+#qa =quest_ans[['PSY_Primary_Psychopathy','PSY_Secondary_Psychopathy','PSY_TOTAL']]
+
+"""
+goods = []
+
+for sc in ["premed_index", 'descr_ratio', 'react_ratio']:
+    for q in quest_ans.columns:
+        qa = quest_ans[[q]]
+        intersect, slope, adj, p = linear_regression_quest_scores(tnt_scores, qa, score=sc)
+        if(p < 0.05):
+            goods.append((intersect, slope, q, sc, adj, p))
+            #print("{} {} {} {}".format(q, sc, adj, p))
+
+for (intersect, slope, q, sc, adj, p) in goods:
+    print("{} {} {} {} {}".format(q, sc, slope[1], adj, p))
+"""
+
+"""
+for col in quest_ans.columns:
+    print("================================= {} ==================================".format(col))
+    qa = quest_ans[[col]]
+    linear_regression_quest_scores(tnt_scores, qa, score="premed_index")
+"""
+
+qa = quest_ans[['subject', 'histrionic']]
+intersect, slope, adj, p = linear_regression_quest_scores(tnt_scores, qa, score="descr_ratio")
+lie_plotQuestRegression(lie_features, qa, slope[1], intersect, index_col="descr_ratio")
+
+for col in ['right_mean']:
+    #lie_plotTnTratioBySubject(lie_features, feature=col, save=True)
+    lie_plotTnTPremedIndex(lie_features, feature=col, save=True)
 
 
 
 #%matplotlib notebook
 plt.show()
-"""

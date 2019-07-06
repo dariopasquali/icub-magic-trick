@@ -15,6 +15,8 @@ def referEyeFeaturesToBaseline(features, baseline, right_eye_cols, left_eye_cols
 
     return features
 
+# Aggrega i non target facendone la media in un solo valore
+# restituisce l-unico target
 def extract_target_nontarget(features, subject, cols, nonTarget, target):
     data = features[cols].loc[features['subject'] == subject]
     nt = data.loc[features['label'] == 0].drop(['card_class'], axis=1)

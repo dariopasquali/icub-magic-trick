@@ -11,6 +11,7 @@ from LieFeatures import *
 from plot_tools import *
 from lie_plot_tools import *
 from evaluation import *
+from Machine_Learning import *
 
 column_names = [
         'subject','source','duration','card_class','show_order',
@@ -152,6 +153,11 @@ lie_feat_cols = [
 sr_window = 1500
 card_names = ['unicorn', 'pepper', 'minion', 'pig', 'hedge', 'aliens']
 
+def warn(*args, **kwargs):
+    pass
+import warnings
+warnings.warn = warn
+
 def extractLieFeatures(subjects=[], cols=lie_column_names, cards=card_names, source="frontiers", ref_to_base="time", mode="sub", plot=False, print_pupil=False):
 
     # refer_to_base = [time, feat, None]
@@ -281,8 +287,14 @@ significant_cols = [
     'react_left_min',
     'react_left_max',
     'react_dur',
-    'point_dur',
     'descr_dur',
+    ]
+
+reduced_significant_cols = [
+    'descr_right_mean',
+    'descr_left_mean',
+    'react_right_mean',
+    'react_left_mean',
     ]
 
 
@@ -295,12 +307,23 @@ print("================== MODE SMOOTH {} =====================".format(mode))
 lie_features = pd.read_csv("lie_features.csv", sep=',')
 #lie_features = lie_features.fillna(0)
 
+lie_features['premed_score_right'] = lie_features['react_right_mean'] / lie_features['descr_right_mean']
+lie_features['premed_score_left'] = lie_features['react_left_mean'] / lie_features['descr_left_mean']
+
+significant_cols.append('premed_score_right')
+significant_cols.append('premed_score_left')
+
+grid_search_Decision_Tree(lie_features, significant_cols)
+
+
+#tnt_scores, subjects = coumpute_TnT_scores(lie_features, lie_feat_cols, "right_mean", abs_ratio=False)
+
 #lie_plotComparBars(lie_features, save=True)
 #lie_plotBySubject(lie_features, mode=mode, save=False)
 
-for col in ['right_mean']:
+#for col in ['right_mean']:
 #    lie_plotTnTratioBySubject(lie_features, feature=col, save=True)
-    lie_plotTnTPremedIndex(lie_features, feature=col, save=False)
+#    lie_plotTnTPremedIndex(lie_features, feature=col, save=False)
 
 
 #cols_to_norm = ['subject', 'label', 'card_class']

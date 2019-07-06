@@ -1,0 +1,50 @@
+# NO OVERSAMPLING =========================== Tuning hyper-parameters for balanced_accuracy
+
+Best parameters set found on development set:
+
+{'C': 10, 'class_weight': 'balanced', 'gamma': 0.001, 'kernel': 'sigmoid'}
+
+Grid scores on development set:
+
+
+>>>>>>> Validation Set Report:
+
+The model is trained on the full Training set.
+The scores are computed on the full Validation set.
+
+              precision    recall  f1-score   support
+
+           0       1.00      0.71      0.83        14
+           1       0.50      1.00      0.67         4
+
+   micro avg       0.78      0.78      0.78        18
+   macro avg       0.75      0.86      0.75        18
+weighted avg       0.89      0.78      0.80        18
+
+
+Accuracy: 0.7777777777777778
+Balanced Accuracy: 0.8571428571428572
+Precision: 0.5
+Recall: 1.0
+F1: 0.6666666666666666
+
+>>>>>>> Test Set Report:
+
+The model is trained on the full Training set.
+The scores are computed on the full Test set.
+
+              precision    recall  f1-score   support
+
+           0       1.00      0.70      0.82        20
+           1       0.40      1.00      0.57         4
+
+   micro avg       0.75      0.75      0.75        24
+   macro avg       0.70      0.85      0.70        24
+weighted avg       0.90      0.75      0.78        24
+
+
+Accuracy: 0.75
+Balanced Accuracy: 0.85
+Precision: 0.4
+Recall: 1.0
+F1: 0.5714285714285715

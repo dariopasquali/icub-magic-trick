@@ -23,7 +23,7 @@ def normalizeWithinSubject(features, cols, mode="minmax"):
             else:
 
                 mean = sub_col_feat.mean()
-                std = sub_col_feat.std(0)
+                std = sub_col_feat.std()
 
                 features.loc[features['subject'] == sub, [col]] = (sub_col_feat - mean) / std
 

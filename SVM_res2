@@ -1,0 +1,66 @@
+(base) dario@IITRBCSLAP114:~/Projects/MAGIC/MAGIC_FRONTIERS$ python featureExtractor.py 
+================== MODE SMOOTH sub =====================
+Grid Search Hyperparam optimization
+==============================
+columns ['descr_right_mean', 'descr_left_mean', 'react_right_mean', 'react_left_mean', 'premed_score_right', 'premed_score_left']
+number of datapoint: 96
+Normalize: True
+Oversample: True
+Oversample Mode: minmax
+Drop NaN: True
+==============================
+split the dataset into Train and Test
+Resplit the Test set in Test and Validtion
+
+# =========================== Tuning hyper-parameters for f1
+
+Best parameters set found on development set:
+
+{'clf__C': 1, 'clf__gamma': 1, 'clf__kernel': 'rbf'}
+
+Grid scores on development set:
+
+
+>>>>>>> Validation Set Report:
+
+The model is trained on the full Training set.
+The scores are computed on the full Validation set.
+
+              precision    recall  f1-score   support
+
+           0       0.93      1.00      0.97        14
+           1       1.00      0.75      0.86         4
+
+   micro avg       0.94      0.94      0.94        18
+   macro avg       0.97      0.88      0.91        18
+weighted avg       0.95      0.94      0.94        18
+
+
+Accuracy: 0.9444444444444444
+Balanced Accuracy: 0.875
+Precision: 1.0
+Recall: 0.75
+F1: 0.8571428571428571
+AUROC: 0.875
+
+>>>>>>> Test Set Report:
+
+The model is trained on the full Training set.
+The scores are computed on the full Test set.
+
+              precision    recall  f1-score   support
+
+           0       0.94      0.85      0.89        20
+           1       0.50      0.75      0.60         4
+
+   micro avg       0.83      0.83      0.83        24
+   macro avg       0.72      0.80      0.75        24
+weighted avg       0.87      0.83      0.85        24
+
+
+Accuracy: 0.8333333333333334
+Balanced Accuracy: 0.8
+Precision: 0.5
+Recall: 0.75
+F1: 0.6
+AUROC: 0.8

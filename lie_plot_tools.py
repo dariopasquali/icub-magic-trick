@@ -10,6 +10,39 @@ from evaluation import *
 markers=[',','1','v','^','<','>','8','s','p','P','*','h','H','+','x',
         'X','D','d','|','_','o','2','3','4','.']
 
+card_color_map = {
+    "unicorn" : "#1E90FF",
+    "pepper" : "#FFD700",
+    "minion" : "#FF0000",
+    "aliens" : "#32CD32",
+    "hedge" : "#4B0082",
+    "pig" : "#FF8C00"
+}
+
+marker_map = {
+    0 :  ("." , "#696969"), 
+    1 :  ("o" , "#9A6324" ), 
+    2 :  ("v" , "#808000" ), 
+    3 :  ("^" , "#469990" ), 
+    4 :  ("<" , "#000075" ), 
+    5 :  (">" , "#000000" ), 
+    6 :  ("s" , "#e6194B" ), 
+    7 :  ("P" , "#f58231" ), 
+    8 :  ("*" , "#FFD700" ), 
+    9 :  ("+" , "#bfef45" ), 
+    10 : ( "x" , "#3cb44b" ), 
+    11 : ( "X" , "#42d4f4" ), 
+    12 : ( "D" , "#4363d8" ), 
+    13 : ( "d" , "#911eb4" ), 
+    14 : ( "p" , "#f032e6" ), 
+    15 : ( "1" , "#a9a9a9" ), 
+    16 : ( "4" , "#800000" ) 
+}
+
+label_font_size = 18
+legend_prop_size = {'size': 18}
+
+
 lie_feat_cols = [
         'subject',
         #'source',
@@ -76,8 +109,11 @@ def lie_plotBySubject(features, mode, feat_cols=lie_feat_cols, save_root="plots/
     plot_cols.remove('subject')
     plot_cols.remove('card_class')
 
+    plot_cols = ["descr_right_mean"]
+
     for f in plot_cols:
-        fig, axs = plt.subplots(1, figsize=(9, 9), num="x{}".format(f))
+        fig, axs = plt.subplots(1, figsize=(12, 12), num="x{}".format(f))
+        
         labels = []
 
         pallX = aggrZeros[f].mean(skipna=True)
@@ -87,41 +123,21 @@ def lie_plotBySubject(features, mode, feat_cols=lie_feat_cols, save_root="plots/
 
         for i, sub in enumerate(subjects):
 
-            axs.set_title("{}".format(f))
-            axs.set_xlabel("Not Target avg")
-            axs.set_ylabel("Target")
+            axs.set_xlabel("Right Mean Pupil Dilation Average Non Target", fontsize=label_font_size)
+            axs.set_ylabel("Right Mean Pupil Dilation Target", fontsize=label_font_size)
             axs.set_label("{}".format(sub))
 
-            if(aggrOnes.loc[aggrOnes['subject'] == sub]["card_class"].values[0] == "pig"):
-                size=200
-                color = "r"
-                labels.append("{}".format(sub))
-            elif(aggrOnes.loc[aggrOnes['subject'] == sub]["card_class"].values[0] == "unicorn"):
-                size=100
-                color = "b"
-                labels.append("{}".format(sub))
-            elif(aggrOnes.loc[aggrOnes['subject'] == sub]["card_class"].values[0] == "pepper"):
-                size=100
-                color = "k"
-                labels.append("{}".format(sub))
-            elif(aggrOnes.loc[aggrOnes['subject'] == sub]["card_class"].values[0] == "minion"):
-                size=100
-                color = "g"
-                labels.append("{}".format(sub))
-            elif(aggrOnes.loc[aggrOnes['subject'] == sub]["card_class"].values[0] == "hedge"):
-                size=100
-                color = "c"
-                labels.append("{}".format(sub))
-            elif(aggrOnes.loc[aggrOnes['subject'] == sub]["card_class"].values[0] == "aliens"):
-                size=100
-                color = "y"
-                labels.append("{}".format(sub))
+            color = card_color_map[aggrOnes.loc[aggrOnes['subject'] == sub]["card_class"].values[0]]
+            size = 200
+            labels.append("{}".format(sub))
+            marker = marker_map[sub][0]
 
+            
             axs.scatter(aggrZeros.loc[aggrZeros['subject'] == sub][f],
                         aggrOnes.loc[aggrOnes['subject'] == sub][f],
                         s=size,
                         c=color,
-                        marker=markers[i]) 
+                        marker=marker) 
 
 
         minX = aggrZeros[f].min()
@@ -142,14 +158,17 @@ def lie_plotBySubject(features, mode, feat_cols=lie_feat_cols, save_root="plots/
         axs.set_ylim(minXY, maxXY)
         axs.set_aspect('equal')        
 
-        plt.legend(labels, loc='center left', bbox_to_anchor=(1, 0.5))    
+        plt.legend(labels, loc='center left', bbox_to_anchor=(1, 0.5), prop=legend_prop_size)    
 
-        axs.scatter(pallX, pallY, s=200, alpha=0.7)
+        axs.scatter(pallX, pallY, s=200, alpha=0.5)
         axs.errorbar(pallX, pallY,
                 xerr=pallX_ste,
                 yerr=pallY_ste)
 
         axs.plot(lims, lims, alpha=0.75, zorder=100)
+
+        axs.tick_params(axis='both', which='major', labelsize=label_font_size)
+
         if(save):
             fig.savefig(save_root.format(f))
 
@@ -233,18 +252,93 @@ def lie_plotTnTratioBySubject(features, feature, save_root="plots/LIE/profile_{}
         y_values = [ point, react, descr]
         y_values_norm = [ point_norm, react_norm, descr_norm]
 
-        axs.plot(labels, y_values, '-o', label=sub)
+        marker = '-' + marker_map[sub][0]
+        color = marker_map[sub][1]
+
+        axs.plot(labels, y_values, marker, label=sub, markersize=15, color=color)
         #axs[1].plot(labels, y_values_norm, '-o', label=sub)
 
-    axs.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+    axs.legend(loc='center left', bbox_to_anchor=(1, 0.5), prop=legend_prop_size)
     #axs[1].legend(loc='center right', bbox_to_anchor=(1, 0.5))
-    axs.set_title("Diff {} T and nonT".format(feature))
+    #axs.set_title("Diff {} T and nonT".format(feature))
     #axs[1].set_title("Diff {} norm to POINT".format(feature))
+
+    axs.tick_params(axis='both', which='major', labelsize=label_font_size)
 
     if(save):
         fig.savefig(save_root.format(feature))
     
     return fig
+
+def lie_stemPlot(features, feature, save_root="plots/LIE/Stem_{}.png", save=True):
+
+    tnt_scores, subjects = coumpute_TnT_scores(features, lie_feat_cols, feature, abs_ratio=False)    
+    tnt_scores = tnt_scores.sort_values(by=['descr_ratio'])
+    labels = [str(lab) for lab in tnt_scores['subject'].values]
+
+    print(tnt_scores)
+    print(labels)
+
+    pos = 0
+
+    for sub in labels:
+
+        sub = int(sub)
+
+        val = tnt_scores.loc[tnt_scores['subject'] == sub]['descr_ratio']
+        #pos = tnt_scores.loc[tnt_scores['subject'] == sub].index.values[0]
+
+        print("sub {} pos {}".format(sub, pos))
+        marker = marker_map[sub][0]
+        color = marker_map[sub][1]
+        (markers, stemlines, baseline) = plt.stem([pos],tnt_scores.loc[tnt_scores['subject'] == sub]['descr_ratio'],
+         markerfmt=marker)
+
+        plt.setp(markers, markersize=18, color=color)
+
+        pos += 1
+
+    x_pos = np.arange(len(labels))  
+    plt.axhline(y=0, color="red")
+    plt.xticks(ticks=x_pos, labels=labels)
+
+    plt.xlabel("Subjects", fontsize=label_font_size)
+    plt.ylabel("DESCR Lie Score", fontsize=label_font_size)
+    plt.tick_params(axis='both', which='major', labelsize=label_font_size)
+
+def lie_premedPlot(features, feature, save_root="plots/LIE/Premed_{}.png", save=True):
+
+
+    tnt_scores, subjects = coumpute_TnT_scores(features, lie_feat_cols, feature, abs_ratio=False)    
+    tnt_scores = tnt_scores.sort_values(by=['descr_ratio'])
+    labels = [str(lab) for lab in tnt_scores['subject'].values]
+
+    pos = 0
+
+    for sub in labels:
+
+        sub = int(sub)
+        #pos = tnt_scores.loc[tnt_scores['subject'] == sub].index.values[0]
+
+        marker = marker_map[sub][0]
+        color = marker_map[sub][1]
+        (markers, stemlines, baseline) = plt.stem([pos],tnt_scores.loc[tnt_scores['subject'] == sub]['premed_index'],
+         markerfmt=marker)
+
+        plt.setp(markers, markersize=18, color=color)
+        plt.setp(stemlines, linewidth=2)
+
+        pos += 1
+
+    x_pos = np.arange(len(labels))  
+    plt.axhline(y=0, color="black")
+    plt.axhline(y=75, color="green")
+    plt.axhline(y=100, color="red")
+    plt.xticks(ticks=x_pos, labels=labels)
+
+    plt.xlabel("Subjects", fontsize=label_font_size)
+    plt.ylabel("Premeditation Score", fontsize=label_font_size)
+    plt.tick_params(axis='both', which='major', labelsize=label_font_size)
 
 def lie_plotTnTPremedIndex(features, feature, save_root="plots/LIE/Premed_{}.png", save=True):
 
@@ -253,15 +347,18 @@ def lie_plotTnTPremedIndex(features, feature, save_root="plots/LIE/Premed_{}.png
 
     tnt_scores, subjects = coumpute_TnT_scores(features, lie_feat_cols, feature, abs_ratio=False)    
     tnt_scores = tnt_scores.sort_values(by=['descr_ratio'])
+    
     labels = [str(lab) for lab in tnt_scores['subject'].values]
     x_pos = np.arange(len(labels))    
+
+    print(labels)
 
     axs0.stem(x_pos, tnt_scores['descr_ratio'], linefmt='green', markerfmt='X', label="DESCR")
     #axs0.stem(x_pos, tnt_scores['react_ratio'], linefmt='grey', markerfmt='D', label="REACT")
     axs0.set_xticks(x_pos)
     axs0.set_xticklabels(labels)
 
-    tnt_scores = tnt_scores.sort_values(by=['premed_index'])
+    #tnt_scores = tnt_scores.sort_values(by=['premed_index'])
 
     labels1 = [str(lab) for lab in tnt_scores['subject'].values]
     x_pos1 = np.arange(len(labels))
@@ -276,10 +373,9 @@ def lie_plotTnTPremedIndex(features, feature, save_root="plots/LIE/Premed_{}.png
     axs1.set_xticks(x_pos1)
     axs1.set_xticklabels(labels1)
 
-    axs0.legend()
-    axs0.set_title("Diff {} T and nonT".format(feature))
-    axs1.set_title("{} Premeditation Index %".format(feature))
-    #axs[1].legend(loc='center right', bbox_to_anchor=(1, 0.5))
+    axs1.set_xlabel("Subjects", fontsize=label_font_size)
+    axs1.set_ylabel("Premeditation Score", fontsize=label_font_size)
+    axs1.tick_params(axis='both', which='major', labelsize=label_font_size)
 
     if(save):
         fig1.savefig(save_root.format(feature))
@@ -297,7 +393,7 @@ def lie_plotComparBars(features, save_root="plots/LIE/Bars_{}.png", save=True):
         #('right_std', 'point_right_std', 'react_right_std', 'descr_right_std'),
         #('right_min', 'point_right_min', 'react_right_min', 'descr_right_min'),
         #('right_max', 'point_right_max', 'react_right_max', 'descr_right_max'),
-        ('left_mean', 'point_left_mean', 'react_left_mean', 'descr_left_mean'),
+        #('left_mean', 'point_left_mean', 'react_left_mean', 'descr_left_mean'),
         #('left_std', 'point_left_std', 'react_left_std', 'descr_left_std'),
         #('left_min', 'point_left_min', 'react_left_min', 'descr_left_min'),
         #('left_max', 'point_left_max', 'react_left_max', 'descr_left_max')
@@ -306,13 +402,13 @@ def lie_plotComparBars(features, save_root="plots/LIE/Bars_{}.png", save=True):
     nonTargets, targets, TnT = aggregate_target_nontarget(features, lie_feat_cols)
 
     bar_width = 0.25   
-    labels = ['point', 'react', 'descr']
+    labels = ['POINT', 'REACT', 'DESCR']
     x_pos = np.arange(len(labels))
 
     for (whole, point, react, descr) in feat_comparison:
 
         fig, axs = plt.subplots(1, figsize=(15, 10), num='{}'.format(whole))
-        fig.suptitle('{}'.format(whole), fontsize=16)
+        #fig.suptitle('{}'.format(whole), fontsize=16)
 
         nT_react_mean = nonTargets[react].mean(skipna=True)
         nT_point_mean = nonTargets[point].mean(skipna=True)
@@ -339,17 +435,22 @@ def lie_plotComparBars(features, save_root="plots/LIE/Bars_{}.png", save=True):
         x_pos = np.arange(len(labels))
         axs.bar(x_pos, y_values_T,
                 yerr=T_errors,
-                color='g', align='center',
-                width=bar_width, label='Target (OLD)', alpha=0.8)
+                color='#32CD32', 
+                width=bar_width, label='Right Mean Dilation Target')
 
         axs.bar(x_pos+bar_width, y_values_nT,
                 yerr=nT_errors,
-                color='b', align='center',
-                width=bar_width, label='nonTarget (NEW)', alpha=0.8)
-        axs.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+                color='#1E90FF', 
+                width=bar_width, label='Right Mean Dilation average Non Target')
+
+        axs.legend(loc="upper left", prop=legend_prop_size)
+
         axs.set_xticks(x_pos)
         axs.set_xticklabels(labels)
-        axs.set_title('{}'.format(whole))
+        axs.set_ylabel("Right Mean Pupil Dilation", fontsize=label_font_size)
+        #axs.set_title('{}'.format(whole))
+
+        axs.tick_params(axis='both', which='major', labelsize=label_font_size)
 
         if(save):
             fig.savefig(save_root.format(whole))

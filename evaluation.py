@@ -186,6 +186,8 @@ def take_max_heuristic(features, features_to_test, print_result=False, only_rel=
             print("{} acc:{}   {}".format(
                 row['feature'], row['accuracy'], row['is_sign']
                 ))
+    
+    return results
 
 def linear_regression_quest_scores(tnt_scores, quest_ans, score="premed_index"):
 

@@ -5,6 +5,30 @@ import matplotlib.pyplot as plt
 pd.options.mode.chained_assignment = None  # default='warn'
 from statsmodels.robust.scale import mad
 
+def normalizeWithinSubject(features, cols, mode="minmax"):
+
+    subjects = features.groupby('subject').count().index.values
+
+    for sub in subjects:
+        for col in cols:
+            sub_col_feat = features.loc[features['subject'] == sub][col]
+
+            if(mode == "minmax"):
+               
+                max_c = sub_col_feat.max()
+                min_c = sub_col_feat.min()
+
+                features.loc[features['subject'] == sub, [col]] = (sub_col_feat - min_c) / (max_c - min_c)
+                
+            else:
+
+                mean = sub_col_feat.mean()
+                std = sub_col_feat.std(0)
+
+                features.loc[features['subject'] == sub, [col]] = (sub_col_feat - mean) / std
+
+    return features
+
 # refer an array of eye data to the mean of the baseline
 def referToBaseline(data, baseline, mode="sub", source_cols=['diam_right'], baseline_col='diam_right'):
 

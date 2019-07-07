@@ -307,13 +307,24 @@ print("================== MODE SMOOTH {} =====================".format(mode))
 lie_features = pd.read_csv("lie_features.csv", sep=',')
 #lie_features = lie_features.fillna(0)
 
+#for col in ['right_mean']:
+#    lie_plotTnTratioBySubject(lie_features, feature=col, save=True)
+#    lie_plotTnTPremedIndex(lie_features, feature=col, save=False)
+
+#plt.show()
+
 lie_features['premed_score_right'] = lie_features['react_right_mean'] / lie_features['descr_right_mean']
 lie_features['premed_score_left'] = lie_features['react_left_mean'] / lie_features['descr_left_mean']
 
-significant_cols.append('premed_score_right')
-significant_cols.append('premed_score_left')
+#significant_cols.append('premed_score_right')
+#significant_cols.append('premed_score_left')
 
-grid_search_Decision_Tree(lie_features, significant_cols)
+#reduced_significant_cols.append('premed_score_right')
+#reduced_significant_cols.append('premed_score_left')
+
+col_sets = [reduced_significant_cols]
+
+multiple_grid_search(lie_features, col_sets)
 
 
 #tnt_scores, subjects = coumpute_TnT_scores(lie_features, lie_feat_cols, "right_mean", abs_ratio=False)
@@ -321,9 +332,7 @@ grid_search_Decision_Tree(lie_features, significant_cols)
 #lie_plotComparBars(lie_features, save=True)
 #lie_plotBySubject(lie_features, mode=mode, save=False)
 
-#for col in ['right_mean']:
-#    lie_plotTnTratioBySubject(lie_features, feature=col, save=True)
-#    lie_plotTnTPremedIndex(lie_features, feature=col, save=False)
+
 
 
 #cols_to_norm = ['subject', 'label', 'card_class']

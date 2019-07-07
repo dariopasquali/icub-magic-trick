@@ -1,0 +1,106 @@
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ Multiple Grid Search 
+==============================
+columns ['descr_fix_freq', 'descr_sacc_freq', 'descr_right_mean', 'descr_right_std', 'descr_right_min', 'descr_right_max', 'descr_left_mean', 'descr_left_std', 'descr_left_min', 'descr_left_max', 'react_fix_freq', 'react_sacc_freq', 'react_right_mean', 'react_right_std', 'react_right_min', 'react_right_max', 'react_left_mean', 'react_left_std', 'react_left_min', 'react_left_max', 'react_dur', 'descr_dur', 'premed_score_right', 'premed_score_left']
+number of datapoint: 96
+Normalize: True
+Oversample: True
+Oversample Mode: minmax
+Drop NaN: True
+==============================
+Split in Train and Test set, equal for all the models
+==============================
+Train Set Datapoints 72
+Test Set Datapoints 24
+==============================
+# =========================== Tuning hyper-parameters for roc_auc
+
+Fitting 4 folds for each of 540 candidates, totalling 2160 fits
+Best parameters set found on development set:
+
+{'clf__bootstrap': False, 'clf__max_depth': 20, 'clf__max_features': 'sqrt', 'clf__min_samples_leaf': 5, 'clf__min_samples_split': 2, 'clf__n_estimators': 10}
+
+Grid scores on development set:
+
+
+>>>>>>> Test Set Report <<<<<<<<
+
+The model is trained on the full Training set.
+The scores are computed on the never revealed Test set.
+
+              precision    recall  f1-score   support
+
+           0       0.95      0.90      0.92        20
+           1       0.60      0.75      0.67         4
+
+   micro avg       0.88      0.88      0.88        24
+   macro avg       0.77      0.82      0.79        24
+weighted avg       0.89      0.88      0.88        24
+
+
+Accuracy: 0.875
+Balanced Accuracy: 0.825
+Precision: 0.6
+Recall: 0.75
+F1: 0.6666666666666665
+AUROC: 0.825
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+================== MODE SMOOTH sub =====================
+ Multiple Grid Search 
+==============================
+columns ['descr_right_mean', 'descr_left_mean', 'react_right_mean', 'react_left_mean', 'premed_score_right', 'premed_score_left']
+number of datapoint: 96
+Normalize: True
+Oversample: True
+Oversample Mode: minmax
+Drop NaN: True
+==============================
+Split in Train and Test set, equal for all the models
+==============================
+Train Set Datapoints 72
+Test Set Datapoints 24
+==============================
+==============================
+ Random Forest 
+==============================
+# =========================== Tuning hyper-parameters for precision
+
+Fitting 4 folds for each of 540 candidates, totalling 2160 fits
+Best parameters set found on development set:
+
+{'clf__bootstrap': True, 'clf__max_depth': 8, 'clf__max_features': 'auto', 'clf__min_samples_leaf': 1, 'clf__min_samples_split': 2, 'clf__n_estimators': 10}
+
+Grid scores on development set:
+
+
+>>>>>>> Test Set Report <<<<<<<<
+
+The model is trained on the full Training set.
+The scores are computed on the never revealed Test set.
+
+              precision    recall  f1-score   support
+
+           0       0.95      0.90      0.92        20
+           1       0.60      0.75      0.67         4
+
+   micro avg       0.88      0.88      0.88        24
+   macro avg       0.77      0.82      0.79        24
+weighted avg       0.89      0.88      0.88        24
+
+
+Accuracy: 0.875
+Balanced Accuracy: 0.825
+Precision: 0.6
+Recall: 0.75
+F1: 0.6666666666666665
+AUROC: 0.825
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

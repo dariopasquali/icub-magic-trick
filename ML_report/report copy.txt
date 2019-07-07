@@ -1,0 +1,1348 @@
+test sys.stdout
+================== MODE SMOOTH sub =====================
+ Multiple Grid Search 
+==============================
+columns ['descr_right_mean', 'descr_left_mean', 'react_right_mean', 'react_left_mean', 'premed_score_right', 'premed_score_left']
+number of datapoint: 96
+Normalize: True
+Oversample: True
+Oversample Mode: minmax
+Drop NaN: True
+==============================
+Split in Train and Test set, equal for all the models
+==============================
+Train Set Datapoints 72
+Test Set Datapoints 24
+==============================
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
+ Support Vector Machine 
+==============================
+# =========================== Tuning hyper-parameters for precision
+
+Fitting 4 folds for each of 81 candidates, totalling 324 fits
+Best parameters set found on development set:
+
+{'clf__C': 1, 'clf__gamma': 1, 'clf__kernel': 'rbf'}
+
+Grid scores on development set:
+
+
+>>>>>>> Test Set Report <<<<<<<<
+
+The model is trained on the full Training set.
+The scores are computed on the never revealed Test set.
+
+              precision    recall  f1-score   support
+
+           0       0.94      0.80      0.86        20
+           1       0.43      0.75      0.55         4
+
+   micro avg       0.79      0.79      0.79        24
+   macro avg       0.68      0.78      0.71        24
+weighted avg       0.86      0.79      0.81        24
+
+
+Accuracy: 0.7916666666666666
+Balanced Accuracy: 0.775
+Precision: 0.42857142857142855
+Recall: 0.75
+F1: 0.5454545454545454
+AUROC: 0.7750000000000001
+
+# =========================== Tuning hyper-parameters for recall
+
+Fitting 4 folds for each of 81 candidates, totalling 324 fits
+Best parameters set found on development set:
+
+{'clf__C': 0.001, 'clf__gamma': 0.001, 'clf__kernel': 'rbf'}
+
+Grid scores on development set:
+
+
+>>>>>>> Test Set Report <<<<<<<<
+
+The model is trained on the full Training set.
+The scores are computed on the never revealed Test set.
+
+              precision    recall  f1-score   support
+
+           0       1.00      0.60      0.75        20
+           1       0.33      1.00      0.50         4
+
+   micro avg       0.67      0.67      0.67        24
+   macro avg       0.67      0.80      0.62        24
+weighted avg       0.89      0.67      0.71        24
+
+
+Accuracy: 0.6666666666666666
+Balanced Accuracy: 0.8
+Precision: 0.3333333333333333
+Recall: 1.0
+F1: 0.5
+AUROC: 0.8
+
+# =========================== Tuning hyper-parameters for f1
+
+Fitting 4 folds for each of 81 candidates, totalling 324 fits
+Best parameters set found on development set:
+
+{'clf__C': 1000, 'clf__gamma': 0.01, 'clf__kernel': 'rbf'}
+
+Grid scores on development set:
+
+
+>>>>>>> Test Set Report <<<<<<<<
+
+The model is trained on the full Training set.
+The scores are computed on the never revealed Test set.
+
+              precision    recall  f1-score   support
+
+           0       0.93      0.70      0.80        20
+           1       0.33      0.75      0.46         4
+
+   micro avg       0.71      0.71      0.71        24
+   macro avg       0.63      0.72      0.63        24
+weighted avg       0.83      0.71      0.74        24
+
+
+Accuracy: 0.7083333333333334
+Balanced Accuracy: 0.725
+Precision: 0.3333333333333333
+Recall: 0.75
+F1: 0.46153846153846156
+AUROC: 0.7249999999999999
+
+# =========================== Tuning hyper-parameters for balanced_accuracy
+
+Fitting 4 folds for each of 81 candidates, totalling 324 fits
+Best parameters set found on development set:
+
+{'clf__C': 100, 'clf__gamma': 0.001, 'clf__kernel': 'rbf'}
+
+Grid scores on development set:
+
+
+>>>>>>> Test Set Report <<<<<<<<
+
+The model is trained on the full Training set.
+The scores are computed on the never revealed Test set.
+
+              precision    recall  f1-score   support
+
+           0       1.00      0.70      0.82        20
+           1       0.40      1.00      0.57         4
+
+   micro avg       0.75      0.75      0.75        24
+   macro avg       0.70      0.85      0.70        24
+weighted avg       0.90      0.75      0.78        24
+
+
+Accuracy: 0.75
+Balanced Accuracy: 0.85
+Precision: 0.4
+Recall: 1.0
+F1: 0.5714285714285715
+AUROC: 0.85
+
+# =========================== Tuning hyper-parameters for roc_auc
+
+Fitting 4 folds for each of 81 candidates, totalling 324 fits
+Best parameters set found on development set:
+
+{'clf__C': 1, 'clf__gamma': 1, 'clf__kernel': 'rbf'}
+
+Grid scores on development set:
+
+
+>>>>>>> Test Set Report <<<<<<<<
+
+The model is trained on the full Training set.
+The scores are computed on the never revealed Test set.
+
+              precision    recall  f1-score   support
+
+           0       0.94      0.80      0.86        20
+           1       0.43      0.75      0.55         4
+
+   micro avg       0.79      0.79      0.79        24
+   macro avg       0.68      0.78      0.71        24
+weighted avg       0.86      0.79      0.81        24
+
+
+Accuracy: 0.7916666666666666
+Balanced Accuracy: 0.775
+Precision: 0.42857142857142855
+Recall: 0.75
+F1: 0.5454545454545454
+AUROC: 0.7750000000000001
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
+ Decision Tree 
+==============================
+# =========================== Tuning hyper-parameters for precision
+
+Fitting 4 folds for each of 1200 candidates, totalling 4800 fits
+Best parameters set found on development set:
+
+{'clf__criterion': 'gini', 'clf__max_depth': 2, 'clf__max_features': 'auto', 'clf__min_samples_leaf': 3, 'clf__min_samples_split': 4, 'clf__splitter': 'random'}
+
+Grid scores on development set:
+
+
+>>>>>>> Test Set Report <<<<<<<<
+
+The model is trained on the full Training set.
+The scores are computed on the never revealed Test set.
+
+              precision    recall  f1-score   support
+
+           0       1.00      0.50      0.67        20
+           1       0.29      1.00      0.44         4
+
+   micro avg       0.58      0.58      0.58        24
+   macro avg       0.64      0.75      0.56        24
+weighted avg       0.88      0.58      0.63        24
+
+
+Accuracy: 0.5833333333333334
+Balanced Accuracy: 0.75
+Precision: 0.2857142857142857
+Recall: 1.0
+F1: 0.4444444444444445
+AUROC: 0.75
+
+# =========================== Tuning hyper-parameters for recall
+
+Fitting 4 folds for each of 1200 candidates, totalling 4800 fits
+Best parameters set found on development set:
+
+{'clf__criterion': 'gini', 'clf__max_depth': 2, 'clf__max_features': 'sqrt', 'clf__min_samples_leaf': 5, 'clf__min_samples_split': 4, 'clf__splitter': 'random'}
+
+Grid scores on development set:
+
+
+>>>>>>> Test Set Report <<<<<<<<
+
+The model is trained on the full Training set.
+The scores are computed on the never revealed Test set.
+
+              precision    recall  f1-score   support
+
+           0       1.00      0.45      0.62        20
+           1       0.27      1.00      0.42         4
+
+   micro avg       0.54      0.54      0.54        24
+   macro avg       0.63      0.72      0.52        24
+weighted avg       0.88      0.54      0.59        24
+
+
+Accuracy: 0.5416666666666666
+Balanced Accuracy: 0.725
+Precision: 0.26666666666666666
+Recall: 1.0
+F1: 0.4210526315789474
+AUROC: 0.725
+
+# =========================== Tuning hyper-parameters for f1
+
+Fitting 4 folds for each of 1200 candidates, totalling 4800 fits
+Best parameters set found on development set:
+
+{'clf__criterion': 'gini', 'clf__max_depth': 8, 'clf__max_features': 'auto', 'clf__min_samples_leaf': 4, 'clf__min_samples_split': 3, 'clf__splitter': 'best'}
+
+Grid scores on development set:
+
+
+>>>>>>> Test Set Report <<<<<<<<
+
+The model is trained on the full Training set.
+The scores are computed on the never revealed Test set.
+
+              precision    recall  f1-score   support
+
+           0       0.86      0.95      0.90        20
+           1       0.50      0.25      0.33         4
+
+   micro avg       0.83      0.83      0.83        24
+   macro avg       0.68      0.60      0.62        24
+weighted avg       0.80      0.83      0.81        24
+
+
+Accuracy: 0.8333333333333334
+Balanced Accuracy: 0.6
+Precision: 0.5
+Recall: 0.25
+F1: 0.3333333333333333
+AUROC: 0.6
+
+# =========================== Tuning hyper-parameters for balanced_accuracy
+
+Fitting 4 folds for each of 1200 candidates, totalling 4800 fits
+Best parameters set found on development set:
+
+{'clf__criterion': 'gini', 'clf__max_depth': 2, 'clf__max_features': 'auto', 'clf__min_samples_leaf': 5, 'clf__min_samples_split': 4, 'clf__splitter': 'best'}
+
+Grid scores on development set:
+
+
+>>>>>>> Test Set Report <<<<<<<<
+
+The model is trained on the full Training set.
+The scores are computed on the never revealed Test set.
+
+              precision    recall  f1-score   support
+
+           0       0.94      0.80      0.86        20
+           1       0.43      0.75      0.55         4
+
+   micro avg       0.79      0.79      0.79        24
+   macro avg       0.68      0.78      0.71        24
+weighted avg       0.86      0.79      0.81        24
+
+
+Accuracy: 0.7916666666666666
+Balanced Accuracy: 0.775
+Precision: 0.42857142857142855
+Recall: 0.75
+F1: 0.5454545454545454
+AUROC: 0.7750000000000001
+
+# =========================== Tuning hyper-parameters for roc_auc
+
+Fitting 4 folds for each of 1200 candidates, totalling 4800 fits
+Best parameters set found on development set:
+
+{'clf__criterion': 'gini', 'clf__max_depth': 2, 'clf__max_features': 'sqrt', 'clf__min_samples_leaf': 1, 'clf__min_samples_split': 5, 'clf__splitter': 'best'}
+
+Grid scores on development set:
+
+
+>>>>>>> Test Set Report <<<<<<<<
+
+The model is trained on the full Training set.
+The scores are computed on the never revealed Test set.
+
+              precision    recall  f1-score   support
+
+           0       0.94      0.80      0.86        20
+           1       0.43      0.75      0.55         4
+
+   micro avg       0.79      0.79      0.79        24
+   macro avg       0.68      0.78      0.71        24
+weighted avg       0.86      0.79      0.81        24
+
+
+Accuracy: 0.7916666666666666
+Balanced Accuracy: 0.775
+Precision: 0.42857142857142855
+Recall: 0.75
+F1: 0.5454545454545454
+AUROC: 0.7750000000000001
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
+ Adaptive Boosting 
+==============================
+# =========================== Tuning hyper-parameters for precision
+
+Fitting 4 folds for each of 40 candidates, totalling 160 fits
+Best parameters set found on development set:
+
+{'clf__algorithm': 'SAMME', 'clf__learning_rate': 0.05, 'clf__n_estimators': 200}
+
+Grid scores on development set:
+
+
+>>>>>>> Test Set Report <<<<<<<<
+
+The model is trained on the full Training set.
+The scores are computed on the never revealed Test set.
+
+              precision    recall  f1-score   support
+
+           0       0.94      0.80      0.86        20
+           1       0.43      0.75      0.55         4
+
+   micro avg       0.79      0.79      0.79        24
+   macro avg       0.68      0.78      0.71        24
+weighted avg       0.86      0.79      0.81        24
+
+
+Accuracy: 0.7916666666666666
+Balanced Accuracy: 0.775
+Precision: 0.42857142857142855
+Recall: 0.75
+F1: 0.5454545454545454
+AUROC: 0.7750000000000001
+
+# =========================== Tuning hyper-parameters for recall
+
+Fitting 4 folds for each of 40 candidates, totalling 160 fits
+Best parameters set found on development set:
+
+{'clf__algorithm': 'SAMME', 'clf__learning_rate': 0.1, 'clf__n_estimators': 100}
+
+Grid scores on development set:
+
+
+>>>>>>> Test Set Report <<<<<<<<
+
+The model is trained on the full Training set.
+The scores are computed on the never revealed Test set.
+
+              precision    recall  f1-score   support
+
+           0       0.94      0.80      0.86        20
+           1       0.43      0.75      0.55         4
+
+   micro avg       0.79      0.79      0.79        24
+   macro avg       0.68      0.78      0.71        24
+weighted avg       0.86      0.79      0.81        24
+
+
+Accuracy: 0.7916666666666666
+Balanced Accuracy: 0.775
+Precision: 0.42857142857142855
+Recall: 0.75
+F1: 0.5454545454545454
+AUROC: 0.7750000000000001
+
+# =========================== Tuning hyper-parameters for f1
+
+Fitting 4 folds for each of 40 candidates, totalling 160 fits
+Best parameters set found on development set:
+
+{'clf__algorithm': 'SAMME', 'clf__learning_rate': 0.1, 'clf__n_estimators': 50}
+
+Grid scores on development set:
+
+
+>>>>>>> Test Set Report <<<<<<<<
+
+The model is trained on the full Training set.
+The scores are computed on the never revealed Test set.
+
+              precision    recall  f1-score   support
+
+           0       0.94      0.80      0.86        20
+           1       0.43      0.75      0.55         4
+
+   micro avg       0.79      0.79      0.79        24
+   macro avg       0.68      0.78      0.71        24
+weighted avg       0.86      0.79      0.81        24
+
+
+Accuracy: 0.7916666666666666
+Balanced Accuracy: 0.775
+Precision: 0.42857142857142855
+Recall: 0.75
+F1: 0.5454545454545454
+AUROC: 0.7750000000000001
+
+# =========================== Tuning hyper-parameters for balanced_accuracy
+
+Fitting 4 folds for each of 40 candidates, totalling 160 fits
+Best parameters set found on development set:
+
+{'clf__algorithm': 'SAMME', 'clf__learning_rate': 0.05, 'clf__n_estimators': 200}
+
+Grid scores on development set:
+
+
+>>>>>>> Test Set Report <<<<<<<<
+
+The model is trained on the full Training set.
+The scores are computed on the never revealed Test set.
+
+              precision    recall  f1-score   support
+
+           0       0.94      0.80      0.86        20
+           1       0.43      0.75      0.55         4
+
+   micro avg       0.79      0.79      0.79        24
+   macro avg       0.68      0.78      0.71        24
+weighted avg       0.86      0.79      0.81        24
+
+
+Accuracy: 0.7916666666666666
+Balanced Accuracy: 0.775
+Precision: 0.42857142857142855
+Recall: 0.75
+F1: 0.5454545454545454
+AUROC: 0.7750000000000001
+
+# =========================== Tuning hyper-parameters for roc_auc
+
+Fitting 4 folds for each of 40 candidates, totalling 160 fits
+Best parameters set found on development set:
+
+{'clf__algorithm': 'SAMME.R', 'clf__learning_rate': 0.05, 'clf__n_estimators': 100}
+
+Grid scores on development set:
+
+
+>>>>>>> Test Set Report <<<<<<<<
+
+The model is trained on the full Training set.
+The scores are computed on the never revealed Test set.
+
+              precision    recall  f1-score   support
+
+           0       0.94      0.80      0.86        20
+           1       0.43      0.75      0.55         4
+
+   micro avg       0.79      0.79      0.79        24
+   macro avg       0.68      0.78      0.71        24
+weighted avg       0.86      0.79      0.81        24
+
+
+Accuracy: 0.7916666666666666
+Balanced Accuracy: 0.775
+Precision: 0.42857142857142855
+Recall: 0.75
+F1: 0.5454545454545454
+AUROC: 0.7750000000000001
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
+ Random Forest 
+==============================
+# =========================== Tuning hyper-parameters for precision
+
+Fitting 4 folds for each of 540 candidates, totalling 2160 fits
+Best parameters set found on development set:
+
+{'clf__bootstrap': True, 'clf__max_depth': 8, 'clf__max_features': 'auto', 'clf__min_samples_leaf': 1, 'clf__min_samples_split': 2, 'clf__n_estimators': 10}
+
+Grid scores on development set:
+
+
+>>>>>>> Test Set Report <<<<<<<<
+
+The model is trained on the full Training set.
+The scores are computed on the never revealed Test set.
+
+              precision    recall  f1-score   support
+
+           0       0.95      0.90      0.92        20
+           1       0.60      0.75      0.67         4
+
+   micro avg       0.88      0.88      0.88        24
+   macro avg       0.77      0.82      0.79        24
+weighted avg       0.89      0.88      0.88        24
+
+
+Accuracy: 0.875
+Balanced Accuracy: 0.825
+Precision: 0.6
+Recall: 0.75
+F1: 0.6666666666666665
+AUROC: 0.825
+
+# =========================== Tuning hyper-parameters for recall
+
+Fitting 4 folds for each of 540 candidates, totalling 2160 fits
+Best parameters set found on development set:
+
+{'clf__bootstrap': True, 'clf__max_depth': 2, 'clf__max_features': 'auto', 'clf__min_samples_leaf': 1, 'clf__min_samples_split': 2, 'clf__n_estimators': 100}
+
+Grid scores on development set:
+
+
+>>>>>>> Test Set Report <<<<<<<<
+
+The model is trained on the full Training set.
+The scores are computed on the never revealed Test set.
+
+              precision    recall  f1-score   support
+
+           0       0.94      0.80      0.86        20
+           1       0.43      0.75      0.55         4
+
+   micro avg       0.79      0.79      0.79        24
+   macro avg       0.68      0.78      0.71        24
+weighted avg       0.86      0.79      0.81        24
+
+
+Accuracy: 0.7916666666666666
+Balanced Accuracy: 0.775
+Precision: 0.42857142857142855
+Recall: 0.75
+F1: 0.5454545454545454
+AUROC: 0.7750000000000001
+
+# =========================== Tuning hyper-parameters for f1
+
+Fitting 4 folds for each of 540 candidates, totalling 2160 fits
+Best parameters set found on development set:
+
+{'clf__bootstrap': True, 'clf__max_depth': 2, 'clf__max_features': 'auto', 'clf__min_samples_leaf': 5, 'clf__min_samples_split': 2, 'clf__n_estimators': 100}
+
+Grid scores on development set:
+
+
+>>>>>>> Test Set Report <<<<<<<<
+
+The model is trained on the full Training set.
+The scores are computed on the never revealed Test set.
+
+              precision    recall  f1-score   support
+
+           0       0.94      0.80      0.86        20
+           1       0.43      0.75      0.55         4
+
+   micro avg       0.79      0.79      0.79        24
+   macro avg       0.68      0.78      0.71        24
+weighted avg       0.86      0.79      0.81        24
+
+
+Accuracy: 0.7916666666666666
+Balanced Accuracy: 0.775
+Precision: 0.42857142857142855
+Recall: 0.75
+F1: 0.5454545454545454
+AUROC: 0.7750000000000001
+
+# =========================== Tuning hyper-parameters for balanced_accuracy
+
+Fitting 4 folds for each of 540 candidates, totalling 2160 fits
+Best parameters set found on development set:
+
+{'clf__bootstrap': False, 'clf__max_depth': 2, 'clf__max_features': 'auto', 'clf__min_samples_leaf': 1, 'clf__min_samples_split': 2, 'clf__n_estimators': 80}
+
+Grid scores on development set:
+
+
+>>>>>>> Test Set Report <<<<<<<<
+
+The model is trained on the full Training set.
+The scores are computed on the never revealed Test set.
+
+              precision    recall  f1-score   support
+
+           0       0.94      0.80      0.86        20
+           1       0.43      0.75      0.55         4
+
+   micro avg       0.79      0.79      0.79        24
+   macro avg       0.68      0.78      0.71        24
+weighted avg       0.86      0.79      0.81        24
+
+
+Accuracy: 0.7916666666666666
+Balanced Accuracy: 0.775
+Precision: 0.42857142857142855
+Recall: 0.75
+F1: 0.5454545454545454
+AUROC: 0.7750000000000001
+
+# =========================== Tuning hyper-parameters for roc_auc
+
+Fitting 4 folds for each of 540 candidates, totalling 2160 fits
+Best parameters set found on development set:
+
+{'clf__bootstrap': True, 'clf__max_depth': 8, 'clf__max_features': 'auto', 'clf__min_samples_leaf': 5, 'clf__min_samples_split': 2, 'clf__n_estimators': 10}
+
+Grid scores on development set:
+
+
+>>>>>>> Test Set Report <<<<<<<<
+
+The model is trained on the full Training set.
+The scores are computed on the never revealed Test set.
+
+              precision    recall  f1-score   support
+
+           0       0.94      0.80      0.86        20
+           1       0.43      0.75      0.55         4
+
+   micro avg       0.79      0.79      0.79        24
+   macro avg       0.68      0.78      0.71        24
+weighted avg       0.86      0.79      0.81        24
+
+
+Accuracy: 0.7916666666666666
+Balanced Accuracy: 0.775
+Precision: 0.42857142857142855
+Recall: 0.75
+F1: 0.5454545454545454
+AUROC: 0.7750000000000001
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ Multiple Grid Search 
+==============================
+columns ['descr_fix_freq', 'descr_sacc_freq', 'descr_right_mean', 'descr_right_std', 'descr_right_min', 'descr_right_max', 'descr_left_mean', 'descr_left_std', 'descr_left_min', 'descr_left_max', 'react_fix_freq', 'react_sacc_freq', 'react_right_mean', 'react_right_std', 'react_right_min', 'react_right_max', 'react_left_mean', 'react_left_std', 'react_left_min', 'react_left_max', 'react_dur', 'descr_dur', 'premed_score_right', 'premed_score_left']
+number of datapoint: 96
+Normalize: True
+Oversample: True
+Oversample Mode: minmax
+Drop NaN: True
+==============================
+Split in Train and Test set, equal for all the models
+==============================
+Train Set Datapoints 72
+Test Set Datapoints 24
+==============================
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
+ Support Vector Machine 
+==============================
+# =========================== Tuning hyper-parameters for precision
+
+Fitting 4 folds for each of 81 candidates, totalling 324 fits
+Best parameters set found on development set:
+
+{'clf__C': 100, 'clf__gamma': 0.001, 'clf__kernel': 'sigmoid'}
+
+Grid scores on development set:
+
+
+>>>>>>> Test Set Report <<<<<<<<
+
+The model is trained on the full Training set.
+The scores are computed on the never revealed Test set.
+
+              precision    recall  f1-score   support
+
+           0       0.93      0.70      0.80        20
+           1       0.33      0.75      0.46         4
+
+   micro avg       0.71      0.71      0.71        24
+   macro avg       0.63      0.72      0.63        24
+weighted avg       0.83      0.71      0.74        24
+
+
+Accuracy: 0.7083333333333334
+Balanced Accuracy: 0.725
+Precision: 0.3333333333333333
+Recall: 0.75
+F1: 0.46153846153846156
+AUROC: 0.7249999999999999
+
+# =========================== Tuning hyper-parameters for recall
+
+Fitting 4 folds for each of 81 candidates, totalling 324 fits
+Best parameters set found on development set:
+
+{'clf__C': 0.001, 'clf__gamma': 0.001, 'clf__kernel': 'rbf'}
+
+Grid scores on development set:
+
+
+>>>>>>> Test Set Report <<<<<<<<
+
+The model is trained on the full Training set.
+The scores are computed on the never revealed Test set.
+
+              precision    recall  f1-score   support
+
+           0       1.00      0.55      0.71        20
+           1       0.31      1.00      0.47         4
+
+   micro avg       0.62      0.62      0.62        24
+   macro avg       0.65      0.78      0.59        24
+weighted avg       0.88      0.62      0.67        24
+
+
+Accuracy: 0.625
+Balanced Accuracy: 0.775
+Precision: 0.3076923076923077
+Recall: 1.0
+F1: 0.47058823529411764
+AUROC: 0.775
+
+# =========================== Tuning hyper-parameters for f1
+
+Fitting 4 folds for each of 81 candidates, totalling 324 fits
+Best parameters set found on development set:
+
+{'clf__C': 50, 'clf__gamma': 0.001, 'clf__kernel': 'sigmoid'}
+
+Grid scores on development set:
+
+
+>>>>>>> Test Set Report <<<<<<<<
+
+The model is trained on the full Training set.
+The scores are computed on the never revealed Test set.
+
+              precision    recall  f1-score   support
+
+           0       1.00      0.65      0.79        20
+           1       0.36      1.00      0.53         4
+
+   micro avg       0.71      0.71      0.71        24
+   macro avg       0.68      0.82      0.66        24
+weighted avg       0.89      0.71      0.75        24
+
+
+Accuracy: 0.7083333333333334
+Balanced Accuracy: 0.825
+Precision: 0.36363636363636365
+Recall: 1.0
+F1: 0.5333333333333333
+AUROC: 0.825
+
+# =========================== Tuning hyper-parameters for balanced_accuracy
+
+Fitting 4 folds for each of 81 candidates, totalling 324 fits
+Best parameters set found on development set:
+
+{'clf__C': 100, 'clf__gamma': 0.0001, 'clf__kernel': 'rbf'}
+
+Grid scores on development set:
+
+
+>>>>>>> Test Set Report <<<<<<<<
+
+The model is trained on the full Training set.
+The scores are computed on the never revealed Test set.
+
+              precision    recall  f1-score   support
+
+           0       1.00      0.65      0.79        20
+           1       0.36      1.00      0.53         4
+
+   micro avg       0.71      0.71      0.71        24
+   macro avg       0.68      0.82      0.66        24
+weighted avg       0.89      0.71      0.75        24
+
+
+Accuracy: 0.7083333333333334
+Balanced Accuracy: 0.825
+Precision: 0.36363636363636365
+Recall: 1.0
+F1: 0.5333333333333333
+AUROC: 0.825
+
+# =========================== Tuning hyper-parameters for roc_auc
+
+Fitting 4 folds for each of 81 candidates, totalling 324 fits
+Best parameters set found on development set:
+
+{'clf__C': 0.01, 'clf__gamma': 0.0001, 'clf__kernel': 'rbf'}
+
+Grid scores on development set:
+
+
+>>>>>>> Test Set Report <<<<<<<<
+
+The model is trained on the full Training set.
+The scores are computed on the never revealed Test set.
+
+              precision    recall  f1-score   support
+
+           0       1.00      0.55      0.71        20
+           1       0.31      1.00      0.47         4
+
+   micro avg       0.62      0.62      0.62        24
+   macro avg       0.65      0.78      0.59        24
+weighted avg       0.88      0.62      0.67        24
+
+
+Accuracy: 0.625
+Balanced Accuracy: 0.775
+Precision: 0.3076923076923077
+Recall: 1.0
+F1: 0.47058823529411764
+AUROC: 0.775
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
+ Decision Tree 
+==============================
+# =========================== Tuning hyper-parameters for precision
+
+Fitting 4 folds for each of 1200 candidates, totalling 4800 fits
+Best parameters set found on development set:
+
+{'clf__criterion': 'entropy', 'clf__max_depth': 10, 'clf__max_features': 'auto', 'clf__min_samples_leaf': 4, 'clf__min_samples_split': 4, 'clf__splitter': 'best'}
+
+Grid scores on development set:
+
+
+>>>>>>> Test Set Report <<<<<<<<
+
+The model is trained on the full Training set.
+The scores are computed on the never revealed Test set.
+
+              precision    recall  f1-score   support
+
+           0       0.86      0.90      0.88        20
+           1       0.33      0.25      0.29         4
+
+   micro avg       0.79      0.79      0.79        24
+   macro avg       0.60      0.57      0.58        24
+weighted avg       0.77      0.79      0.78        24
+
+
+Accuracy: 0.7916666666666666
+Balanced Accuracy: 0.575
+Precision: 0.3333333333333333
+Recall: 0.25
+F1: 0.28571428571428575
+AUROC: 0.575
+
+# =========================== Tuning hyper-parameters for recall
+
+Fitting 4 folds for each of 1200 candidates, totalling 4800 fits
+Best parameters set found on development set:
+
+{'clf__criterion': 'entropy', 'clf__max_depth': 2, 'clf__max_features': 'auto', 'clf__min_samples_leaf': 4, 'clf__min_samples_split': 3, 'clf__splitter': 'best'}
+
+Grid scores on development set:
+
+
+>>>>>>> Test Set Report <<<<<<<<
+
+The model is trained on the full Training set.
+The scores are computed on the never revealed Test set.
+
+              precision    recall  f1-score   support
+
+           0       0.90      0.90      0.90        20
+           1       0.50      0.50      0.50         4
+
+   micro avg       0.83      0.83      0.83        24
+   macro avg       0.70      0.70      0.70        24
+weighted avg       0.83      0.83      0.83        24
+
+
+Accuracy: 0.8333333333333334
+Balanced Accuracy: 0.7
+Precision: 0.5
+Recall: 0.5
+F1: 0.5
+AUROC: 0.7000000000000001
+
+# =========================== Tuning hyper-parameters for f1
+
+Fitting 4 folds for each of 1200 candidates, totalling 4800 fits
+Best parameters set found on development set:
+
+{'clf__criterion': 'entropy', 'clf__max_depth': 2, 'clf__max_features': 'sqrt', 'clf__min_samples_leaf': 3, 'clf__min_samples_split': 5, 'clf__splitter': 'best'}
+
+Grid scores on development set:
+
+
+>>>>>>> Test Set Report <<<<<<<<
+
+The model is trained on the full Training set.
+The scores are computed on the never revealed Test set.
+
+              precision    recall  f1-score   support
+
+           0       0.90      0.45      0.60        20
+           1       0.21      0.75      0.33         4
+
+   micro avg       0.50      0.50      0.50        24
+   macro avg       0.56      0.60      0.47        24
+weighted avg       0.79      0.50      0.56        24
+
+
+Accuracy: 0.5
+Balanced Accuracy: 0.6
+Precision: 0.21428571428571427
+Recall: 0.75
+F1: 0.3333333333333333
+AUROC: 0.6
+
+# =========================== Tuning hyper-parameters for balanced_accuracy
+
+Fitting 4 folds for each of 1200 candidates, totalling 4800 fits
+Best parameters set found on development set:
+
+{'clf__criterion': 'entropy', 'clf__max_depth': 2, 'clf__max_features': 'sqrt', 'clf__min_samples_leaf': 1, 'clf__min_samples_split': 2, 'clf__splitter': 'best'}
+
+Grid scores on development set:
+
+
+>>>>>>> Test Set Report <<<<<<<<
+
+The model is trained on the full Training set.
+The scores are computed on the never revealed Test set.
+
+              precision    recall  f1-score   support
+
+           0       0.87      0.65      0.74        20
+           1       0.22      0.50      0.31         4
+
+   micro avg       0.62      0.62      0.62        24
+   macro avg       0.54      0.57      0.53        24
+weighted avg       0.76      0.62      0.67        24
+
+
+Accuracy: 0.625
+Balanced Accuracy: 0.575
+Precision: 0.2222222222222222
+Recall: 0.5
+F1: 0.30769230769230765
+AUROC: 0.5750000000000001
+
+# =========================== Tuning hyper-parameters for roc_auc
+
+Fitting 4 folds for each of 1200 candidates, totalling 4800 fits
+Best parameters set found on development set:
+
+{'clf__criterion': 'gini', 'clf__max_depth': 4, 'clf__max_features': 'sqrt', 'clf__min_samples_leaf': 2, 'clf__min_samples_split': 6, 'clf__splitter': 'random'}
+
+Grid scores on development set:
+
+
+>>>>>>> Test Set Report <<<<<<<<
+
+The model is trained on the full Training set.
+The scores are computed on the never revealed Test set.
+
+              precision    recall  f1-score   support
+
+           0       0.91      0.50      0.65        20
+           1       0.23      0.75      0.35         4
+
+   micro avg       0.54      0.54      0.54        24
+   macro avg       0.57      0.62      0.50        24
+weighted avg       0.80      0.54      0.60        24
+
+
+Accuracy: 0.5416666666666666
+Balanced Accuracy: 0.625
+Precision: 0.23076923076923078
+Recall: 0.75
+F1: 0.3529411764705882
+AUROC: 0.625
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
+ Adaptive Boosting 
+==============================
+# =========================== Tuning hyper-parameters for precision
+
+Fitting 4 folds for each of 40 candidates, totalling 160 fits
+Best parameters set found on development set:
+
+{'clf__algorithm': 'SAMME.R', 'clf__learning_rate': 0.01, 'clf__n_estimators': 50}
+
+Grid scores on development set:
+
+
+>>>>>>> Test Set Report <<<<<<<<
+
+The model is trained on the full Training set.
+The scores are computed on the never revealed Test set.
+
+              precision    recall  f1-score   support
+
+           0       0.94      0.80      0.86        20
+           1       0.43      0.75      0.55         4
+
+   micro avg       0.79      0.79      0.79        24
+   macro avg       0.68      0.78      0.71        24
+weighted avg       0.86      0.79      0.81        24
+
+
+Accuracy: 0.7916666666666666
+Balanced Accuracy: 0.775
+Precision: 0.42857142857142855
+Recall: 0.75
+F1: 0.5454545454545454
+AUROC: 0.7750000000000001
+
+# =========================== Tuning hyper-parameters for recall
+
+Fitting 4 folds for each of 40 candidates, totalling 160 fits
+Best parameters set found on development set:
+
+{'clf__algorithm': 'SAMME', 'clf__learning_rate': 0.05, 'clf__n_estimators': 50}
+
+Grid scores on development set:
+
+
+>>>>>>> Test Set Report <<<<<<<<
+
+The model is trained on the full Training set.
+The scores are computed on the never revealed Test set.
+
+              precision    recall  f1-score   support
+
+           0       0.94      0.80      0.86        20
+           1       0.43      0.75      0.55         4
+
+   micro avg       0.79      0.79      0.79        24
+   macro avg       0.68      0.78      0.71        24
+weighted avg       0.86      0.79      0.81        24
+
+
+Accuracy: 0.7916666666666666
+Balanced Accuracy: 0.775
+Precision: 0.42857142857142855
+Recall: 0.75
+F1: 0.5454545454545454
+AUROC: 0.7750000000000001
+
+# =========================== Tuning hyper-parameters for f1
+
+Fitting 4 folds for each of 40 candidates, totalling 160 fits
+Best parameters set found on development set:
+
+{'clf__algorithm': 'SAMME', 'clf__learning_rate': 0.01, 'clf__n_estimators': 10}
+
+Grid scores on development set:
+
+
+>>>>>>> Test Set Report <<<<<<<<
+
+The model is trained on the full Training set.
+The scores are computed on the never revealed Test set.
+
+              precision    recall  f1-score   support
+
+           0       0.94      0.80      0.86        20
+           1       0.43      0.75      0.55         4
+
+   micro avg       0.79      0.79      0.79        24
+   macro avg       0.68      0.78      0.71        24
+weighted avg       0.86      0.79      0.81        24
+
+
+Accuracy: 0.7916666666666666
+Balanced Accuracy: 0.775
+Precision: 0.42857142857142855
+Recall: 0.75
+F1: 0.5454545454545454
+AUROC: 0.7750000000000001
+
+# =========================== Tuning hyper-parameters for balanced_accuracy
+
+Fitting 4 folds for each of 40 candidates, totalling 160 fits
+Best parameters set found on development set:
+
+{'clf__algorithm': 'SAMME', 'clf__learning_rate': 0.01, 'clf__n_estimators': 10}
+
+Grid scores on development set:
+
+
+>>>>>>> Test Set Report <<<<<<<<
+
+The model is trained on the full Training set.
+The scores are computed on the never revealed Test set.
+
+              precision    recall  f1-score   support
+
+           0       0.94      0.80      0.86        20
+           1       0.43      0.75      0.55         4
+
+   micro avg       0.79      0.79      0.79        24
+   macro avg       0.68      0.78      0.71        24
+weighted avg       0.86      0.79      0.81        24
+
+
+Accuracy: 0.7916666666666666
+Balanced Accuracy: 0.775
+Precision: 0.42857142857142855
+Recall: 0.75
+F1: 0.5454545454545454
+AUROC: 0.7750000000000001
+
+# =========================== Tuning hyper-parameters for roc_auc
+
+Fitting 4 folds for each of 40 candidates, totalling 160 fits
+Best parameters set found on development set:
+
+{'clf__algorithm': 'SAMME', 'clf__learning_rate': 0.1, 'clf__n_estimators': 10}
+
+Grid scores on development set:
+
+
+>>>>>>> Test Set Report <<<<<<<<
+
+The model is trained on the full Training set.
+The scores are computed on the never revealed Test set.
+
+              precision    recall  f1-score   support
+
+           0       0.94      0.80      0.86        20
+           1       0.43      0.75      0.55         4
+
+   micro avg       0.79      0.79      0.79        24
+   macro avg       0.68      0.78      0.71        24
+weighted avg       0.86      0.79      0.81        24
+
+
+Accuracy: 0.7916666666666666
+Balanced Accuracy: 0.775
+Precision: 0.42857142857142855
+Recall: 0.75
+F1: 0.5454545454545454
+AUROC: 0.7750000000000001
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
+ Random Forest 
+==============================
+# =========================== Tuning hyper-parameters for precision
+
+Fitting 4 folds for each of 540 candidates, totalling 2160 fits
+Best parameters set found on development set:
+
+{'clf__bootstrap': False, 'clf__max_depth': 8, 'clf__max_features': 'sqrt', 'clf__min_samples_leaf': 1, 'clf__min_samples_split': 4, 'clf__n_estimators': 100}
+
+Grid scores on development set:
+
+
+>>>>>>> Test Set Report <<<<<<<<
+
+The model is trained on the full Training set.
+The scores are computed on the never revealed Test set.
+
+              precision    recall  f1-score   support
+
+           0       0.90      0.90      0.90        20
+           1       0.50      0.50      0.50         4
+
+   micro avg       0.83      0.83      0.83        24
+   macro avg       0.70      0.70      0.70        24
+weighted avg       0.83      0.83      0.83        24
+
+
+Accuracy: 0.8333333333333334
+Balanced Accuracy: 0.7
+Precision: 0.5
+Recall: 0.5
+F1: 0.5
+AUROC: 0.7000000000000001
+
+# =========================== Tuning hyper-parameters for recall
+
+Fitting 4 folds for each of 540 candidates, totalling 2160 fits
+Best parameters set found on development set:
+
+{'clf__bootstrap': False, 'clf__max_depth': 2, 'clf__max_features': 'sqrt', 'clf__min_samples_leaf': 1, 'clf__min_samples_split': 6, 'clf__n_estimators': 10}
+
+Grid scores on development set:
+
+
+>>>>>>> Test Set Report <<<<<<<<
+
+The model is trained on the full Training set.
+The scores are computed on the never revealed Test set.
+
+              precision    recall  f1-score   support
+
+           0       0.94      0.80      0.86        20
+           1       0.43      0.75      0.55         4
+
+   micro avg       0.79      0.79      0.79        24
+   macro avg       0.68      0.78      0.71        24
+weighted avg       0.86      0.79      0.81        24
+
+
+Accuracy: 0.7916666666666666
+Balanced Accuracy: 0.775
+Precision: 0.42857142857142855
+Recall: 0.75
+F1: 0.5454545454545454
+AUROC: 0.7750000000000001
+
+# =========================== Tuning hyper-parameters for f1
+
+Fitting 4 folds for each of 540 candidates, totalling 2160 fits
+Best parameters set found on development set:
+
+{'clf__bootstrap': True, 'clf__max_depth': 2, 'clf__max_features': 'sqrt', 'clf__min_samples_leaf': 3, 'clf__min_samples_split': 2, 'clf__n_estimators': 80}
+
+Grid scores on development set:
+
+
+>>>>>>> Test Set Report <<<<<<<<
+
+The model is trained on the full Training set.
+The scores are computed on the never revealed Test set.
+
+              precision    recall  f1-score   support
+
+           0       0.94      0.85      0.89        20
+           1       0.50      0.75      0.60         4
+
+   micro avg       0.83      0.83      0.83        24
+   macro avg       0.72      0.80      0.75        24
+weighted avg       0.87      0.83      0.85        24
+
+
+Accuracy: 0.8333333333333334
+Balanced Accuracy: 0.8
+Precision: 0.5
+Recall: 0.75
+F1: 0.6
+AUROC: 0.8
+
+# =========================== Tuning hyper-parameters for balanced_accuracy
+
+Fitting 4 folds for each of 540 candidates, totalling 2160 fits
+Best parameters set found on development set:
+
+{'clf__bootstrap': True, 'clf__max_depth': 50, 'clf__max_features': 'auto', 'clf__min_samples_leaf': 5, 'clf__min_samples_split': 2, 'clf__n_estimators': 10}
+
+Grid scores on development set:
+
+
+>>>>>>> Test Set Report <<<<<<<<
+
+The model is trained on the full Training set.
+The scores are computed on the never revealed Test set.
+
+              precision    recall  f1-score   support
+
+           0       0.94      0.80      0.86        20
+           1       0.43      0.75      0.55         4
+
+   micro avg       0.79      0.79      0.79        24
+   macro avg       0.68      0.78      0.71        24
+weighted avg       0.86      0.79      0.81        24
+
+
+Accuracy: 0.7916666666666666
+Balanced Accuracy: 0.775
+Precision: 0.42857142857142855
+Recall: 0.75
+F1: 0.5454545454545454
+AUROC: 0.7750000000000001
+
+# =========================== Tuning hyper-parameters for roc_auc
+
+Fitting 4 folds for each of 540 candidates, totalling 2160 fits
+Best parameters set found on development set:
+
+{'clf__bootstrap': False, 'clf__max_depth': 20, 'clf__max_features': 'sqrt', 'clf__min_samples_leaf': 5, 'clf__min_samples_split': 2, 'clf__n_estimators': 10}
+
+Grid scores on development set:
+
+
+>>>>>>> Test Set Report <<<<<<<<
+
+The model is trained on the full Training set.
+The scores are computed on the never revealed Test set.
+
+              precision    recall  f1-score   support
+
+           0       0.95      0.90      0.92        20
+           1       0.60      0.75      0.67         4
+
+   micro avg       0.88      0.88      0.88        24
+   macro avg       0.77      0.82      0.79        24
+weighted avg       0.89      0.88      0.88        24
+
+
+Accuracy: 0.875
+Balanced Accuracy: 0.825
+Precision: 0.6
+Recall: 0.75
+F1: 0.6666666666666665
+AUROC: 0.825
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

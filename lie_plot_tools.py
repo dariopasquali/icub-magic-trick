@@ -368,8 +368,7 @@ def lie_plotTnTPremedIndex(features, feature, save_root="plots/LIE/Premed_{}.png
                 width=0.35, alpha=0.8)
 
     axs1.axhline(y=0)
-    axs1.axhline(y=75, color="limegreen")
-    axs1.axhline(y=100, color="orange")
+    axs1.axhline(y=80, color="limegreen")
     axs1.set_xticks(x_pos1)
     axs1.set_xticklabels(labels1)
 

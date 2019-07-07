@@ -316,13 +316,13 @@ lie_features = pd.read_csv("lie_features.csv", sep=',')
 lie_features['premed_score_right'] = lie_features['react_right_mean'] / lie_features['descr_right_mean']
 lie_features['premed_score_left'] = lie_features['react_left_mean'] / lie_features['descr_left_mean']
 
-#significant_cols.append('premed_score_right')
-#significant_cols.append('premed_score_left')
+significant_cols.append('premed_score_right')
+significant_cols.append('premed_score_left')
 
-#reduced_significant_cols.append('premed_score_right')
-#reduced_significant_cols.append('premed_score_left')
+reduced_significant_cols.append('premed_score_right')
+reduced_significant_cols.append('premed_score_left')
 
-col_sets = [reduced_significant_cols]
+col_sets = [reduced_significant_cols, significant_cols]
 
 multiple_grid_search(lie_features, col_sets)
 

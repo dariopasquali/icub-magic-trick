@@ -28,7 +28,7 @@ from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.model_selection import GridSearchCV
 
 import sys
-sys.stdout = open("ML_report/report_2.txt", "w")
+sys.stdout = open("ML_report/report_3.txt", "w")
 print ("test sys.stdout")
 
 # ==========================================================
@@ -207,7 +207,7 @@ def grid_search_ADA(X_train, X_test, y_train, y_test, oversamp=True):
     grid_search_hyp_tuning(AdaBoostClassifier(), param_map, scores, X_train, X_test, y_train, y_test, oversamp=oversamp)
 
 
-def multiple_grid_search(data, col_sets=[], norm_by_subject=True, dropna=True, oversamp=True, oversamp_mode="minmax"):
+def multiple_grid_search(data, col_sets=[], norm_by_subject=False, dropna=True, oversamp=True, oversamp_mode="minmax"):
 
 
     for cols in col_sets:

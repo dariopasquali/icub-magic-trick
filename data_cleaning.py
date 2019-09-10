@@ -76,7 +76,7 @@ def cleanMAD(time_series, tresh=3.5, col="diam_right"):
 def resampleAndFill(time_series, col="diam_right", resample=True, fill=True, smooth=True):
     # RESAMPLE
     if(resample):
-        time_series[col] = time_series[[col]].resample("ms").mean(skipna=True) 
+        time_series[col] = time_series[[col]].resample("ms").mean() 
     
     # Fill NaN
     if(fill):
@@ -84,7 +84,7 @@ def resampleAndFill(time_series, col="diam_right", resample=True, fill=True, smo
  
     # Smooth
     if(smooth): 
-        time_series[col] = time_series[[col]].rolling(window=150).mean(skipna=True)
+        time_series[col] = time_series[[col]].rolling(window=150).mean()
 
     return time_series
 

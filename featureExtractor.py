@@ -6,12 +6,12 @@ pd.options.mode.chained_assignment = None  # default='warn'
 
 from quest_reader import *
 from time_series_extractor import *
-from SubjectMagicFeatures import *
 from LieFeatures import *
-from plot_tools import *
 from lie_plot_tools import *
 from evaluation import *
 from Machine_Learning import *
+
+import sys
 
 column_names = [
         'subject','source','duration','card_class','show_order',
@@ -60,36 +60,35 @@ feat_cols = [
         'fix_freq',
         'sacc_freq',
         'pd_right_mean',
-        'pd_right_std',
-        'pd_right_min',
-        'pd_right_max',
+        #'pd_right_std',
+        #'pd_right_min',
+        #'pd_right_max',
         'pd_left_mean',
-        'pd_left_std',
-        'pd_left_min',
-        'pd_left_max',
+        #'pd_left_std',
+        #'pd_left_min',
+        #'pd_left_max',
         'sre_fix_freq',
         'sre_sacc_freq',
         'sre_pd_right_mean',
-        'sre_pd_right_std',
-        'sre_pd_right_min',
-        'sre_pd_right_max',
+        #'sre_pd_right_std',
+        #'sre_pd_right_min',
+        #'sre_pd_right_max',
         'sre_pd_left_mean',
-        'sre_pd_left_std',
-        'sre_pd_left_min',
-        'sre_pd_left_max',
+        #'sre_pd_left_std',
+        #'sre_pd_left_min',
+        #'sre_pd_left_max',
         'srl_fix_freq',
         'srl_sacc_freq',
         'srl_pd_right_mean',
-        'srl_pd_right_std',
-        'srl_pd_right_min',
-        'srl_pd_right_max',
+        #'srl_pd_right_std',
+        #'srl_pd_right_min',
+        #'srl_pd_right_max',
         'srl_pd_left_mean',
-        'srl_pd_left_std',
-        'srl_pd_left_min',
-        'srl_pd_left_max',
-        'label'
+        #'srl_pd_left_std',
+        #'srl_pd_left_min',
+        #'srl_pd_left_max',
+        #'label'
     ]
-
 
 lie_ML_cols = [
         'right_mean',
@@ -158,7 +157,7 @@ def warn(*args, **kwargs):
 import warnings
 warnings.warn = warn
 
-def extractLieFeatures(subjects=[], cols=lie_column_names, cards=card_names, source="frontiers", ref_to_base="time", mode="sub", plot=False, print_pupil=False):
+def extractLieFeatures(subjects=[], cols=lie_column_names, cards=card_names, source="frontiers", ref_to_base="time", mode="sub", plot=False, print_pupil=False, save_root="plots/V2/pupils_{}.png", save=False):
 
     # refer_to_base = [time, feat, None]
 
@@ -221,9 +220,10 @@ def extractLieFeatures(subjects=[], cols=lie_column_names, cards=card_names, sou
         features['subject'] = features.index // 6
 
         if(plot):
-            lie_plotTimeSeries(sub, cards, annot_dfs, overall_eye_df, filtered_interaction_dfs)
-            #, baseline)            
-
+            fig = lie_plotTimeSeries(sub, cards, annot_dfs, overall_eye_df, filtered_interaction_dfs)
+            if(save):
+                fig.savefig(save_root.format(sub))
+                  
 
     return features, baseline_right, baseline_left
 
@@ -266,28 +266,42 @@ def extractFeatures(subject=None, cols=column_names, cards=card_names, source="f
 
 
 significant_cols = [
-    'descr_fix_freq',
-    'descr_sacc_freq',
-    'descr_right_mean',
-    'descr_right_std',
-    'descr_right_min',
-    'descr_right_max',
-    'descr_left_mean',
-    'descr_left_std',
-    'descr_left_min',
-    'descr_left_max',
-    'react_fix_freq',
-    'react_sacc_freq',
-    'react_right_mean',
-    'react_right_std',
-    'react_right_min',
-    'react_right_max',
-    'react_left_mean',
-    'react_left_std',
-    'react_left_min',
-    'react_left_max',
-    'react_dur',
-    'descr_dur',
+        'duration',
+        'react_dur',
+        'point_dur',
+        'descr_dur',
+        'right_mean',
+        'right_std',
+        'right_min',
+        'right_max',
+        'left_mean',
+        'left_std',
+        'left_min',
+        'left_max',
+        'react_right_mean',
+        'react_right_std',
+        'react_right_min',
+        'react_right_max',
+        'react_left_mean',
+        'react_left_std',
+        'react_left_min',
+        'react_left_max',
+        'point_right_mean',
+        'point_right_std',
+        'point_right_min',
+        'point_right_max',
+        'point_left_mean',
+        'point_left_std',
+        'point_left_min',
+        'point_left_max',
+        'descr_right_mean',
+        'descr_right_std',
+        'descr_right_min',
+        'descr_right_max',
+        'descr_left_mean',
+        'descr_left_std',
+        'descr_left_min',
+        'descr_left_max',
     ]
 
 reduced_significant_cols = [
@@ -297,27 +311,227 @@ reduced_significant_cols = [
     'react_left_mean',
     ]
 
+tt_sign_cols = [
+    'left_max',
+    'left_std',
+    'react_mean_pupil',
+    'react_left_mean',
+    'descr_left_max',
+    'right_mean',
+    'left_mean',
+    'descr_right_max',
+    'descr_left_mean',
+    'descr_right_mean',
+    'descr_mean_pupil'
+]
+
+tt_sign_cols_2 = [
+    'left_max',
+    'left_std',
+    'right_mean',
+    'left_mean',
+    'react_right_mean',
+    'react_left_mean',
+    'react_mean_pupil',
+    'descr_left_mean',
+    'descr_left_max',
+    'descr_mean_pupil',
+    'descr_right_max',
+    'descr_right_mean',   
+]
+
+wtf_col_set = [
+    'left_max',
+    'right_max',
+    'right_mean',
+    'left_mean',
+
+    'react_right_mean',
+    'react_left_mean',
+    'react_mean_pupil',
+    'react_right_max',
+    'react_left_max',
+
+    'descr_left_mean',
+    'descr_right_mean',
+    'descr_mean_pupil',
+    'descr_right_max',
+    'descr_left_max',      
+]
+
+points_cols = [
+        'subject',
+        'card_class',
+        'label',
+        'duration',
+        'react_dur',
+        'point_dur',
+        'descr_dur',
+        'right_mean',
+        'right_std',
+        'right_min',
+        'right_max',
+        'left_mean',
+        'left_std',
+        'left_min',
+        'left_max',
+        'react_right_mean',
+        'react_right_std',
+        'react_right_min',
+        'react_right_max',
+        'react_left_mean',
+        'react_left_std',
+        'react_left_min',
+        'react_left_max',
+        'point_right_mean',
+        'point_right_std',
+        'point_right_min',
+        'point_right_max',
+        'point_left_mean',
+        'point_left_std',
+        'point_left_min',
+        'point_left_max',
+        'descr_right_mean',
+        'descr_right_std',
+        'descr_right_min',
+        'descr_right_max',
+        'descr_left_mean',
+        'descr_left_std',
+        'descr_left_min',
+        'descr_left_max',
+    ]
+
+
 
 mode = "sub"
 print("================== MODE SMOOTH {} =====================".format(mode))
 #lie_features, lie_base_right, lie_base_left = \
-#    extractLieFeatures(subjects=[], mode=mode, ref_to_base="time", plot=False, print_pupil=False)
-#lie_features.to_csv("lie_features.csv", index=False)
+#    extractLieFeatures(subjects=[], mode=mode, ref_to_base="time", plot=True, save=True, save_root="plots/V2/smooth/pupils_{}.png")
+#lie_features.to_csv("lie_features_smooth.csv", index=False)
 
+
+#lie_features = pd.read_csv("lie_features_smooth.csv", sep=',')
 lie_features = pd.read_csv("lie_features.csv", sep=',')
-#lie_features = lie_features.fillna(0)
 
-#for col in ['right_mean']:
-#    lie_plotTnTratioBySubject(lie_features, feature=col, save=True)
-#    lie_plotTnTPremedIndex(lie_features, feature=col, save=False)
 
-#plt.show()
+lie_features = lie_features.fillna(0)
+lie_features['descr_mean_pupil'] = (lie_features['descr_right_mean'] + lie_features['descr_left_mean'])/2
+lie_features['react_mean_pupil'] = (lie_features['react_right_mean'] + lie_features['react_left_mean'])/2
+lie_features['point_mean_pupil'] = (lie_features['point_right_mean'] + lie_features['point_left_mean'])/2
 
-lie_features['premed_score_right'] = lie_features['react_right_mean'] / lie_features['descr_right_mean']
-lie_features['premed_score_left'] = lie_features['react_left_mean'] / lie_features['descr_left_mean']
+lie_feat_cols.append('descr_mean_pupil')
+lie_feat_cols.append('react_mean_pupil')
+lie_feat_cols.append('point_mean_pupil')
 
-significant_cols.append('premed_score_right')
-significant_cols.append('premed_score_left')
+significant_cols.append('descr_mean_pupil')
+significant_cols.append('react_mean_pupil')
+significant_cols.append('point_mean_pupil')
+
+points_cols.append('descr_mean_pupil')
+points_cols.append('react_mean_pupil')
+points_cols.append('point_mean_pupil')
+
+
+
+"""
+print("PLOT COMPARE BARS =================================================")
+lie_plotComparBars(lie_features, feat_cols=lie_feat_cols, save_root="plots/V2/smooth/bars_{}.png", save=True)
+print("PLOT POINTS FOR EACH SUBJECT =================================================")
+lie_plotPointsAllSubjects(lie_features, feat_cols=points_cols, save_root="plots/V2/smooth/points_{}.png", mode=mode, save=True)
+"""
+
+
+"""
+# ============= HEURISTIC AND STATISTIC TESTS ===========================
+
+# TAKE MAX HEURISIC
+sys.stdout = open("V2_reports/take_max_heuristic_smooth.txt", "w")
+print("======================================================")
+take_max_heuristic(lie_features, significant_cols, print_result=True, only_rel=True)
+
+# MAX MEAN HEURISIC
+#sys.stdout = open("V2_reports/max_mean_heuristic.txt", "w")
+#print("======================================================")
+#max_mean_heuristic(lie_features, significant_cols, print_result=True, only_rel=True)
+
+# PAIRED T TEST
+sys.stdout = open("V2_reports/paired_t_test_smooth.txt", "w")
+print("======================================================")
+paired_t_test(lie_features, lie_feat_cols, significant_cols, print_result=True, only_rel=True)
+"""
+
+#lie_features['premed_score_right'] = lie_features['react_right_mean'] / lie_features#['descr_right_mean']
+#lie_features['premed_score_left'] = lie_features['react_left_mean'] / lie_features['descr_left_mean']
+#lie_feat_cols.append('premed_score_right')
+#lie_feat_cols.append('premed_score_left')
+#significant_cols.append('premed_score_right')
+#significant_cols.append('premed_score_left')
+#reduced_significant_cols.append('premed_score_right')
+#reduced_significant_cols.append('premed_score_left')
+#tt_sign_cols_2.append('premed_score_right')
+#tt_sign_cols_2.append('premed_score_left')
+
+
+#"""
+col_sets = {
+    'all_columns' : significant_cols,
+    'reduced' : reduced_significant_cols,
+    'tt_test' : tt_sign_cols_2,
+    'wtf' : wtf_col_set
+}
+
+sys.stdout = open("V2_reports/multiple_grid_search_KNN_MLP.txt", "w")
+
+gsEngine = GridSearchEngine()
+#gsEngine.add_knn()
+gsEngine.add_mlp()
+
+report = gsEngine.multiple_grid_search(lie_features, col_sets=col_sets)
+report.to_csv("V2_reports/MGS_report_KNN_MLP.csv", sep='\t')
+#"""
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+"""
+for col in ['right_mean', 'left_mean']:
+    lie_plotTnTratioBySubject(lie_features, feature=col, save=False)
+    lie_plotTnTPremedIndex(lie_features, feature=col, save=False)
+"""
+
+"""
+
+tnt_scores, subjects = coumpute_TnT_scores(lie_features, lie_feat_cols, "right_mean", abs_ratio=False)
+
+lie_plotComparBars(lie_features, save=True)
+lie_plotBySubject(lie_features, mode=mode, save=False)
+
 
 reduced_significant_cols.append('premed_score_right')
 reduced_significant_cols.append('premed_score_left')
@@ -325,12 +539,10 @@ reduced_significant_cols.append('premed_score_left')
 col_sets = [reduced_significant_cols, significant_cols]
 
 multiple_grid_search(lie_features, col_sets)
+"""
 
 
-#tnt_scores, subjects = coumpute_TnT_scores(lie_features, lie_feat_cols, "right_mean", abs_ratio=False)
 
-#lie_plotComparBars(lie_features, save=True)
-#lie_plotBySubject(lie_features, mode=mode, save=False)
 
 
 
@@ -345,17 +557,6 @@ multiple_grid_search(lie_features, col_sets)
 #randomForestHyperTuning(feats, significant_cols)
 #trainMLP(lie_features, significant_cols)
 
-
-#o_cols = lie_column_names.copy()
-#o_cols.remove("source")
-#o_cols.remove("show_order")
-
-#tt_significant_cols = ['subject', 'label', 'card_class', 'react_right_mean','react_left_mean','descr_right_mean','descr_left_mean']
-
-#tt_cols = lie_feat_cols.copy()
-#tt_cols.remove("card_class")
-#tt_cols.remove("label")
-#tt_cols.remove("subject")
 
 #paired_t_test(lie_features, lie_feat_cols, tt_cols, print_result=True)
 

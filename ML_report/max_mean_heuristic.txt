@@ -1,0 +1,3 @@
+===== MAX MEAN RESULTS =====
+descr_left_mean acc:0.5416666666666666   True
+descr_right_mean acc:0.6666666666666666   True

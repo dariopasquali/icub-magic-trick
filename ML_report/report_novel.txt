@@ -1,0 +1,2 @@
+test sys.stdout
+ciao

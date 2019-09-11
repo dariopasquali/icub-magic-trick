@@ -1,0 +1,5 @@
+======================================================
+===== TAKE MAX RESULTS =====
+descr_left_mean acc:0.5909090909090909   True
+descr_mean_pupil acc:0.5909090909090909   True
+descr_right_mean acc:0.6818181818181818   True

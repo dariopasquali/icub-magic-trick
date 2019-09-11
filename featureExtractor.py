@@ -157,7 +157,7 @@ def warn(*args, **kwargs):
 import warnings
 warnings.warn = warn
 
-def extractLieFeatures(subjects=[], cols=lie_column_names, cards=card_names, source="frontiers", ref_to_base="time", mode="sub", plot=False, print_pupil=False, save_root="plots/V2/pupils_{}.png", save=False):
+def extractLieFeatures(subjects=[], subject_to_exclude=[], cols=lie_column_names, cards=card_names, source="frontiers", ref_to_base="time", mode="sub", plot=False, print_pupil=False, save_root="plots/V2/pupils_{}.png", save=False):
 
     # refer_to_base = [time, feat, None]
 
@@ -171,6 +171,8 @@ def extractLieFeatures(subjects=[], cols=lie_column_names, cards=card_names, sou
 
     ref_time = ref_to_base == 'time'
     ref_features = ref_to_base == 'feat'
+
+    subjects = [s for s in subjects if s not in subject_to_exclude]
 
     for sub in subjects:
 
@@ -325,7 +327,21 @@ tt_sign_cols = [
     'descr_mean_pupil'
 ]
 
-tt_sign_cols_2 = [
+tt_sign_cols_clear = [
+    'left_max',
+    'descr_left_max',
+    'react_right_mean',
+    'react_mean_pupil',
+    'descr_right_max',
+    'react_left_mean',
+    'right_mean',
+    'left_mean',
+    'descr_right_mean',
+    'descr_left_mean',
+    'descr_mean_pupil',
+]
+
+tt_sign_cols_all = [
     'left_max',
     'left_std',
     'right_mean',
@@ -337,26 +353,29 @@ tt_sign_cols_2 = [
     'descr_left_max',
     'descr_mean_pupil',
     'descr_right_max',
-    'descr_right_mean',   
+    'descr_right_mean',
+    'descr_mean_pupil',   
 ]
 
-wtf_col_set = [
-    'left_max',
-    'right_max',
-    'right_mean',
-    'left_mean',
-
-    'react_right_mean',
-    'react_left_mean',
-    'react_mean_pupil',
-    'react_right_max',
-    'react_left_max',
-
-    'descr_left_mean',
+descr_react_col_set = [
     'descr_right_mean',
-    'descr_mean_pupil',
+    'descr_right_std',
+    'descr_right_min',
     'descr_right_max',
-    'descr_left_max',      
+    'descr_left_mean',
+    'descr_left_std',
+    'descr_left_min',
+    'descr_left_max',
+    'descr_mean_pupil',
+    'react_right_mean',
+    'react_right_std',
+    'react_right_min',
+    'react_right_max',
+    'react_left_mean',
+    'react_left_std',
+    'react_left_min',
+    'react_left_max', 
+    'react_mean_pupil'    
 ]
 
 points_cols = [
@@ -405,13 +424,14 @@ points_cols = [
 
 mode = "sub"
 print("================== MODE SMOOTH {} =====================".format(mode))
-#lie_features, lie_base_right, lie_base_left = \
-#    extractLieFeatures(subjects=[], mode=mode, ref_to_base="time", plot=True, save=True, save_root="plots/V2/smooth/pupils_{}.png")
-#lie_features.to_csv("lie_features_smooth.csv", index=False)
+lie_features, lie_base_right, lie_base_left = \
+    extractLieFeatures(subjects=[2, 5, 12, 19, 26], subject_to_exclude=[], mode=mode, ref_to_base="time", plot=True, save=False, save_root="plots/V2/smooth/pupils_{}.png")
+#lie_features.to_csv("lie_features_clear.csv", index=False)
 
 
 #lie_features = pd.read_csv("lie_features_smooth.csv", sep=',')
-lie_features = pd.read_csv("lie_features.csv", sep=',')
+#lie_features = pd.read_csv("lie_features.csv", sep=',')
+#lie_features = pd.read_csv("lie_features_clear.csv", sep=',')
 
 
 lie_features = lie_features.fillna(0)
@@ -435,9 +455,9 @@ points_cols.append('point_mean_pupil')
 
 """
 print("PLOT COMPARE BARS =================================================")
-lie_plotComparBars(lie_features, feat_cols=lie_feat_cols, save_root="plots/V2/smooth/bars_{}.png", save=True)
+lie_plotComparBars(lie_features, feat_cols=lie_feat_cols, save_root="plots/V2/clear/bars_{}.png", save=True)
 print("PLOT POINTS FOR EACH SUBJECT =================================================")
-lie_plotPointsAllSubjects(lie_features, feat_cols=points_cols, save_root="plots/V2/smooth/points_{}.png", mode=mode, save=True)
+lie_plotPointsAllSubjects(lie_features, feat_cols=points_cols, save_root="plots/V2/clear/points_{}.png", mode=mode, save=True)
 """
 
 
@@ -445,7 +465,7 @@ lie_plotPointsAllSubjects(lie_features, feat_cols=points_cols, save_root="plots/
 # ============= HEURISTIC AND STATISTIC TESTS ===========================
 
 # TAKE MAX HEURISIC
-sys.stdout = open("V2_reports/take_max_heuristic_smooth.txt", "w")
+sys.stdout = open("V2_reports/take_max_heuristic_clear.txt", "w")
 print("======================================================")
 take_max_heuristic(lie_features, significant_cols, print_result=True, only_rel=True)
 
@@ -455,7 +475,7 @@ take_max_heuristic(lie_features, significant_cols, print_result=True, only_rel=T
 #max_mean_heuristic(lie_features, significant_cols, print_result=True, only_rel=True)
 
 # PAIRED T TEST
-sys.stdout = open("V2_reports/paired_t_test_smooth.txt", "w")
+sys.stdout = open("V2_reports/paired_t_test_clear.txt", "w")
 print("======================================================")
 paired_t_test(lie_features, lie_feat_cols, significant_cols, print_result=True, only_rel=True)
 """
@@ -472,23 +492,29 @@ paired_t_test(lie_features, lie_feat_cols, significant_cols, print_result=True, 
 #tt_sign_cols_2.append('premed_score_left')
 
 
-#"""
+"""
 col_sets = {
     'all_columns' : significant_cols,
     'reduced' : reduced_significant_cols,
-    'tt_test' : tt_sign_cols_2,
-    'wtf' : wtf_col_set
+    'tt_clear' : tt_sign_cols_clear,
+    'tt_all' : tt_sign_cols_all,
+    'descr_react' : descr_react_col_set
 }
 
-sys.stdout = open("V2_reports/multiple_grid_search_KNN_MLP.txt", "w")
+sys.stdout = open("V2_reports/multiple_grid_search__all.txt", "w")
 
 gsEngine = GridSearchEngine()
-#gsEngine.add_knn()
+gsEngine.add_naive_bayes()
+gsEngine.add_knn()
+gsEngine.add_ada()
+gsEngine.add_svm()
+gsEngine.add_decision_tree()
+gsEngine.add_random_forest()
 gsEngine.add_mlp()
 
 report = gsEngine.multiple_grid_search(lie_features, col_sets=col_sets)
-report.to_csv("V2_reports/MGS_report_KNN_MLP.csv", sep='\t')
-#"""
+report.to_csv("V2_reports/MGS_report__all.csv", sep='\t')
+"""
 
 
 

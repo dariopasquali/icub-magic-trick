@@ -253,24 +253,18 @@ class GridSearchEngine:
             ]
 
         param_map = {
-            'hidden_layer_sizes': [(100,), (100, 100,), (100, 100, 100,)],
+            'hidden_layer_sizes': [(100,), (300, ), (32, 8, 32,)],
             'activation': ['tanh', 'relu'],
             'solver': ['sgd', 'adam'],
             'alpha' : [0.0001, 0.05, 0.005],
-            #'learning_rate' : ['invscaling', 'adaptive'],
-            #'max_iter' : [10, 20, 50, 500],
-            #'tol' : [1e-4, 0.0000001]
             }
 
         if(oversamp):
             param_map = {
-            'clf__hidden_layer_sizes': [(100,), (100, 100,), (100, 100, 100,)],
+            'clf__hidden_layer_sizes':  [(100,), (300, ), (32, 8, 32,)],
             'clf__activation': ['tanh', 'relu'],
             'clf__solver': ['sgd', 'adam'],
             'clf__alpha' : [0.0001, 0.05, 0.005],
-            #'clf__learning_rate' : ['invscaling', 'adaptive'],
-            #'clf__max_iter' : [10, 20, 50, 500],
-            #'clf__tol' : [1e-4, 0.0000001]
             }
 
 

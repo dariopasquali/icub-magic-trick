@@ -152,6 +152,7 @@ def loadLieTimeSeries(subject, card_names,
     
     # vector with temporal filtered data for each card
     filtered_interaction_dfs = []
+    filtered_interaction__size = []
     
     # load tobii data
     eye = preprocessEye(eye_in, source)
@@ -190,6 +191,10 @@ def loadLieTimeSeries(subject, card_names,
 
         filtered_interaction_dfs.append(
             (whole_interval, point_interaction, reaction_interval, point_reaction_interval, description_interval)
+        )
+
+        print(
+            (whole_interval['diam_right'].count(), point_interaction['diam_right'].count(), reaction_interval['diam_right'].count(), point_reaction_interval['diam_right'].count(), description_interval['diam_right'].count())
         )
     
     return eye, annotations, baseline, overall, filtered_interaction_dfs

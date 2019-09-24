@@ -44,8 +44,9 @@ def aggregate_target_nontarget(features, cols):
         nonTargets, targets = extract_target_nontarget(
             features, sub, cols, nonTargets, targets)
 
-    TnT.append(targets, ignore_index=True)
-    TnT.append(nonTargets, ignore_index=True)
+    TnT = TnT.append(targets, ignore_index=True)
+    TnT = TnT.append(nonTargets, ignore_index=True)
+    TnT = TnT.sort_values(by=['subject'])
 
     return nonTargets, targets, TnT
 

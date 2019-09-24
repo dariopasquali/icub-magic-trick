@@ -7,8 +7,9 @@ pd.options.mode.chained_assignment = None  # default='warn'
 from eye_feature_tools import *
 from evaluation import *
 
-markers=[',','1','v','^','<','>','8','s','p','P','*','h','H','+','x',
-        'X','D','d','|','_','o','2','3','4','.']
+markers=[".",",","o","v","^","<",">",
+"1","2","3","4","8","s","p","P",
+"*","h","H","+","x","X","D","d","|","_",]
 
 card_color_map = {
     "unicorn" : "#1E90FF",
@@ -20,34 +21,31 @@ card_color_map = {
 }
 
 marker_map = {
-    0 :  ("." , "#696969"), 
-    1 :  ("o" , "#9A6324" ), 
-    2 :  ("v" , "#808000" ), 
-    3 :  ("^" , "#469990" ), 
-    4 :  ("<" , "#000075" ), 
-    5 :  (">" , "#000000" ), 
-    6 :  ("s" , "#e6194B" ), 
-    7 :  ("P" , "#f58231" ), 
-    8 :  ("*" , "#FFD700" ), 
-    9 :  ("+" , "#bfef45" ), 
-    10 : ( "x" , "#3cb44b" ), 
-    11 : ( "X" , "#42d4f4" ), 
-    12 : ( "D" , "#4363d8" ), 
-    13 : ( "d" , "#911eb4" ), 
-    14 : ( "p" , "#f032e6" ), 
-    15 : ( "1" , "#a9a9a9" ), 
-    16 : ( "4" , "#800000" ), 
-    17 : ( "4" , "#800000" ), 
-    18 : ( "4" , "#800000" ), 
-    19 : ( "4" , "#800000" ), 
-    20 : ( "4" , "#800000" ), 
-    21 : ( "4" , "#800000" ), 
-    22 : ( "4" , "#800000" ), 
-    23 : ( "4" , "#800000" ), 
-    24 : ( "4" , "#800000" ), 
-    25 : ( "4" , "#800000" ), 
-    26 : ( "4" , "#800000" ), 
-    27 : ( "4" , "#800000" ) 
+0 : ( ".", "#696969" ), 
+1 : ( ",", "#9A6324" ), 
+2 : ( "o", "#808000" ), 
+3 : ( "v", "#469990" ), 
+4 : ( "^", "#000075" ), 
+5 : ( "<", "#000000" ), 
+6 : ( ">", "#e6194B" ), 
+7 : ( "1", "#f58231" ), 
+8 : ( "2", "#FFD700" ), 
+9 : ( "3", "#bfef45" ), 
+10 : ( "4", "#3cb44b" ), 
+11 : ( "8", "#42d4f4" ), 
+12 : ( "s", "#4363d8" ), 
+13 : ( "p", "#911eb4" ), 
+14 : ( "P", "#f032e6" ), 
+15 : ( "*", "#a9a9a9" ), 
+16 : ( "h", "#FFDA00" ), 
+17 : ( "H", "#bfef55" ), 
+18 : ( "+", "#3cb4ab" ),
+19 : ( "x", "#a2d4f4" ), 
+20 : ( "X", "#f363d8" ), 
+21 : ( "D", "#a11eb4" ), 
+22 : ( "d", "#f072e6" ), 
+23 : ( "|", "#a9f9a9" ), 
+24 : ( "_", "#00f000" ), 
 }
 
 label_font_size = 18
@@ -106,12 +104,75 @@ lie_feat_cols = [
         'label'
     ]
 
-def lie_plotPointsAllSubjects(features, mode, feat_cols=lie_feat_cols, save_root="plots/LIE/points_{}.png", save=True):
+
+def TNT_points(lie_features, lie_feat_cols, feature, title, abs_ratio=False, norm_to_point=False):
+    tnt_scores, sss = coumpute_TnT_scores(lie_features, lie_feat_cols, feature, abs_ratio=abs_ratio, norm_to_point=norm_to_point)
+    
+    print(sss)
+
+    f, axs = plt.subplots(1, figsize=(10, 10), num="{}".format(feature))
+    pallX = tnt_scores['react_ratio'].mean(skipna=True)
+    pallX_ste = tnt_scores['react_ratio'].sem(skipna=True)    
+    pallY = tnt_scores['descr_ratio'].mean(skipna=True)
+    pallY_ste = tnt_scores['descr_ratio'].sem(skipna=True)
+
+    labels = []
+    size = 200
+    label_font_size = 10
+    legend_prop_size = {'size': 12}
+
+    for i, sub in enumerate(sss):
+
+        labels.append("{}".format(sub))
+        marker = marker_map[sub][0]
+
+        axs.set_xlabel("REACT ratio {}".format(title), fontsize=label_font_size)
+        axs.set_ylabel("DESCR ratio {}".format(title), fontsize=label_font_size)
+        axs.set_label("{}".format(sub))
+        
+        color = marker_map[sub][1]
+        labels.append("{}".format(sub))
+        marker = marker_map[sub][0]
+        
+        axs.scatter(tnt_scores.loc[tnt_scores['subject'] == sub]['react_ratio'],
+                            tnt_scores.loc[tnt_scores['subject'] == sub]['descr_ratio'],
+                            s=size,
+                            c=color,
+                            marker=marker)
+
+    minX = tnt_scores['react_ratio'].min()
+    maxX = tnt_scores['react_ratio'].max()        
+    minY = tnt_scores['descr_ratio'].min()
+    maxY = tnt_scores['descr_ratio'].max()       
+    minXY = min(minX, minY)
+    maxXY = max(maxX, maxY)
+
+    mn = (maxXY + minXY) / 20
+
+    minXY = minXY - mn
+    maxXY = maxXY + mn
+    
+    lims = [minXY, maxXY]
+    
+    plt.legend(labels, loc='center left', bbox_to_anchor=(1, 0.5), prop=legend_prop_size)  
+    axs.scatter(pallX, pallY, s=200, alpha=0.5)
+    axs.errorbar(pallX, pallY,
+                xerr=pallX_ste,
+                yerr=pallY_ste)
+    
+    axs.plot(lims, lims, alpha=0.75, zorder=100)
+    axs.axvline(color='black', alpha=0.2)
+    axs.axhline(color='black', alpha=0.2)
+    axs.tick_params(axis='both', which='major', labelsize=label_font_size)
+
+
+def lie_plotPointsAllSubjects(features, mode, feat_cols=[], save_root="plots/LIE/points_{}.png", save=True):
     
     label_font_size = 10
-    legend_prop_size = {'size': 10}
+    legend_prop_size = {'size': 12}
 
-    aggrZeros, aggrOnes, TnT = aggregate_target_nontarget(features, feat_cols)
+    cols_to_aggregate = [col for (col, title) in feat_cols]
+    aggrZeros, aggrOnes, TnT = aggregate_target_nontarget(features, cols_to_aggregate)
 
     sub_z = aggrZeros['subject'].values
     sub_o = aggrOnes['subject'].values
@@ -120,13 +181,12 @@ def lie_plotPointsAllSubjects(features, mode, feat_cols=lie_feat_cols, save_root
     subjects
     
     plot_cols = feat_cols.copy()
-    plot_cols.remove('subject')
-    plot_cols.remove('card_class')
+    plot_cols = [(f, t) for (f, t) in plot_cols if f not in ('subject', 'card_class')]
 
     #plot_cols = ["descr_right_mean"]
 
-    for f in plot_cols:
-        fig, axs = plt.subplots(1, figsize=(12, 12), num="x{}".format(f))
+    for (f, title) in plot_cols:
+        fig, axs = plt.subplots(1, figsize=(10, 10), num="x{}".format(f))
         print(f)
         labels = []
 
@@ -140,15 +200,14 @@ def lie_plotPointsAllSubjects(features, mode, feat_cols=lie_feat_cols, save_root
 
             #axs.set_xlabel("Right Mean Pupil Dilation Average Non Target", fontsize=label_font_size)
             #axs.set_ylabel("Right Mean Pupil Dilation Target", fontsize=label_font_size)
-            axs.set_xlabel("{} Average Non Target".format(f), fontsize=label_font_size)
-            axs.set_ylabel("{} Target".format(f), fontsize=label_font_size)
+            axs.set_xlabel("{} Average Non Target".format(title), fontsize=label_font_size)
+            axs.set_ylabel("{} Target".format(title), fontsize=label_font_size)
             axs.set_label("{}".format(sub))
 
             color = card_color_map[aggrOnes.loc[aggrOnes['subject'] == sub]["card_class"].values[0]]
             size = 200
             labels.append("{}".format(sub))
             marker = marker_map[sub][0]
-
             
             axs.scatter(aggrZeros.loc[aggrZeros['subject'] == sub][f],
                         aggrOnes.loc[aggrOnes['subject'] == sub][f],
@@ -183,11 +242,13 @@ def lie_plotPointsAllSubjects(features, mode, feat_cols=lie_feat_cols, save_root
                 yerr=pallY_ste)
 
         axs.plot(lims, lims, alpha=0.75, zorder=100)
+        axs.axvline(color='black', alpha=0.2)
+        axs.axhline(color='black', alpha=0.2)
 
         axs.tick_params(axis='both', which='major', labelsize=label_font_size)
 
         if(save):
-            fig.savefig(save_root.format(f))
+            fig.savefig(save_root.format(f), dpi=1200)
 
 def lie_plotTnTratioMean(features, save=True):
 
@@ -402,17 +463,17 @@ def lie_plotTnTPremedIndex(features, feature, save_root="plots/LIE/Premed_{}.png
 def lie_plotComparBars(features, feat_cols=lie_feat_cols, save_root="plots/LIE/Bars_{}.png", save=True):
 
     feat_comparison = [
-        ('duration', 'react_dur', 'point_dur', 'descr_dur'),
-        ('fix_freq', 'point_fix_freq', 'react_fix_freq', 'descr_fix_freq'),
-        ('sacc_freq', 'point_sacc_freq', 'react_sacc_freq', 'descr_sacc_freq'),
-        ('right_mean', 'point_right_mean', 'react_right_mean', 'descr_right_mean'),
-        ('right_std', 'point_right_std', 'react_right_std', 'descr_right_std'),
-        ('right_min', 'point_right_min', 'react_right_min', 'descr_right_min'),
-        ('right_max', 'point_right_max', 'react_right_max', 'descr_right_max'),
-        ('left_mean', 'point_left_mean', 'react_left_mean', 'descr_left_mean'),
-        ('left_std', 'point_left_std', 'react_left_std', 'descr_left_std'),
-        ('left_min', 'point_left_min', 'react_left_min', 'descr_left_min'),
-        ('left_max', 'point_left_max', 'react_left_max', 'descr_left_max')
+        #('duration', 'react_dur', 'point_dur', 'descr_dur'),
+        #('fix_freq', 'point_fix_freq', 'react_fix_freq', 'descr_fix_freq'),
+        #('sacc_freq', 'point_sacc_freq', 'react_sacc_freq', 'descr_sacc_freq'),
+        ('right_mean', 'point_right_mean', 'react_right_mean', 'descr_right_mean', "Right Mean Pupil Dilation"),
+        #('right_std', 'point_right_std', 'react_right_std', 'descr_right_std', "Right STD Pupil Dilation"),
+        #('right_min', 'point_right_min', 'react_right_min', 'descr_right_min', "Right Min Pupil Dilation"),
+        #('right_max', 'point_right_max', 'react_right_max', 'descr_right_max', "Right Max Pupil Dilation"),
+        ('left_mean', 'point_left_mean', 'react_left_mean', 'descr_left_mean', "Left Mean Pupil Dilation"),
+        #('left_std', 'point_left_std', 'react_left_std', 'descr_left_std', "Left STD Pupil Dilation" ),
+        #('left_min', 'point_left_min', 'react_left_min', 'descr_left_min',  "Left Min Pupil Dilation" ),
+        #('left_max', 'point_left_max', 'react_left_max', 'descr_left_max',  "Left Max Pupil Dilation" )
     ]
 
     nonTargets, targets, TnT = aggregate_target_nontarget(features, feat_cols)
@@ -421,9 +482,9 @@ def lie_plotComparBars(features, feat_cols=lie_feat_cols, save_root="plots/LIE/B
     labels = ['POINT', 'REACT', 'DESCR']
     x_pos = np.arange(len(labels))
 
-    for (whole, point, react, descr) in feat_comparison:
+    for (whole, point, react, descr, title) in feat_comparison:
 
-        fig, axs = plt.subplots(1, figsize=(15, 10), num='{}'.format(whole))
+        fig, axs = plt.subplots(1, figsize=(15, 10), num='{}'.format(title))
         #fig.suptitle('{}'.format(whole), fontsize=16)
 
         nT_react_mean = nonTargets[react].mean(skipna=True)
@@ -452,24 +513,90 @@ def lie_plotComparBars(features, feat_cols=lie_feat_cols, save_root="plots/LIE/B
         axs.bar(x_pos, y_values_T,
                 yerr=T_errors,
                 color='#32CD32', 
-                width=bar_width, label='{} Target'.format(whole))
+                width=bar_width, label='{} Target'.format(title))
 
         axs.bar(x_pos+bar_width, y_values_nT,
                 yerr=nT_errors,
                 color='#1E90FF', 
-                width=bar_width, label='{} Non Target'.format(whole))
+                width=bar_width, label='{} Non Target'.format(title))
 
         axs.legend(loc="upper left", prop=legend_prop_size)
 
         axs.set_xticks(x_pos)
         axs.set_xticklabels(labels)
-        axs.set_ylabel(whole, fontsize=label_font_size)
+        axs.set_ylabel(title, fontsize=label_font_size)
         #axs.set_title('{}'.format(whole))
 
         axs.tick_params(axis='both', which='major', labelsize=label_font_size)
 
         if(save):
-            fig.savefig(save_root.format(whole))
+            fig.savefig(save_root.format(whole), dpi=1200)
+
+def lie_plotRLbars(features, feat_cols=lie_feat_cols, save_root="plots/LIE/Bars_{}.png", save=True):
+
+    feat_comparison = [
+        ('right_mean', 'point_right_mean', 'react_right_mean', 'descr_right_mean', "Right Mean Pupil Dilation"),
+        ('left_mean', 'point_left_mean', 'react_left_mean', 'descr_left_mean', "Left Mean Pupil Dilation"),
+    ]
+
+    nonTargets, targets, TnT = aggregate_target_nontarget(features, feat_cols)
+
+    bar_width = 0.25   
+    labels = ['POINT', 'REACT', 'DESCR']
+    x_pos = np.arange(len(labels))
+
+    fig, axs = plt.subplots(1, figsize=(15, 10), num='{}'.format("Right and Left Mean Pupil Dilation"))
+
+    x_pos = np.arange(len(labels))
+    axs.set_xticks(x_pos)
+    axs.set_xticklabels(labels)
+    axs.tick_params(axis='both', which='major', labelsize=label_font_size)
+
+    colors = ['#32CD32', '#1E90FF', '#FFEB3B', '#FFEB3B']
+
+    for i, (whole, point, react, descr, title) in enumerate(feat_comparison):
+
+        nT_react_mean = nonTargets[react].mean(skipna=True)
+        nT_point_mean = nonTargets[point].mean(skipna=True)
+        nT_descr_mean = nonTargets[descr].mean(skipna=True)
+        
+        nT_react_ste = nonTargets[react].sem(skipna=True)
+        nT_point_ste = nonTargets[point].sem(skipna=True)
+        nT_descr_ste = nonTargets[descr].sem(skipna=True)
+
+        T_react_mean = targets[react].mean(skipna=True)
+        T_point_mean = targets[point].mean(skipna=True)
+        T_descr_mean = targets[descr].mean(skipna=True)
+        
+        T_react_ste = targets[react].sem(skipna=True)
+        T_point_ste = targets[point].sem(skipna=True)
+        T_descr_ste = targets[descr].sem(skipna=True)        
+
+
+        y_values_T = [ T_point_mean, T_react_mean, T_descr_mean]
+        y_values_nT = [ nT_point_mean, nT_react_mean, nT_descr_mean]
+        T_errors = [ T_point_ste, T_react_ste, T_descr_ste]
+        nT_errors = [ nT_point_ste, nT_react_ste, nT_descr_ste] 
+        
+        axs.bar(x_pos*i, y_values_T,
+                yerr=T_errors,
+                color=colors[i], 
+                width=bar_width, label='{} Target'.format(title))
+
+        axs.bar((x_pos+bar_width)*i, y_values_nT,
+                yerr=nT_errors,
+                color=colors[i+1], 
+                width=bar_width, label='{} Non Target'.format(title))
+
+        axs.legend(loc="upper left", prop=legend_prop_size)
+
+    
+    
+
+    if(save):
+        fig.savefig(save_root.format(whole), dpi=1200)
+
+
 
 def lie_plotTimeSeries(subject, card_names, annotations, overall_eye, filtered_inter_dfs, baseline=None):
     

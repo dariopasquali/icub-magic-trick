@@ -54,6 +54,38 @@ from eye_feature_tools import *
 from evaluation_metrics import *
 
 # Evaluate the paired t-test for each feature
+
+def paired_t_test_pupil_dilation(features, features_to_test, print_result=False, only_rel=False):
+    results = pd.DataFrame(columns=["right", 'left', 't-score', 'p', 'is_sign'])
+
+    for (right, left) in features_to_test:
+        t, p = stats.ttest_rel(features[right],features[left])
+
+        is_rel = ""
+        if(p <= 0.05):
+            is_rel = "*"
+        
+        if(p <= 0.001):
+            is_rel = "**"
+
+        res = pd.DataFrame(data=[[right, left, t, p, is_rel]], columns=["right", 'left', 't-score', 'p', 'is_sign'])
+        results = results.append(res, ignore_index=True)
+
+    results = results.sort_values(by=['p'], ascending=False)
+    if(print_result):
+        print("===== PAIRED T-test RESULTS for RIGHT AND MEAN PUPILS =====")
+        for index, row in results.iterrows():
+
+            if(only_rel and "*" not in row['is_sign']):
+                continue
+
+            print("{} {} T:{} p:{}   {}".format(
+                row['right'], row['left'], row['t-score'], row['p'], row['is_sign']
+                ))
+
+    return results
+
+
 def paired_t_test(features, origin_cols, features_to_test, print_result=False, only_rel=False):
 
     results = pd.DataFrame(columns=["feature", 't-score', 'p', 'is_sign'])

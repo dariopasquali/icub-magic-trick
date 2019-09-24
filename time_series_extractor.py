@@ -193,8 +193,32 @@ def loadLieTimeSeries(subject, card_names,
             (whole_interval, point_interaction, reaction_interval, point_reaction_interval, description_interval)
         )
 
-        print(
-            (whole_interval['diam_right'].count(), point_interaction['diam_right'].count(), reaction_interval['diam_right'].count(), point_reaction_interval['diam_right'].count(), description_interval['diam_right'].count())
+        start_point = annotations[i]['start_p'].iloc[0]
+        stop_point = annotations[i]['stop_p'].iloc[0]
+        start_descr = annotations[i]['start_d'].iloc[0]
+        stop_descr = annotations[i]['stop_d'].iloc[0]
+
+        filtered_interaction__size.append(
+            [
+                subject,
+                annotations[0]['subject_card'].iloc[0],
+                annotations[i]['card'].iloc[0],
+                whole_interval['diam_right'].count(),
+                point_interaction['diam_right'].count(),
+                reaction_interval['diam_right'].count(),
+                point_reaction_interval['diam_right'].count(),
+                description_interval['diam_right'].count(),
+                whole_interval['diam_left'].count(),
+                point_interaction['diam_left'].count(),
+                reaction_interval['diam_left'].count(),
+                point_reaction_interval['diam_left'].count(),
+                description_interval['diam_left'].count(),
+                (stop_descr - start_point), #whole
+                (stop_point - start_point), #point
+                (start_descr - stop_point), #reaction
+                (start_descr - start_point), #point_reaction
+                (stop_descr - start_descr) #description
+            ]
         )
     
-    return eye, annotations, baseline, overall, filtered_interaction_dfs
+    return eye, annotations, baseline, overall, filtered_interaction_dfs, filtered_interaction__size

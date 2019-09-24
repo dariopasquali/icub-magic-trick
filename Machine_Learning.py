@@ -273,7 +273,6 @@ class GridSearchEngine:
         report['model'] = 'mlp'
         return report
 
-
     def concat_dict(self, source, dict_to_add):
         df = source.copy()
         
@@ -349,7 +348,7 @@ class GridSearchEngine:
             print("The scores are computed on the never revealed Test set.")
             print()
             y_true, y_pred = y_test, clf.predict(X_test)
-            print(classification_report(y_true, y_pred))
+            #print(classification_report(y_true, y_pred))
             print()
             print("Accuracy:",metrics.accuracy_score(y_true, y_pred))
             print("Balanced Accuracy:",metrics.balanced_accuracy_score(y_true, y_pred))

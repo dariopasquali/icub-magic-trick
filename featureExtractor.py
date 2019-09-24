@@ -149,122 +149,26 @@ lie_feat_cols = [
         'descr_left_max',
     ]
 
-sr_window = 1500
-card_names = ['unicorn', 'pepper', 'minion', 'pig', 'hedge', 'aliens']
-
-def warn(*args, **kwargs):
-    pass
-import warnings
-warnings.warn = warn
-
-def extractLieFeatures(subjects=[], subject_to_exclude=[], cols=lie_column_names, cards=card_names, source="frontiers", ref_to_base="time", mode="sub", plot=False, print_pupil=False, save_root="plots/V2/pupils_{}.png", save=False):
-
-    # refer_to_base = [time, feat, None]
-
-    features = pd.DataFrame(columns=cols)
-
-    if(len(subjects) == 0):
-        subjects = extractMinSubjectSet(source, annot_path=annotations_lie_in_temp)
-
-    baseline_right = []
-    baseline_left = []
-
-    ref_time = ref_to_base == 'time'
-    ref_features = ref_to_base == 'feat'
-
-    subjects = [s for s in subjects if s not in subject_to_exclude]
-
-    for sub in subjects:
-
-        eye_df, annot_dfs, baseline, overall_eye_df, filtered_interaction_dfs = \
-                loadLieTimeSeries(
-                    sub, card_names, source="frontiers", 
-                    refer_to_baseline=ref_time, refer_mode=mode,
-                    clean=True, clean_mode="MAD", smooth=False) 
-        
-        mf = LieFeatures(sub, "frontiers",
-                            annot_dfs,
-                            filtered_interaction_dfs)
-
-        baseline_right.append(baseline['diam_right'].mean(skipna = True))
-        baseline_left.append(baseline['diam_left'].mean(skipna = True)) 
-
-        sub_features = mf.getDataFrame()
-
-        if(ref_features):
-            print(">> refer features to baseline")
-
-            lie_right_feats = [
-                    'right_mean', 'right_min','right_max',
-                    'react_right_mean', 'react_right_min', 'react_right_max',
-                    'point_right_mean', 'point_right_min','point_right_max',
-                    'descr_right_mean', 'descr_right_min','descr_right_max'
-                ]
-
-            lie_left_feats = [
-                    'left_mean', 'left_min','left_max',
-                    'react_left_mean', 'react_left_min', 'react_left_max',
-                    'point_left_mean', 'point_left_min','point_left_max',
-                    'descr_left_mean', 'descr_left_min','descr_left_max'
-                ]
-
-            sub_features = referEyeFeaturesToBaseline(sub_features, baseline, lie_right_feats, lie_left_feats)
-
-        
-        if(print_pupil):
-            print(annot_dfs[0])
-            for card in card_names:
-                print("card {} {}".format(card, sub_features.loc[sub_features['card_class'] == card]['descr_left_mean'].values[0]))
-            print("=======================================")
-        
-
-        features = features.append(sub_features, ignore_index=True)
-        features['subject'] = features.index // 6
-
-        if(plot):
-            fig = lie_plotTimeSeries(sub, cards, annot_dfs, overall_eye_df, filtered_interaction_dfs)
-            if(save):
-                fig.savefig(save_root.format(sub))
-                  
-
-    return features, baseline_right, baseline_left
-
-def extractFeatures(subject=None, cols=column_names, cards=card_names, source="frontiers", short_resp=1500, ref_to_base=True, mode="sub", plot=False):
-    
-    features = pd.DataFrame(columns=cols)
-
-    subjects = []
-
-    if(subject != None):
-        subjects = [subject]
-    else:
-        subjects = extractMinSubjectSet(source)
-
-    baseline_right = []
-    baseline_left = []
-    
-    for sub in subjects:
-        eye_df, annot_dfs, baseline, overall_eye_df, \
-            cards_eye_dfs, early_sr_dfs, late_sr_dfs = \
-                loadTimeSeries(sub, cards, source=source, clean=True, clean_mode="MAD", smooth=False) 
-        
-        subject_card = getSubjectCard(sub, source, subject_cards_file)
-        
-        mf = SubjectMagicFeatures(sub, source, subject_card,
-                              annot_dfs,
-                              cards_eye_dfs, early_sr_dfs, late_sr_dfs,
-                              short_resp,
-                              cols=cols
-                            )
-
-        baseline_right.append(baseline['diam_right'].mean(skipna = True))
-        baseline_left.append(baseline['diam_left'].mean(skipna = True))
-        features = features.append(mf.getDataFrame(), ignore_index=True)
-
-        if(plot):
-            plotPupilDilationTimeSeries(sub, subject_card, cards, overall_eye_df, cards_eye_dfs)
-        
-    return features, baseline_right, baseline_left
+tobii_quality_columns = [
+    'subject',
+    'subject_card',
+    'card',
+    'whole_right',
+    'point_right',
+    'react_right',
+    'point_react_right',
+    'descr_right',
+    'whole_left',
+    'point_left',
+    'react_left',
+    'point_react_left',
+    'descr_left',
+    'whole_dur',
+    'point_dur',
+    'react_dur',
+    'point_react_dur',
+    'descr_dur',
+]
 
 
 significant_cols = [
@@ -379,216 +283,229 @@ descr_react_col_set = [
 ]
 
 points_cols = [
-        'subject',
-        'card_class',
-        'label',
-        'duration',
-        'react_dur',
-        'point_dur',
-        'descr_dur',
-        'right_mean',
-        'right_std',
-        'right_min',
-        'right_max',
-        'left_mean',
-        'left_std',
-        'left_min',
-        'left_max',
-        'react_right_mean',
-        'react_right_std',
-        'react_right_min',
-        'react_right_max',
-        'react_left_mean',
-        'react_left_std',
-        'react_left_min',
-        'react_left_max',
-        'point_right_mean',
-        'point_right_std',
-        'point_right_min',
-        'point_right_max',
-        'point_left_mean',
-        'point_left_std',
-        'point_left_min',
-        'point_left_max',
-        'descr_right_mean',
-        'descr_right_std',
-        'descr_right_min',
-        'descr_right_max',
-        'descr_left_mean',
-        'descr_left_std',
-        'descr_left_min',
-        'descr_left_max',
+        ( 'subject', "subject" ) ,
+        ( 'card_class', "card_class" ) ,
+        ( 'label', "label" ) ,
+        ( 'right_mean', "Right Mean Pupil Dilation" ) ,
+        ( 'left_mean', "" ) ,
+        ( 'react_right_mean', "REACT Right Mean Pupil Dilation" ) ,
+        ( 'react_left_mean', "REACT Left Mean Pupil Dilation" ) ,
+        ( 'point_right_mean', "POINT Right Mean Pupil Dilation" ) ,
+        ( 'point_left_mean', "POINT Left Mean Pupil Dilation" ) ,
+        ( 'descr_right_mean', "DESCR Right Mean Pupil Dilation" ) ,
+        ( 'descr_left_mean', "DESCR Left Mean Pupil Dilation" ) ,
     ]
 
+tt_sign_cols_35 = [
+    'descr_left_max',
+    'react_left_max',
+    'descr_right_max',
+    'react_left_std',
+    'right_max',
+    'left_std',
+    'react_right_mean',
+    'react_mean_pupil',
+    'react_left_mean',
+    'right_mean',
+    'left_mean',
+    'descr_left_mean',
+    'descr_right_mean',
+    'descr_mean_pupil',
+]
+
+
+sr_window = 1500
+card_names = ['unicorn', 'pepper', 'minion', 'pig', 'hedge', 'aliens']
+
+def warn(*args, **kwargs):
+    pass
+import warnings
+warnings.warn = warn
+
+def extractLieFeatures(subjects=[], subject_to_exclude=[], cols=lie_column_names, cards=card_names, source="frontiers", ref_to_base="time", mode="sub", plot=False, print_pupil=False, save_root="plots/V2/pupils_{}.png", save=False):
+
+    # refer_to_base = [time, feat, None]
+
+    features = pd.DataFrame(columns=cols)
+
+    if(len(subjects) == 0):
+        subjects = extractMinSubjectSet(source, annot_path=annotations_lie_in_temp)
+
+    baseline_right = []
+    baseline_left = []
+
+    ref_time = ref_to_base == 'time'
+    ref_features = ref_to_base == 'feat'
+
+    subjects = [s for s in subjects if s not in subject_to_exclude]
+
+    tobii_data_stats = []
+
+    for sub in subjects:
+
+        eye_df, annot_dfs, baseline, overall_eye_df, filtered_interaction_dfs, filtered_interaction__size = \
+                loadLieTimeSeries(
+                    sub, card_names, source="frontiers", 
+                    refer_to_baseline=ref_time, refer_mode=mode,
+                    clean=True, clean_mode="MAD", smooth=False)
+
+        tobii_data_stats = tobii_data_stats + filtered_interaction__size
+        
+        mf = LieFeatures(sub, "frontiers",
+                            annot_dfs,
+                            filtered_interaction_dfs)
+
+        baseline_right.append(baseline['diam_right'].mean(skipna = True))
+        baseline_left.append(baseline['diam_left'].mean(skipna = True)) 
+
+        sub_features = mf.getDataFrame()
+
+        if(ref_features):
+            print(">> refer features to baseline")
+
+            lie_right_feats = [
+                    'right_mean', 'right_min','right_max',
+                    'react_right_mean', 'react_right_min', 'react_right_max',
+                    'point_right_mean', 'point_right_min','point_right_max',
+                    'descr_right_mean', 'descr_right_min','descr_right_max'
+                ]
+
+            lie_left_feats = [
+                    'left_mean', 'left_min','left_max',
+                    'react_left_mean', 'react_left_min', 'react_left_max',
+                    'point_left_mean', 'point_left_min','point_left_max',
+                    'descr_left_mean', 'descr_left_min','descr_left_max'
+                ]
+
+            sub_features = referEyeFeaturesToBaseline(sub_features, baseline, lie_right_feats, lie_left_feats)
+
+        
+        if(print_pupil):
+            print(annot_dfs[0])
+            for card in card_names:
+                print("card {} {}".format(card, sub_features.loc[sub_features['card_class'] == card]['descr_left_mean'].values[0]))
+            print("=======================================")
+        
+
+        features = features.append(sub_features, ignore_index=True)
+        features['subject'] = features.index // 6
+
+        if(plot):
+            fig = lie_plotTimeSeries(sub, cards, annot_dfs, overall_eye_df, filtered_interaction_dfs)
+            if(save):
+                fig.savefig(save_root.format(sub))
+                  
+
+    return features, baseline_right, baseline_left, tobii_data_stats
+
+def extractFeatures(subject=None, cols=column_names, cards=card_names, source="frontiers", short_resp=1500, ref_to_base=True, mode="sub", plot=False):
+    
+    features = pd.DataFrame(columns=cols)
+
+    subjects = []
+
+    if(subject != None):
+        subjects = [subject]
+    else:
+        subjects = extractMinSubjectSet(source)
+
+    baseline_right = []
+    baseline_left = []
+    
+    for sub in subjects:
+        eye_df, annot_dfs, baseline, overall_eye_df, \
+            cards_eye_dfs, early_sr_dfs, late_sr_dfs = \
+                loadTimeSeries(sub, cards, source=source, clean=True, clean_mode="MAD", smooth=False) 
+        
+        subject_card = getSubjectCard(sub, source, subject_cards_file)
+        
+        mf = SubjectMagicFeatures(sub, source, subject_card,
+                              annot_dfs,
+                              cards_eye_dfs, early_sr_dfs, late_sr_dfs,
+                              short_resp,
+                              cols=cols
+                            )
+
+        baseline_right.append(baseline['diam_right'].mean(skipna = True))
+        baseline_left.append(baseline['diam_left'].mean(skipna = True))
+        features = features.append(mf.getDataFrame(), ignore_index=True)
+
+        if(plot):
+            plotPupilDilationTimeSeries(sub, subject_card, cards, overall_eye_df, cards_eye_dfs)
+        
+    return features, baseline_right, baseline_left
+
+
+def calc_tobii_quality_features(tobii_features, threshold=50.0):
+
+    df = pd.DataFrame(data=tobii_features, columns=tobii_quality_columns)
+
+    # Expected points at 100Hz
+    df['whole_exp'] = df['whole_dur'] / 10 #/1000 to seconds * 100 samples per second
+    df['point_exp'] = df['point_dur'] / 10
+    df['react_exp'] = df['react_dur'] / 10
+    df['point_react_exp'] = df['point_react_dur'] / 10
+    df['descr_exp'] = df['descr_dur'] / 10
+
+    # Percentage of points resect to expected
+    df['whole_perc_right_exp'] = (df['whole_right'] / df['whole_exp']) * 100
+    df['point_perc_right_exp'] = (df['point_right'] / df['point_exp']) * 100
+    df['react_perc_right_exp'] = (df['react_right'] / df['react_exp']) * 100
+    df['point_react_perc_right_exp'] = (df['point_react_right'] / df['point_react_exp']) * 100
+    df['descr_perc_right_exp'] = (df['descr_right'] / df['descr_exp']) * 100
+
+    df['whole_perc_left_exp'] = (df['whole_left'] / df['whole_exp']) * 100
+    df['point_perc_left_exp'] = (df['point_left'] / df['point_exp']) * 100
+    df['react_perc_left_exp'] = (df['react_left'] / df['react_exp']) * 100
+    df['point_react_perc_left_exp'] = (df['point_react_left'] / df['point_react_exp']) * 100
+    df['descr_perc_left_exp'] = (df['descr_left'] / df['descr_exp']) * 100
+
+    # ====================================================================================
+
+    # Expected points at 100Hz
+    df['whole_right_mean'] = df['whole_right'].mean()
+    df['point_right_mean'] = df['point_right'].mean()
+    df['react_right_mean'] = df['react_right'].mean()
+    df['point_right_react_mean'] = df['point_react_right'].mean()
+    df['descr_right_mean'] = df['descr_right'].mean()
+
+    df['whole_left_mean'] = df['whole_left'].mean()
+    df['point_left_mean'] = df['point_left'].mean()
+    df['react_left_mean'] = df['react_left'].mean()
+    df['point_left_react_mean'] = df['point_react_left'].mean()
+    df['descr_left_mean'] = df['descr_left'].mean()
+
+    # Percentage of points resect to mean
+    df['whole_perc_right_mean'] = (df['whole_right'] / df['whole_right_mean']) * 100
+    df['point_perc_right_mean'] = (df['point_right'] / df['whole_right_mean']) * 100
+    df['react_perc_right_mean'] = (df['react_right'] / df['whole_right_mean']) * 100
+    df['point_react_perc_right_mean'] = (df['point_react_right'] / df['whole_right_mean']) * 100
+    df['descr_perc_right_mean'] = (df['descr_right'] / df['whole_right_mean']) * 100
+
+    df['whole_perc_left_mean'] = (df['whole_left'] / df['descr_left_mean']) * 100
+    df['point_perc_left_mean'] = (df['point_left'] / df['descr_left_mean']) * 100
+    df['react_perc_left_mean'] = (df['react_left'] / df['descr_left_mean']) * 100
+    df['point_react_perc_left_mean'] = (df['point_react_left'] / df['descr_left_mean']) * 100
+    df['descr_perc_left_mean'] = (df['descr_left'] / df['descr_left_mean']) * 100
+
+    # ============================================================================
+
+    return df
+
+
+def filter_by_quality(df, thresh_target, thresh_other):
+
+    #df_filtered = df.query("(subject_card == card & (point_perc_right_exp < @thresh_target | react_perc_right_exp < @thresh_target | descr_perc_right_exp < @thresh_target |   point_perc_left_exp < @thresh_target | react_perc_left_exp < @thresh_target | descr_perc_left_exp < @thresh_target)) | (subject_card == card & (point_perc_right_exp < @thresh_other | react_perc_right_exp < @thresh_other | descr_perc_right_exp < @thresh_other |   point_perc_left_exp < @thresh_other | react_perc_left_exp < @thresh_other | descr_perc_left_exp < @thresh_other))")
+
+
+    df_filtered = df.query("descr_perc_right_exp < @thresh_target |  descr_perc_left_exp < @thresh_target")
+
+    #df['exclude'] = df['lower_exp_right'] or df['lower_exp_left'] or df['lower_mean_right'] or df['lower_mean_left']
+        
+    sub_to_exclude = df_filtered.groupby('subject').max().index.values
+
+    return sub_to_exclude
 
-
-mode = "sub"
-print("================== MODE SMOOTH {} =====================".format(mode))
-lie_features, lie_base_right, lie_base_left = \
-    extractLieFeatures(subjects=[2, 5, 12, 19, 26], subject_to_exclude=[], mode=mode, ref_to_base="time", plot=True, save=False, save_root="plots/V2/smooth/pupils_{}.png")
-#lie_features.to_csv("lie_features_clear.csv", index=False)
-
-
-#lie_features = pd.read_csv("lie_features_smooth.csv", sep=',')
-#lie_features = pd.read_csv("lie_features.csv", sep=',')
-#lie_features = pd.read_csv("lie_features_clear.csv", sep=',')
-
-
-lie_features = lie_features.fillna(0)
-lie_features['descr_mean_pupil'] = (lie_features['descr_right_mean'] + lie_features['descr_left_mean'])/2
-lie_features['react_mean_pupil'] = (lie_features['react_right_mean'] + lie_features['react_left_mean'])/2
-lie_features['point_mean_pupil'] = (lie_features['point_right_mean'] + lie_features['point_left_mean'])/2
-
-lie_feat_cols.append('descr_mean_pupil')
-lie_feat_cols.append('react_mean_pupil')
-lie_feat_cols.append('point_mean_pupil')
-
-significant_cols.append('descr_mean_pupil')
-significant_cols.append('react_mean_pupil')
-significant_cols.append('point_mean_pupil')
-
-points_cols.append('descr_mean_pupil')
-points_cols.append('react_mean_pupil')
-points_cols.append('point_mean_pupil')
-
-
-
-"""
-print("PLOT COMPARE BARS =================================================")
-lie_plotComparBars(lie_features, feat_cols=lie_feat_cols, save_root="plots/V2/clear/bars_{}.png", save=True)
-print("PLOT POINTS FOR EACH SUBJECT =================================================")
-lie_plotPointsAllSubjects(lie_features, feat_cols=points_cols, save_root="plots/V2/clear/points_{}.png", mode=mode, save=True)
-"""
-
-
-"""
-# ============= HEURISTIC AND STATISTIC TESTS ===========================
-
-# TAKE MAX HEURISIC
-sys.stdout = open("V2_reports/take_max_heuristic_clear.txt", "w")
-print("======================================================")
-take_max_heuristic(lie_features, significant_cols, print_result=True, only_rel=True)
-
-# MAX MEAN HEURISIC
-#sys.stdout = open("V2_reports/max_mean_heuristic.txt", "w")
-#print("======================================================")
-#max_mean_heuristic(lie_features, significant_cols, print_result=True, only_rel=True)
-
-# PAIRED T TEST
-sys.stdout = open("V2_reports/paired_t_test_clear.txt", "w")
-print("======================================================")
-paired_t_test(lie_features, lie_feat_cols, significant_cols, print_result=True, only_rel=True)
-"""
-
-#lie_features['premed_score_right'] = lie_features['react_right_mean'] / lie_features#['descr_right_mean']
-#lie_features['premed_score_left'] = lie_features['react_left_mean'] / lie_features['descr_left_mean']
-#lie_feat_cols.append('premed_score_right')
-#lie_feat_cols.append('premed_score_left')
-#significant_cols.append('premed_score_right')
-#significant_cols.append('premed_score_left')
-#reduced_significant_cols.append('premed_score_right')
-#reduced_significant_cols.append('premed_score_left')
-#tt_sign_cols_2.append('premed_score_right')
-#tt_sign_cols_2.append('premed_score_left')
-
-
-"""
-col_sets = {
-    'all_columns' : significant_cols,
-    'reduced' : reduced_significant_cols,
-    'tt_clear' : tt_sign_cols_clear,
-    'tt_all' : tt_sign_cols_all,
-    'descr_react' : descr_react_col_set
-}
-
-sys.stdout = open("V2_reports/multiple_grid_search__all.txt", "w")
-
-gsEngine = GridSearchEngine()
-gsEngine.add_naive_bayes()
-gsEngine.add_knn()
-gsEngine.add_ada()
-gsEngine.add_svm()
-gsEngine.add_decision_tree()
-gsEngine.add_random_forest()
-gsEngine.add_mlp()
-
-report = gsEngine.multiple_grid_search(lie_features, col_sets=col_sets)
-report.to_csv("V2_reports/MGS_report__all.csv", sep='\t')
-"""
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-"""
-for col in ['right_mean', 'left_mean']:
-    lie_plotTnTratioBySubject(lie_features, feature=col, save=False)
-    lie_plotTnTPremedIndex(lie_features, feature=col, save=False)
-"""
-
-"""
-
-tnt_scores, subjects = coumpute_TnT_scores(lie_features, lie_feat_cols, "right_mean", abs_ratio=False)
-
-lie_plotComparBars(lie_features, save=True)
-lie_plotBySubject(lie_features, mode=mode, save=False)
-
-
-reduced_significant_cols.append('premed_score_right')
-reduced_significant_cols.append('premed_score_left')
-
-col_sets = [reduced_significant_cols, significant_cols]
-
-multiple_grid_search(lie_features, col_sets)
-"""
-
-
-
-
-
-
-
-#cols_to_norm = ['subject', 'label', 'card_class']
-#cols_to_norm.extend(significant_cols)
-
-#lie_features = normalizeWithinSubject(lie_features, significant_cols, mode='mean')
-
-#lie_features = lie_features.fillna(0)
-#decisionTreeHyperTuning(feats, significant_cols)
-#randomForestHyperTuning(feats, significant_cols)
-#trainMLP(lie_features, significant_cols)
-
-
-#paired_t_test(lie_features, lie_feat_cols, tt_cols, print_result=True)
-
-#lie_features['descr_mean_rl'] = (lie_features['descr_right_mean'] + lie_features['descr_left_mean'])/2
-#take_max_heuristic(lie_features, ['descr_right_mean', 'descr_left_mean'], print_result=True, only_rel=False)
-#max_mean_heuristic(lie_features, lie_ML_cols, print_result=True, only_rel=False)
 
 #lie_plotComparBars(lie_features, save=True)
 #lie_plotBySubject(lie_features, mode=mode, save=True)

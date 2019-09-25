@@ -3,6 +3,8 @@ import numpy as np
 from scipy import stats
 import matplotlib.pyplot as plt
 from scipy import stats
+from scipy.stats import shapiro
+from scipy.stats import normaltest
 pd.options.mode.chained_assignment = None  # default='warn'
 
 import statsmodels.api as sm
@@ -55,6 +57,20 @@ from evaluation_metrics import *
 
 # Evaluate the paired t-test for each feature
 
+def normality_test(features, feat_to_test, mode=1):
+    data = features[feat_to_test]
+    if mode == 0:
+        stat, p = shapiro(data)
+    elif mode == 1:
+        stat, p = normaltest(data)
+    print('%s Statistics=%.3f, p=%.3f' % (feat_to_test, stat, p))
+    # interpret
+    #alpha = 0.05
+    #if p > alpha:
+    #    print('Sample looks Gaussian (fail to reject H0)')
+    #else:
+    #    print('Sample does not look Gaussian (reject H0)')
+
 def paired_t_test_pupil_dilation(features, features_to_test, print_result=False, only_rel=False):
     results = pd.DataFrame(columns=["right", 'left', 't-score', 'p', 'is_sign'])
 
@@ -86,7 +102,7 @@ def paired_t_test_pupil_dilation(features, features_to_test, print_result=False,
     return results
 
 
-def paired_t_test(features, origin_cols, features_to_test, print_result=False, only_rel=False):
+def paired_t_test(features, origin_cols, features_to_test, mode=1, print_result=False, only_rel=False):
 
     results = pd.DataFrame(columns=["feature", 't-score', 'p', 'is_sign'])
 
@@ -98,9 +114,17 @@ def paired_t_test(features, origin_cols, features_to_test, print_result=False, o
     nonTargets = nonTargets.sort_index()
     targets = targets.sort_index()
 
+    if(mode == 0):
+        print('========== STUDENT PAIRED T-TEST =============')
+    elif(mode == 1):
+        print('========== WILCOXON =============')
 
     for col in features_to_test:
-        t, p = stats.ttest_rel(targets[col],nonTargets[col])
+
+        if(mode == 0):
+            t, p = stats.ttest_rel(targets[col],nonTargets[col])
+        elif(mode == 1):
+            t, p = stats.wilcoxon(targets[col],nonTargets[col])
 
         is_rel = ""
         if(p <= 0.05):
@@ -178,6 +202,55 @@ def max_mean_heuristic(features, features_to_test, print_result=False, only_rel=
             print("{} acc:{}   {}".format(
                 row['feature'], row['accuracy'], row['is_sign']
                 ))
+
+def take_max_best_pupil_heuristic(features, interval, print_result=False, only_rel=False):
+
+    results = pd.DataFrame(columns=["feature", 'accuracy', 'is_sign'])
+    subjects = features.groupby('subject').count().index.values
+
+    feat_restricted = features[['subject', '{}_right_mean'.format(interval), '{}_left_mean'.format(interval), 'card_class', 'label']]
+    count = 0
+    for sub in subjects:
+        sub_feats = feat_restricted.loc[feat_restricted['subject'] == sub]
+        sub_card = sub_feats.loc[sub_feats['label'] == 1]['card_class'].values[0]
+        
+        max_r = sub_feats['{}_right_mean'.format(interval)].max()
+        max_l = sub_feats['{}_left_mean'.format(interval)].max()
+
+        max_f = None
+        max_f_name = ""
+
+        if(max_r > max_l):
+            max_f = max_r
+            max_f_name = '{}_right_mean'.format(interval)
+        else:
+            max_f = max_l
+            max_f_name = '{}_left_mean'.format(interval)
+
+        max_card = sub_feats.loc[sub_feats[max_f_name] == max_f]['card_class'].values[0]
+
+        if(sub_card == max_card):
+            count += 1
+
+    accuracy = count/len(subjects)
+    is_sign = (accuracy >= 0.5)
+
+    res = pd.DataFrame(data=[[interval, accuracy, is_sign]], columns=["feature", 'accuracy', 'is_sign'])
+    results = results.append(res, ignore_index=True)
+    results = results.sort_values(by=['accuracy'])
+
+    if(print_result):
+        print("===== TAKE MAX RESULTS =====")
+        for index, row in results.iterrows():
+
+            if(only_rel and not row['is_sign']):
+                continue
+
+            print("{} acc:{}   {}".format(
+                row['feature'], row['accuracy'], row['is_sign']
+                ))
+    
+    return results
 
 def take_max_heuristic(features, features_to_test, print_result=False, only_rel=False):
 

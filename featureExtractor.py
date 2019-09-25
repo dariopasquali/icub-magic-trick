@@ -296,22 +296,7 @@ points_cols = [
         ( 'descr_left_mean', "DESCR Left Mean Pupil Dilation" ) ,
     ]
 
-tt_sign_cols_35 = [
-    'descr_left_max',
-    'react_left_max',
-    'descr_right_max',
-    'react_left_std',
-    'right_max',
-    'left_std',
-    'react_right_mean',
-    'react_mean_pupil',
-    'react_left_mean',
-    'right_mean',
-    'left_mean',
-    'descr_left_mean',
-    'descr_right_mean',
-    'descr_mean_pupil',
-]
+
 
 
 sr_window = 1500

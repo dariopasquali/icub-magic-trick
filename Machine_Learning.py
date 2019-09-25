@@ -288,6 +288,8 @@ class GridSearchEngine:
 
         report = pd.DataFrame(
                 columns=['tune_for',
+                'mean',
+                'std',
                 'accuracy',
                 'bal_accuracy',
                 'precision',
@@ -360,6 +362,8 @@ class GridSearchEngine:
             print()
 
             tune_rep = pd.DataFrame(columns=['tune_for',
+                'mean',
+                'std',
                 'accuracy',
                 'bal_accuracy',
                 'precision',
@@ -369,6 +373,8 @@ class GridSearchEngine:
                 'params'
                 ],
                 data=[[score,
+                str(clf.cv_results_['mean_test_score'][clf.best_index_]),
+                str(clf.cv_results_['std_test_score'][clf.best_index_]),
                 metrics.accuracy_score(y_true, y_pred),
                 metrics.balanced_accuracy_score(y_true, y_pred),
                 metrics.precision_score(y_true, y_pred),
@@ -405,6 +411,8 @@ class GridSearchEngine:
             'test_set',
             'model',
             'tune_for',
+            'mean',
+            'std',
             'accuracy',
             'bal_accuracy',
             'precision',
@@ -431,6 +439,8 @@ class GridSearchEngine:
 
         report = pd.DataFrame(columns=[
             'tune_for',
+            'mean',
+            'std',
             'accuracy',
             'bal_accuracy',
             'precision',
@@ -469,7 +479,7 @@ class GridSearchEngine:
             print(" Multiple Grid Search ")
             print("==============================")
             print("columns {}".format(cols))
-            print("number of datapoint: {}".format(len(data.index.values)))
+            print("number of datapoints: {}".format(len(data.index.values)))
             print("Normalize: {}".format(norm_by_subject))
             print("Oversample: {}".format(oversamp))
             print("Oversample Mode: {}".format(oversamp_mode))

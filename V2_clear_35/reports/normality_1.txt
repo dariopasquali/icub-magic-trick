@@ -1,0 +1,7 @@
+============= NORMALITY TEST =========================
+right_mean Statistics=6.826, p=0.033
+left_mean Statistics=21.137, p=0.000
+descr_right_mean Statistics=6.704, p=0.035
+descr_left_mean Statistics=6.793, p=0.033
+react_right_mean Statistics=3.053, p=0.217
+react_left_mean Statistics=4.273, p=0.118

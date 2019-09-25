@@ -1,0 +1,52 @@
+======================================================
+========== WILCOXON =============
+===== PAIRED T-test RESULTS =====
+point_dur T:115.0 p:0.9861344018198014   
+react_dur T:114.0 p:0.9584199496651095   
+descr_left_std T:113.0 p:0.9307556694906441   
+point_right_mean T:113.0 p:0.9307556694906441   
+descr_right_std T:112.0 p:0.9031748075260909   
+left_min T:112.0 p:0.9031675318276239   
+descr_right_min T:111.0 p:0.8757103086427647   
+point_left_mean T:111.0 p:0.8757103086427647   
+react_right_std T:110.0 p:0.8483946983538319   
+point_mean_pupil T:110.0 p:0.8483946983538319   
+descr_left_min T:109.0 p:0.8212599673323558   
+right_min T:109.0 p:0.8212599673323558   
+point_left_min T:109.0 p:0.8212599673323558   
+duration T:108.0 p:0.7943374591300819   
+point_left_max T:105.0 p:0.715124182763363   
+point_fix_freq T:102.0 p:0.6389064772442071   
+react_right_max T:101.0 p:0.614271268095052   
+premed_score_left T:100.0 p:0.5900638024577389   
+react_left_min T:100.0 p:0.5900638024577389   
+react_fix_freq T:96.0 p:0.49791488806124606   
+fix_freq T:96.0 p:0.49791488806124606   
+descr_fix_freq T:92.0 p:0.4140400034242331   
+point_right_min T:91.0 p:0.3944570025144395   
+point_right_max T:91.0 p:0.3944570025144395   
+premed_score_right T:91.0 p:0.3944570025144395   
+descr_dur T:90.0 p:0.37544507472938493   
+descr_sacc_freq T:87.0 p:0.32188434536878685   
+react_sacc_freq T:81.0 p:0.23047393117047554   
+point_sacc_freq T:80.0 p:0.2172414463719159   
+point_left_std T:78.0 p:0.19243418492041608   
+sacc_freq T:76.0 p:0.16977498788033196   
+point_right_std T:75.0 p:0.1592244176320513   
+left_max T:71.5 p:0.12615240860686322   
+react_right_min T:64.5 p:0.07626616196016939   
+right_std T:63.0 p:0.06803474489437815   
+descr_left_max T:63.0 p:0.06803474489437815   
+react_left_max T:63.0 p:0.06801394475750264   
+descr_right_max T:53.0 p:0.0298290379406944   *
+right_max T:52.0 p:0.02730632132788956   *
+react_left_std T:52.0 p:0.02730632132788956   *
+left_std T:45.0 p:0.014269191674987056   *
+react_right_mean T:40.0 p:0.008685211199123489   *
+react_left_mean T:26.0 p:0.0018657515196867558   *
+react_mean_pupil T:25.0 p:0.0016576503916601775   *
+left_mean T:20.0 p:0.0009022546344924854   **
+right_mean T:19.0 p:0.0007961977684636033   **
+descr_right_mean T:8.0 p:0.00018663848961448544   **
+descr_mean_pupil T:5.0 p:0.00012267381509278223   **
+descr_left_mean T:3.0 p:9.220613278654252e-05   **

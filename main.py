@@ -194,26 +194,26 @@ tt_sign_cols_wilcoxon_premed = [
 ]
 
 col_sets = {
-    'all_columns' : significant_cols,
-    'reduced' : reduced_significant_cols,
-    'tt_0' : tt_sign_cols_all,
-    'tt_35' : tt_sign_cols_35,
+    #'all_columns' : significant_cols,
+    #'reduced' : reduced_significant_cols,
+    #'tt_0' : tt_sign_cols_all,
+    #'tt_35' : tt_sign_cols_35,
     'tt_wilcoxon' : tt_sign_cols_wilcoxon,
-    'tt_35_premed' : tt_sign_cols_35_premed,
+    #'tt_35_premed' : tt_sign_cols_35_premed,
     'tt_wilcoxon_premed' : tt_sign_cols_wilcoxon_premed,
 }
 
-sys.stdout = open("V2_clear_35/reports/multiple_grid_search_mean_std_seed_log.txt", "w")
+sys.stdout = open("V2_clear_35/reports/multiple_grid_search_MLP_wilcoxon_log.txt", "w")
 
 gsEngine = GridSearchEngine()
-gsEngine.add_naive_bayes()
-gsEngine.add_knn()
-gsEngine.add_ada()
-gsEngine.add_svm()
-gsEngine.add_decision_tree()
-gsEngine.add_random_forest()
+#gsEngine.add_naive_bayes()
+#gsEngine.add_knn()
+#gsEngine.add_ada()
+#gsEngine.add_svm()
+#gsEngine.add_decision_tree()
+#gsEngine.add_random_forest()
 gsEngine.add_mlp()
 
 report = gsEngine.multiple_grid_search(lie_features, col_sets=col_sets, norm_by_subject=True)
-report.to_csv("V2_clear_35/reports/MGS_report_mean_std_seed.csv", sep='\t')
+report.to_csv("V2_clear_35/reports/MGS_report_MLP_wilcoxon.csv", sep='\t')
 #"""

@@ -253,7 +253,7 @@ class GridSearchEngine:
             ]
 
         param_map = {
-            'hidden_layer_sizes': [(100,), (300, ), (32, 8, 32,)],
+            'hidden_layer_sizes': [(100,), (300, ), (128, 64, ), (32, 8, 32,), (16, 4, 16,)],
             'activation': ['tanh', 'relu'],
             'solver': ['sgd', 'adam'],
             'alpha' : [0.0001, 0.05, 0.005],

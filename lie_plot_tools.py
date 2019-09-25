@@ -663,19 +663,14 @@ def lie_plotTimeSeries(subject, card_names, annotations, overall_eye, filtered_i
     
     return fig
 
-def lie_plotQuestRegression(lie_features, quest_ans, slope, intersect, index_col, TnT_score_feature="right_mean"):
+def lie_plotQuestRegression(tnt_scores, subjects, quest_ans, slope, intersect, index_col):
 
-    lie_subs = lie_features.groupby('subject').count().index.values
-    quest_subs = quest_ans.groupby('subject').count().index.values
-
-    tnt_scores, subjects = coumpute_TnT_scores(lie_features, lie_feat_cols, TnT_score_feature, abs_ratio=False) 
-
-    subjects = [s for s in lie_subs if s in quest_subs]
     quest_cols = quest_ans.columns
 
     for col in quest_cols:
-        
-        fig, axs = plt.subplots(1, figsize=(9, 9), num="lr {}".format(col))
+        if(col == 'subject'): continue
+
+        fig, axs = plt.subplots(1, figsize=(10, 10))
         labels = []
 
         for i, sub in enumerate(subjects):
@@ -700,3 +695,4 @@ def lie_plotQuestRegression(lie_features, quest_ans, slope, intersect, index_col
         maxY = slope * maxX + intersect        
 
         axs.plot([minX, maxX], [minY, maxY], alpha=0.75, zorder=100)
+        fig.savefig("V2_clear_35/plot/trait_reg_{}_{}.png".format(index_col, col), dpi=100)

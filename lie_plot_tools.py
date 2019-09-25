@@ -168,8 +168,8 @@ def TNT_points(lie_features, lie_feat_cols, feature, title, abs_ratio=False, nor
 
 def lie_plotPointsAllSubjects(features, mode, feat_cols=[], scale=4, save_root="plots/LIE/points_{}.png", save=True):
     
-    label_font_size = 20 * scale
-    legend_prop_size = {'size': 12 * scale}
+    label_font_size = 18 * scale
+    legend_prop_size = {'size': 13 * scale}
 
     cols_to_aggregate = [col for (col, title) in feat_cols]
     aggrZeros, aggrOnes, TnT = aggregate_target_nontarget(features, cols_to_aggregate)
@@ -248,7 +248,7 @@ def lie_plotPointsAllSubjects(features, mode, feat_cols=[], scale=4, save_root="
         axs.tick_params(axis='both', which='major', labelsize=label_font_size)
 
         if(save):
-            fig.savefig(save_root.format(f), dpi=300)
+            fig.savefig(save_root.format(f), dpi=100)
 
 def lie_plotTnTratioMean(features, save=True):
 
@@ -533,7 +533,7 @@ def lie_plotComparBars(features, feat_cols=lie_feat_cols, scale=3, save_root="pl
         axs.tick_params(axis='both', which='major', labelsize=label_font_size)
 
         if(save):
-            fig.savefig(save_root.format(whole), dpi=300)
+            fig.savefig(save_root.format(whole), dpi=100)
 
 def lie_plotRLbars(features, feat_cols=lie_feat_cols, save_root="plots/LIE/Bars_{}.png", save=True):
 

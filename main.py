@@ -58,8 +58,8 @@ paired_t_test_pupil_dilation(lie_features, right_left_means, print_result=True)
 #"""
 print("PLOT COMPARE BARS =================================================")
 lie_plotComparBars(lie_features, feat_cols=lie_feat_cols, save_root="V2_clear_35/plot/hd/bars_{}.png", save=True)
-#print("PLOT POINTS FOR EACH SUBJECT =================================================")
-#lie_plotPointsAllSubjects(lie_features, feat_cols=points_cols, save_root="V2_clear_35/plot/hd/{}.png", mode=mode, save=True)
+print("PLOT POINTS FOR EACH SUBJECT =================================================")
+lie_plotPointsAllSubjects(lie_features, feat_cols=points_cols, save_root="V2_clear_35/plot/hd/{}.png", mode=mode, save=True)
 #"""
 
 

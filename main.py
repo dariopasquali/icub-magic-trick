@@ -42,6 +42,7 @@ significant_cols.append('point_mean_pupil')
 #"""
 
 # PAIRED T TEST
+"""
 right_left_means = [
     ('right_mean', 'left_mean'),
     ('point_right_mean', 'point_left_mean'),
@@ -51,15 +52,15 @@ right_left_means = [
 sys.stdout = open("V2_clear_35/reports/paired_t_test_pupil_dilation.txt", "w")
 print("======================================================")
 paired_t_test_pupil_dilation(lie_features, right_left_means, print_result=True)
-
-
-
 """
+
+
+#"""
 print("PLOT COMPARE BARS =================================================")
-lie_plotComparBars(lie_features, feat_cols=lie_feat_cols, save_root="V2_clear_35/plot/hd/bars_{}.svg", save=True)
-print("PLOT POINTS FOR EACH SUBJECT =================================================")
-lie_plotPointsAllSubjects(lie_features, feat_cols=points_cols, save_root="V2_clear_35/plot/hd/{}.svg", mode=mode, save=True)
-"""
+lie_plotComparBars(lie_features, feat_cols=lie_feat_cols, save_root="V2_clear_35/plot/hd/bars_{}.png", save=True)
+#print("PLOT POINTS FOR EACH SUBJECT =================================================")
+#lie_plotPointsAllSubjects(lie_features, feat_cols=points_cols, save_root="V2_clear_35/plot/hd/{}.png", mode=mode, save=True)
+#"""
 
 
 """
@@ -69,16 +70,13 @@ lie_plotPointsAllSubjects(lie_features, feat_cols=points_cols, save_root="V2_cle
 sys.stdout = open("V2_clear_35/reports/take_max_heuristic.txt", "w")
 print("======================================================")
 take_max_heuristic(lie_features, significant_cols, print_result=True, only_rel=True)
+"""
 
-# MAX MEAN HEURISIC
-#sys.stdout = open("V2_reports/max_mean_heuristic.txt", "w")
-#print("======================================================")
-#max_mean_heuristic(lie_features, significant_cols, print_result=True, only_rel=True)
-
+"""
 # PAIRED T TEST
 sys.stdout = open("V2_clear_35/reports/paired_t_test.txt", "w")
 print("======================================================")
-paired_t_test(lie_features, lie_feat_cols, significant_cols, print_result=True, only_rel=True)
+paired_t_test(lie_features, lie_feat_cols, significant_cols, print_result=True, only_rel=False)
 """
 
 #lie_features['premed_score_right'] = lie_features['react_right_mean'] / lie_features#['descr_right_mean']

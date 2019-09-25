@@ -166,10 +166,10 @@ def TNT_points(lie_features, lie_feat_cols, feature, title, abs_ratio=False, nor
     axs.tick_params(axis='both', which='major', labelsize=label_font_size)
 
 
-def lie_plotPointsAllSubjects(features, mode, feat_cols=[], save_root="plots/LIE/points_{}.png", save=True):
+def lie_plotPointsAllSubjects(features, mode, feat_cols=[], scale=4, save_root="plots/LIE/points_{}.png", save=True):
     
-    label_font_size = 10
-    legend_prop_size = {'size': 12}
+    label_font_size = 20 * scale
+    legend_prop_size = {'size': 12 * scale}
 
     cols_to_aggregate = [col for (col, title) in feat_cols]
     aggrZeros, aggrOnes, TnT = aggregate_target_nontarget(features, cols_to_aggregate)
@@ -181,12 +181,12 @@ def lie_plotPointsAllSubjects(features, mode, feat_cols=[], save_root="plots/LIE
     subjects
     
     plot_cols = feat_cols.copy()
-    plot_cols = [(f, t) for (f, t) in plot_cols if f not in ('subject', 'card_class')]
+    plot_cols = [(f, t) for (f, t) in plot_cols if f not in ('subject', 'card_class', 'label')]
 
     #plot_cols = ["descr_right_mean"]
 
     for (f, title) in plot_cols:
-        fig, axs = plt.subplots(1, figsize=(10, 10), num="x{}".format(f))
+        fig, axs = plt.subplots(1, figsize=(10 * scale, 10 * scale), num="x{}".format(f))
         print(f)
         labels = []
 
@@ -205,7 +205,7 @@ def lie_plotPointsAllSubjects(features, mode, feat_cols=[], save_root="plots/LIE
             axs.set_label("{}".format(sub))
 
             color = card_color_map[aggrOnes.loc[aggrOnes['subject'] == sub]["card_class"].values[0]]
-            size = 200
+            size = 1000 * scale
             labels.append("{}".format(sub))
             marker = marker_map[sub][0]
             
@@ -213,7 +213,7 @@ def lie_plotPointsAllSubjects(features, mode, feat_cols=[], save_root="plots/LIE
                         aggrOnes.loc[aggrOnes['subject'] == sub][f],
                         s=size,
                         c=color,
-                        marker=marker) 
+                        marker=marker, linewidth=10) 
 
 
         minX = aggrZeros[f].min()
@@ -236,19 +236,19 @@ def lie_plotPointsAllSubjects(features, mode, feat_cols=[], save_root="plots/LIE
 
         plt.legend(labels, loc='center left', bbox_to_anchor=(1, 0.5), prop=legend_prop_size)    
 
-        axs.scatter(pallX, pallY, s=200, alpha=0.5)
+        axs.scatter(pallX, pallY, s=1000*scale, alpha=0.5, linewidth=10)
         axs.errorbar(pallX, pallY,
                 xerr=pallX_ste,
-                yerr=pallY_ste)
+                yerr=pallY_ste, linewidth=10)
 
-        axs.plot(lims, lims, alpha=0.75, zorder=100)
-        axs.axvline(color='black', alpha=0.2)
-        axs.axhline(color='black', alpha=0.2)
+        axs.plot(lims, lims, alpha=0.75, zorder=100, linewidth=10)
+        axs.axvline(color='black', alpha=0.2, linewidth=10)
+        axs.axhline(color='black', alpha=0.2, linewidth=10)
 
         axs.tick_params(axis='both', which='major', labelsize=label_font_size)
 
         if(save):
-            fig.savefig(save_root.format(f), dpi=1200)
+            fig.savefig(save_root.format(f), dpi=300)
 
 def lie_plotTnTratioMean(features, save=True):
 
@@ -460,7 +460,7 @@ def lie_plotTnTPremedIndex(features, feature, save_root="plots/LIE/Premed_{}.png
     return fig0, fig1
 
 # Average Histogram of Target (old) vs nonTarget (new) for each feature
-def lie_plotComparBars(features, feat_cols=lie_feat_cols, save_root="plots/LIE/Bars_{}.png", save=True):
+def lie_plotComparBars(features, feat_cols=lie_feat_cols, scale=3, save_root="plots/LIE/Bars_{}.png", save=True):
 
     feat_comparison = [
         #('duration', 'react_dur', 'point_dur', 'descr_dur'),
@@ -476,6 +476,9 @@ def lie_plotComparBars(features, feat_cols=lie_feat_cols, save_root="plots/LIE/B
         #('left_max', 'point_left_max', 'react_left_max', 'descr_left_max',  "Left Max Pupil Dilation" )
     ]
 
+    label_font_size = 18*scale
+    legend_prop_size = {'size': 18*scale}
+
     nonTargets, targets, TnT = aggregate_target_nontarget(features, feat_cols)
 
     bar_width = 0.25   
@@ -484,7 +487,7 @@ def lie_plotComparBars(features, feat_cols=lie_feat_cols, save_root="plots/LIE/B
 
     for (whole, point, react, descr, title) in feat_comparison:
 
-        fig, axs = plt.subplots(1, figsize=(15, 10), num='{}'.format(title))
+        fig, axs = plt.subplots(1, figsize=(15 * scale, 10 * scale), num='{}'.format(title))
         #fig.suptitle('{}'.format(whole), fontsize=16)
 
         nT_react_mean = nonTargets[react].mean(skipna=True)
@@ -513,12 +516,12 @@ def lie_plotComparBars(features, feat_cols=lie_feat_cols, save_root="plots/LIE/B
         axs.bar(x_pos, y_values_T,
                 yerr=T_errors,
                 color='#32CD32', 
-                width=bar_width, label='{} Target'.format(title))
+                width=bar_width, label='{} Target'.format(title), linewidth=10)
 
         axs.bar(x_pos+bar_width, y_values_nT,
                 yerr=nT_errors,
                 color='#1E90FF', 
-                width=bar_width, label='{} Non Target'.format(title))
+                width=bar_width, label='{} Non Target'.format(title), linewidth=10)
 
         axs.legend(loc="upper left", prop=legend_prop_size)
 
@@ -530,7 +533,7 @@ def lie_plotComparBars(features, feat_cols=lie_feat_cols, save_root="plots/LIE/B
         axs.tick_params(axis='both', which='major', labelsize=label_font_size)
 
         if(save):
-            fig.savefig(save_root.format(whole), dpi=1200)
+            fig.savefig(save_root.format(whole), dpi=300)
 
 def lie_plotRLbars(features, feat_cols=lie_feat_cols, save_root="plots/LIE/Bars_{}.png", save=True):
 

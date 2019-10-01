@@ -515,12 +515,12 @@ def lie_plotComparBars(features, feat_cols=lie_feat_cols, scale=3, save_root="pl
         x_pos = np.arange(len(labels))
         axs.bar(x_pos, y_values_T,
                 yerr=T_errors,
-                color='#248D22', 
+                color='#1E90FF', 
                 width=bar_width, label='target')
 
         axs.bar(x_pos+bar_width, y_values_nT,
                 yerr=nT_errors,
-                color='#1E90FF', 
+                color='#1eff8f',  
                 width=bar_width, label='non-target')
 
         axs.legend(loc="upper left", prop=legend_prop_size)

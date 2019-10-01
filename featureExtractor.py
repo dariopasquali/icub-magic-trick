@@ -282,19 +282,7 @@ descr_react_col_set = [
     'react_mean_pupil'    
 ]
 
-points_cols = [
-        ( 'subject', "subject" ) ,
-        ( 'card_class', "card_class" ) ,
-        ( 'label', "label" ) ,
-        #( 'right_mean', "Right Mean Pupil Dilation" ) ,
-        #( 'left_mean', "Left Mean Pupil Dilation" ) ,
-        #( 'react_right_mean', "REACT Right Mean Pupil Dilation" ) ,
-        #( 'react_left_mean', "REACT Left Mean Pupil Dilation" ) ,
-        #( 'point_right_mean', "POINT Right Mean Pupil Dilation" ) ,
-        #( 'point_left_mean', "POINT Left Mean Pupil Dilation" ) ,
-        ( 'descr_right_mean', "DESCR Right Mean Pupil Dilation" ) ,
-        ( 'descr_left_mean', "DESCR Left Mean Pupil Dilation" ) ,
-    ]
+
 
 
 

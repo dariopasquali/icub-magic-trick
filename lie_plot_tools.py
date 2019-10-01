@@ -169,7 +169,7 @@ def TNT_points(lie_features, lie_feat_cols, feature, title, abs_ratio=False, nor
 def lie_plotPointsAllSubjects(features, mode, feat_cols=[], scale=4, save_root="plots/LIE/points_{}.png", save=True):
     
     label_font_size = 18 * scale
-    legend_prop_size = {'size': 13 * scale}
+    legend_prop_size = {'size': 14 * scale}
 
     cols_to_aggregate = [col for (col, title) in feat_cols]
     aggrZeros, aggrOnes, TnT = aggregate_target_nontarget(features, cols_to_aggregate)
@@ -200,12 +200,12 @@ def lie_plotPointsAllSubjects(features, mode, feat_cols=[], scale=4, save_root="
 
             #axs.set_xlabel("Right Mean Pupil Dilation Average Non Target", fontsize=label_font_size)
             #axs.set_ylabel("Right Mean Pupil Dilation Target", fontsize=label_font_size)
-            axs.set_xlabel("{} Average Non Target".format(title), fontsize=label_font_size)
-            axs.set_ylabel("{} Target".format(title), fontsize=label_font_size)
-            axs.set_label("{}".format(sub))
+            axs.set_xlabel("average non-target [mm]", fontsize=label_font_size)
+            axs.set_ylabel("target [mm]", fontsize=label_font_size)
+            #axs.set_title("{}".format(title), fontsize=label_font_size, pad=100)
 
             color = card_color_map[aggrOnes.loc[aggrOnes['subject'] == sub]["card_class"].values[0]]
-            size = 1000 * scale
+            size = 1200 * scale
             labels.append("{}".format(sub))
             marker = marker_map[sub][0]
             
@@ -225,8 +225,8 @@ def lie_plotPointsAllSubjects(features, mode, feat_cols=[], scale=4, save_root="
 
         mn = (maxXY + minXY) / 20
 
-        minXY = minXY - mn
-        maxXY = maxXY + mn
+        minXY = minXY - (5 * mn)
+        maxXY = maxXY + (5 * mn)
 
         lims = [minXY, maxXY]
 
@@ -236,12 +236,12 @@ def lie_plotPointsAllSubjects(features, mode, feat_cols=[], scale=4, save_root="
 
         plt.legend(labels, loc='center left', bbox_to_anchor=(1, 0.5), prop=legend_prop_size)    
 
-        axs.scatter(pallX, pallY, s=1000*scale, alpha=0.5, linewidth=10)
+        axs.scatter(pallX, pallY, s=2500*scale, alpha=0.8, linewidth=10, color='black')
         axs.errorbar(pallX, pallY,
                 xerr=pallX_ste,
-                yerr=pallY_ste, linewidth=10)
+                yerr=pallY_ste, linewidth=10, color='black')
 
-        axs.plot(lims, lims, alpha=0.75, zorder=100, linewidth=10)
+        axs.plot(lims, lims, alpha=0.75, zorder=100, linewidth=10, color='red')
         axs.axvline(color='black', alpha=0.2, linewidth=10)
         axs.axhline(color='black', alpha=0.2, linewidth=10)
 
@@ -466,18 +466,18 @@ def lie_plotComparBars(features, feat_cols=lie_feat_cols, scale=3, save_root="pl
         #('duration', 'react_dur', 'point_dur', 'descr_dur'),
         #('fix_freq', 'point_fix_freq', 'react_fix_freq', 'descr_fix_freq'),
         #('sacc_freq', 'point_sacc_freq', 'react_sacc_freq', 'descr_sacc_freq'),
-        ('right_mean', 'point_right_mean', 'react_right_mean', 'descr_right_mean', "Right Mean Pupil Dilation"),
+        ('right_mean', 'point_right_mean', 'react_right_mean', 'descr_right_mean', "Right mean pupil dilation"),
         #('right_std', 'point_right_std', 'react_right_std', 'descr_right_std', "Right STD Pupil Dilation"),
         #('right_min', 'point_right_min', 'react_right_min', 'descr_right_min', "Right Min Pupil Dilation"),
         #('right_max', 'point_right_max', 'react_right_max', 'descr_right_max', "Right Max Pupil Dilation"),
-        ('left_mean', 'point_left_mean', 'react_left_mean', 'descr_left_mean', "Left Mean Pupil Dilation"),
+        ('left_mean', 'point_left_mean', 'react_left_mean', 'descr_left_mean', "Left mean pupil dilation"),
         #('left_std', 'point_left_std', 'react_left_std', 'descr_left_std', "Left STD Pupil Dilation" ),
         #('left_min', 'point_left_min', 'react_left_min', 'descr_left_min',  "Left Min Pupil Dilation" ),
         #('left_max', 'point_left_max', 'react_left_max', 'descr_left_max',  "Left Max Pupil Dilation" )
     ]
 
-    label_font_size = 18*scale
-    legend_prop_size = {'size': 18*scale}
+    label_font_size = 25*scale
+    legend_prop_size = {'size': 20*scale}
 
     nonTargets, targets, TnT = aggregate_target_nontarget(features, feat_cols)
 
@@ -515,22 +515,23 @@ def lie_plotComparBars(features, feat_cols=lie_feat_cols, scale=3, save_root="pl
         x_pos = np.arange(len(labels))
         axs.bar(x_pos, y_values_T,
                 yerr=T_errors,
-                color='#32CD32', 
-                width=bar_width, label='{} Target'.format(title), linewidth=10)
+                color='#248D22', 
+                width=bar_width, label='target')
 
         axs.bar(x_pos+bar_width, y_values_nT,
                 yerr=nT_errors,
                 color='#1E90FF', 
-                width=bar_width, label='{} Non Target'.format(title), linewidth=10)
+                width=bar_width, label='non-target')
 
         axs.legend(loc="upper left", prop=legend_prop_size)
 
         axs.set_xticks(x_pos)
         axs.set_xticklabels(labels)
-        axs.set_ylabel(title, fontsize=label_font_size)
+        axs.set_ylabel("{} [mm]".format(title), fontsize=label_font_size)
         #axs.set_title('{}'.format(whole))
 
         axs.tick_params(axis='both', which='major', labelsize=label_font_size)
+        axs.axhline(color='black', alpha=0.2, linewidth=10)
 
         if(save):
             fig.savefig(save_root.format(whole), dpi=100)

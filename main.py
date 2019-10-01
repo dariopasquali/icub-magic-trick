@@ -55,18 +55,32 @@ right_left_means = [
     ('react_right_mean', 'react_left_mean'),
     ('descr_right_mean', 'descr_left_mean')
 ]
-sys.stdout = open("V2_clear_35/reports/paired_t_test_pupil_dilation.txt", "w")
+sys.stdout = open("V2_clear_35/reports/wilcoxon_pupil_dilation.txt", "w")
 print("======================================================")
-paired_t_test_pupil_dilation(lie_features, right_left_means, print_result=True)
+paired_t_test_pupil_dilation(lie_features, right_left_means, mode=1, print_result=True)
 """
 
 
-"""
+points_cols = [
+        ( 'subject', "subject" ) ,
+        ( 'card_class', "card_class" ) ,
+        ( 'label', "label" ) ,
+        #( 'right_mean', "Right Mean Pupil Dilation" ) ,
+        #( 'left_mean', "Left Mean Pupil Dilation" ) ,
+        #( 'react_right_mean', "REACT Right Mean Pupil Dilation" ) ,
+        #( 'react_left_mean', "REACT Left Mean Pupil Dilation" ) ,
+        #( 'point_right_mean', "POINT Right Mean Pupil Dilation" ) ,
+        #( 'point_left_mean', "POINT Left Mean Pupil Dilation" ) ,
+        ( 'descr_right_mean', "DESCR right mean pupil dilation" ) ,
+        ( 'descr_left_mean', "DESCR left mean pupil dilation" ) ,
+    ]
+
+#"""
 print("PLOT COMPARE BARS =================================================")
-lie_plotComparBars(lie_features, feat_cols=lie_feat_cols, save_root="V2_clear_35/plot/hd/bars_NONAN_{}.png", save=True)
+lie_plotComparBars(lie_features, feat_cols=lie_feat_cols, save_root="V2_clear_35/plot/hd/bars_HD_{}.png", save=True)
 print("PLOT POINTS FOR EACH SUBJECT =================================================")
-lie_plotPointsAllSubjects(lie_features, feat_cols=points_cols, save_root="V2_clear_35/plot/hd/NONAN_{}.png", mode=mode, save=True)
-"""
+lie_plotPointsAllSubjects(lie_features, feat_cols=points_cols, save_root="V2_clear_35/plot/hd/HD_{}.png", mode=mode, save=True)
+#"""
 
 """
 # ============= NORMALITY TEST ==========================================
@@ -122,7 +136,7 @@ paired_t_test(lie_features, lie_feat_cols, tt_cols, mode=1, print_result=True, o
 """
 
 
-#"""
+"""
 tt_sign_cols_35 = [
     'descr_left_max',
     'react_left_std',
@@ -216,4 +230,4 @@ gsEngine.add_mlp()
 
 report = gsEngine.multiple_grid_search(lie_features, col_sets=col_sets, norm_by_subject=True)
 report.to_csv("V2_clear_35/reports/MGS_report_MLP_wilcoxon.csv", sep='\t')
-#"""
+"""

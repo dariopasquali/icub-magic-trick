@@ -1,0 +1,6 @@
+======================================================
+===== PAIRED T-test RESULTS for RIGHT AND MEAN PUPILS =====
+descr_right_mean descr_left_mean T:3571.0 p:0.6446718699586348   
+right_mean left_mean T:3408.0 p:0.38013863183703855   
+react_right_mean react_left_mean T:3212.0 p:0.16807366095419407   
+point_right_mean point_left_mean T:3171.0 p:0.1380279803547219   

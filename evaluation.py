@@ -71,11 +71,15 @@ def normality_test(features, feat_to_test, mode=1):
     #else:
     #    print('Sample does not look Gaussian (reject H0)')
 
-def paired_t_test_pupil_dilation(features, features_to_test, print_result=False, only_rel=False):
+def paired_t_test_pupil_dilation(features, features_to_test, mode=1, print_result=False, only_rel=False):
     results = pd.DataFrame(columns=["right", 'left', 't-score', 'p', 'is_sign'])
 
     for (right, left) in features_to_test:
-        t, p = stats.ttest_rel(features[right],features[left])
+
+        if(mode == 0):
+            t, p = stats.ttest_rel(features[right],features[left])
+        elif(mode == 1):
+            t, p = stats.wilcoxon(features[right],features[left])
 
         is_rel = ""
         if(p <= 0.05):

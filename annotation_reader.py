@@ -70,11 +70,18 @@ def preprocessLieAnnotations(annotation_file, card_names):
         columns=["subject", "subject_card", "start", "stop"]
         ) 
     
-    dfs = [overall]    
-    for card in card_names:
+    dfs = [overall] 
+    starts = annot.groupby('start_p').count().index.values
+
+    for s in starts:
         dfs.append(
-            annot.loc[(annot['card'] == card)]
+            annot.loc[(annot['start_p'] == s)]
         )
+
+    #for card in card_names:
+    #    dfs.append(
+    #        annot.loc[(annot['card'] == card)]
+    #    )
         
     return dfs
 

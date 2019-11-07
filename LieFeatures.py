@@ -59,6 +59,51 @@ lie_feat_cols = [
     ]
 
 
+
+
+
+class RealTimeHeuristicFeatures:
+
+    def __init__(self, subject, annot_dfs, filtered_interaction_dfs, cols):
+
+        self.features = pd.DataFrame(columns=cols)
+
+        for c, (robot_inter, sub_inter) in enumerate(filtered_interaction_dfs):
+
+            annot = annot_dfs[c+1]
+
+            self.subject = subject
+            self.card_class = annot['card'].iloc[0]
+            self.label = annot['label'].iloc[0]
+
+            sub_inter = sub_inter[['diam_right', 'diam_left']]
+
+            self.right_mean = sub_inter['diam_right'].mean(skipna = True)
+            self.left_mean = sub_inter['diam_left'].mean(skipna = True)
+            self.mean = (self.right_mean + self.left_mean) / 2.0
+
+            self.column_names = cols            
+            self.features = self.features.append(self.aggregate(), ignore_index=True)
+            
+
+    def getDataFrame(self):
+        return self.features
+    
+    def aggregate(self):
+        return pd.DataFrame(
+            data=[[
+                self.subject,
+                self.card_class,
+                self.right_mean,
+                self.left_mean,
+                self.mean,
+                self.label,
+            ]],
+            columns=self.column_names
+        )
+
+
+
 class LieFeatures:
     
     def __init__(self,

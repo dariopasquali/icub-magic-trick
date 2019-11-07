@@ -107,6 +107,58 @@ def dataCleaner(eyeDF, clean_mode="MAD", clean=True, smooth=False):
 
     return eyeDF
 
+def vad_rt_data_filtering(eyeDF, sound_annot, clean=True, clean_mode="MAD", smooth=False):
+
+    (start_p, stop_p, start_d, stop_d) = sound_annot
+
+    robot_time = eyeDF.loc[
+        (eyeDF['timestamp'] >= start_p) & (eyeDF['timestamp'] <= stop_p)
+    ]
+
+    subject_time = eyeDF.loc[
+        (eyeDF['timestamp'] >= start_d) & (eyeDF['timestamp'] <= stop_d)
+    ]
+
+    if(clean or smooth):
+        robot_time = dataCleaner(robot_time, clean, clean_mode, smooth)
+        subject_time = dataCleaner(subject_time, clean, clean_mode, smooth)
+
+    return robot_time, subject_time
+
+
+def rt_data_filtering(eyeDF, annot, annot_1, clean=True, clean_mode="MAD", smooth=False):
+
+    annot = annot.reset_index()
+    start_point_0 = annot.at[0, 'start_p']
+    stop_point_0 = annot.at[0, 'stop_p']
+    stop_descr_0 = annot.at[0, 'stop_d']
+
+
+    if(not annot_1.empty):
+        annot_1 = annot_1.reset_index()
+        start_point_1 = annot_1.at[0, 'start_p']
+
+    robot_time = eyeDF.loc[
+        (eyeDF['timestamp'] >= start_point_0) & (eyeDF['timestamp'] <= stop_point_0)
+    ]
+
+    if(not annot_1.empty):
+        subject_time = eyeDF.loc[
+            (eyeDF['timestamp'] >= stop_point_0) & (eyeDF['timestamp'] <= start_point_1)
+        ]
+    else:
+        subject_time = eyeDF.loc[
+            (eyeDF['timestamp'] >= stop_point_0) & (eyeDF['timestamp'] <= stop_descr_0)
+        ]
+
+    if(clean or smooth):
+        robot_time = dataCleaner(robot_time, clean, clean_mode, smooth)
+        subject_time = dataCleaner(subject_time, clean, clean_mode, smooth)
+
+    return robot_time, subject_time
+
+
+
 def lieDataFiltering(eyeDF, annot, clean=True, clean_mode="MAD", smooth=False):
 
     # 'start_p', 'stop_p', 'start_d', 'stop_d'

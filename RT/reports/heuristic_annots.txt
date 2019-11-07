@@ -1,0 +1,5 @@
+======================================================
+===== TAKE MAX RESULTS =====
+rt_mean_pupil acc:0.5714285714285714   True
+rt_right_mean acc:0.6190476190476191   True
+rt_left_mean acc:0.6190476190476191   True

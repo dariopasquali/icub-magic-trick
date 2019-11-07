@@ -8,6 +8,7 @@ pd.options.mode.chained_assignment = None  # default='warn'
 # PROJECT
 from data_cleaning import  *
 from annotation_reader import *
+from sound_reader import *
 from eye_reader import *
 
 
@@ -16,13 +17,14 @@ annotations_lie_in_temp = "data/{}annotations_lie/s{}.csv"
 tobii_in_temp = "data/{}tobii/s{}.csv"
 subject_cards_file = "data/{}cards.csv"
 
+sound_in_temp = "data/{}sounds/s{}.wav"
+
 def annot_var_init():
     root_pilot = "PILOT/"
     root_front = ""
     root = root_front
 
     return root, root_pilot, root_front
-
 
 def extractMinSubjectSet(source="frontiers",
                          annot_path=annotations_in_temp,
@@ -129,6 +131,82 @@ def loadTimeSeries(subject, card_names,
         cards_sr_late.append(late)
     
     return eye, annotations, baseline, overall, cards, cards_sr_early, cards_sr_late
+
+def load_rt_lie_timeseries(subject, card_names,
+                    source="frontiers",
+                    tobii_input_template=tobii_in_temp,
+                    annot_input_template=annotations_lie_in_temp,
+                    refer_to_baseline=True, refer_mode='sub',
+                    clean_mode="MAD",
+                    clean=True,
+                    smooth=False,
+                    with_vad=False,
+                    sound_input_template=sound_in_temp):
+
+    root, root_pilot, root_front = annot_var_init()
+    #print("LOAD s{} from {}".format(subject, source))
+
+    root = root_front
+    if(source == "pilot"):
+        root = root_pilot
+
+    # Complete the files
+    eye_in = tobii_input_template.format(root, subject)
+    annot_in = annot_input_template.format(root, subject)
+    sound_in = sound_input_template.format(root, subject)
+    
+    # vector with temporal filtered data for each card
+    filtered_interaction_dfs = []
+    
+    # load tobii data
+    eye = preprocessEye(eye_in, source)
+
+    # Load annotations
+    annotations = preprocessLieAnnotations(annot_in, card_names)
+
+    if(with_vad):
+        sound_annotations = preprocess_vad_annotations(sound_in, annotations)
+
+
+    # filter eye data relative to the entire phase
+    overall = filterEyeData(eye, annotations[0], \
+        start_col="start", stop_col="stop", \
+        clean=clean, clean_mode=clean_mode, smooth=smooth)
+
+    # Extract the baseline to rescale the pupil dilation data
+    baseline = filterBaseline(eye, annotations[0], \
+        start_col="start", stop_col="stop", \
+        clean=clean, clean_mode=clean_mode, smooth=smooth, window=5000)
+
+    if(refer_to_baseline):
+        # Refer the Pupil data to the baseline
+        overall = referToBaseline(overall, baseline, mode=refer_mode,
+        source_cols=['diam_right'], baseline_col='diam_right')
+
+        overall = referToBaseline(overall, baseline, mode=refer_mode,
+        source_cols=['diam_left'], baseline_col='diam_left')
+
+
+    for i in range(1, len(annotations)):        
+
+        if(with_vad):
+            robot_interaction, subject_interaction = vad_rt_data_filtering(overall, sound_annotations[i-1], clean=False, smooth=False)
+        else:
+            if(i < (len(annotations)-1)):
+                robot_interaction, subject_interaction = rt_data_filtering(overall, annotations[i], annotations[i+1], clean=False, smooth=False)
+            else:
+                robot_interaction, subject_interaction = rt_data_filtering(overall, annotations[i], pd.DataFrame(), clean=False, smooth=False)
+        
+        robot_interaction['card'] = annotations[i]['card'].iloc[0]
+        subject_interaction['card'] = annotations[i]['card'].iloc[0]
+
+        filtered_interaction_dfs.append(
+            (robot_interaction, subject_interaction)
+        )
+
+    return eye, annotations, baseline, overall, filtered_interaction_dfs
+
+
 
 def loadLieTimeSeries(subject, card_names,
                     source="frontiers",

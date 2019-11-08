@@ -4,10 +4,14 @@ seed(42)
 
 
 mode = "sub"
+
+to_exclude = [5, 16, 19, 22, 24 26]
+#to_exclude = []
+
 print("================== MODE SMOOTH {} =====================".format(mode))
 #lie_features, lie_base_right, lie_base_left, tobii_stats = \
-#    extractLieFeatures(subjects=[], subject_to_exclude=[5, 16, 19, 22, 24, 26], mode=mode, ref_to_base="time", plot=False, save=False, save_root="plots/V2/pupils_{}.png")
-#lie_features.to_csv("lie_features_clear_whole_35.csv", index=False)
+#    extractLieFeatures(subjects=[], subject_to_exclude=to_exclude, mode=mode, ref_to_base="time", plot=False, save=False, save_root="plots/V2/pupils_{}.png")
+#lie_features.to_csv("lie_features_fixed_24_all.csv", index=False)
 
 #quality = calc_tobii_quality_features(tobii_stats)
 #quality.to_csv("quality_tobii_50.csv", index=False)
@@ -21,7 +25,7 @@ print("================== MODE SMOOTH {} =====================".format(mode))
 
 #"""
 #lie_features = pd.read_csv("lie_features_smooth.csv", sep=',')
-lie_features = pd.read_csv("lie_features_clear_whole_35.csv", sep=',')
+#lie_features = pd.read_csv("lie_features_clear_whole_35.csv", sep=',')
 #lie_features = pd.read_csv("lie_features_clear.csv", sep=',')
 
 
@@ -75,12 +79,12 @@ points_cols = [
         ( 'descr_left_mean', "DESCR left mean pupil dilation" ) ,
     ]
 
-#"""
+"""
 print("PLOT COMPARE BARS =================================================")
 lie_plotComparBars(lie_features, feat_cols=lie_feat_cols, save_root="V2_clear_35/plot/hd/bars_HD_{}.png", save=True)
 print("PLOT POINTS FOR EACH SUBJECT =================================================")
 lie_plotPointsAllSubjects(lie_features, feat_cols=points_cols, save_root="V2_clear_35/plot/hd/HD_{}.png", mode=mode, save=True)
-#"""
+"""
 
 """
 # ============= NORMALITY TEST ==========================================
@@ -102,11 +106,11 @@ normality_test(lie_features, 'react_right_mean', mode=1)
 normality_test(lie_features, 'react_left_mean', mode=1)
 """
 
-"""
+#"""
 # ============= HEURISTIC AND STATISTIC TESTS ===========================
 
 # TAKE MAX HEURISIC
-sys.stdout = open("V2_clear_35/reports/NONAN_take_max_heuristic.txt", "w")
+sys.stdout = open("RT/heuristic_legacy_fixed_24_all.txt", "w")
 print("======================================================")
 take_max_heuristic(lie_features, significant_cols, print_result=True, only_rel=True)
 #"""

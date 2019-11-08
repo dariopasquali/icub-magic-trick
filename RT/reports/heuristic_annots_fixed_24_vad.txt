@@ -1,0 +1,5 @@
+======================================================
+===== TAKE MAX RESULTS =====
+rt_left_mean acc:0.5   True
+rt_mean_pupil acc:0.5   True
+rt_right_mean acc:0.5454545454545454   True

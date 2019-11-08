@@ -65,6 +65,18 @@ def clearFloats(x):
         x = x.replace('\U00002013', '-').replace(',', '.')
     return x   
 
+
+def preprocess_streaming_eye_data(eye_file, source="frontiers"):
+
+    eye_data = preprocessEye(eye_file, source)
+
+    # Select relevant columns
+    eye_data = eye_data[['timestamp', 'name', 'rec_date', 'start_time', 'diam_left', 'diam_right']]
+    
+    eye_data.to_csv("./RT/temp_tobii_stream.csv", index=False, header=False)
+    return open("./RT/temp_tobii_stream.csv", "r")
+
+
 def preprocessEye(eye_file, source="frontiers"):
     
     cols, cols_to_drop, cols_frontiers, \

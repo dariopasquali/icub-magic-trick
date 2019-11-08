@@ -146,12 +146,4 @@ def elanToLieDetection(fn, fout, mode="jonas", source="win", outmode=None):
 
 
 
-elanToLieDetection("data/annotations_lie_raw/s0.csv","data/annotations_lie/s0.csv",  source="win", mode="dario", outmode="write")
-elanToLieDetection("data/annotations_lie_raw/s1.csv","data/annotations_lie/s1.csv",  source="win", mode="dario", outmode="write")
-elanToLieDetection("data/annotations_lie_raw/s2.csv","data/annotations_lie/s2.csv",  source="win", mode="dario", outmode="write")
-elanToLieDetection("data/annotations_lie_raw/s9.csv","data/annotations_lie/s9.csv",  source="win", mode="dario", outmode="write")
-elanToLieDetection("data/annotations_lie_raw/s17.csv","data/annotations_lie/s17.csv",  source="win", mode="dario", outmode="write")
-elanToLieDetection("data/annotations_lie_raw/s19.csv","data/annotations_lie/s19.csv",  source="win", mode="dario", outmode="write")
-elanToLieDetection("data/annotations_lie_raw/s22.csv","data/annotations_lie/s22.csv",  source="win", mode="dario", outmode="write")
-elanToLieDetection("data/annotations_lie_raw/s26.csv","data/annotations_lie/s26.csv",  source="win", mode="dario", outmode="write")
-elanToLieDetection("data/annotations_lie_raw/s27.csv","data/annotations_lie/s27.csv",  source="win", mode="dario", outmode="write")
+elanToLieDetection("data/annotations_lie_raw/s24.csv","data/annotations_lie/s24.csv",  source="win", mode="dario", outmode="write")

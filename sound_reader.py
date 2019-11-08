@@ -44,15 +44,15 @@ def preprocess_vad_annotations(sound_in, annotations):
 
         for (label, start, stop) in segmentation:
             if(label is not 'noise'):
-                if(stop - start >= 1.2):
+                if(stop - start >= 1.0):
                     if(vad_descr_start == None):
                         vad_descr_start = start
-                
+                    
                     vad_descr_stop = stop
 
         # Shift
-        vad_descr_start = (vad_descr_start * 1000) + start_point_0
-        vad_descr_stop = (vad_descr_stop * 1000) + start_point_0
+        vad_descr_start = int((vad_descr_start * 1000) + stop_point_0)
+        vad_descr_stop = int((vad_descr_stop * 1000) + stop_point_0)
 
         # Append and clear
         sounds.append((start_point_0, stop_point_0, vad_descr_start, vad_descr_stop))

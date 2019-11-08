@@ -132,6 +132,43 @@ def loadTimeSeries(subject, card_names,
     
     return eye, annotations, baseline, overall, cards, cards_sr_early, cards_sr_late
 
+def load_rt_annotations(subject, card_names,
+                    source="frontiers",
+                    annot_input_template=annotations_lie_in_temp):
+
+
+    root, root_pilot, root_front = annot_var_init()
+    print("LOAD s{} from {}".format(subject, source))
+
+    root = root_front
+    if(source == "pilot"):
+        root = root_pilot
+
+    # Complete the files
+    annot_in = annot_input_template.format(root, subject)
+
+    # Load annotations
+    annotations = preprocessLieAnnotations(annot_in, card_names)
+
+    return annotations
+
+def create_rt_eye_streaming(subject, source="frontiers", tobii_input_template=tobii_in_temp):
+
+    root, root_pilot, root_front = annot_var_init()
+    print("LOAD s{} from {}".format(subject, source))
+
+    root = root_front
+    if(source == "pilot"):
+        root = root_pilot
+
+    # Complete the files
+    eye_in = tobii_input_template.format(root, subject)
+
+    # load tobii data
+    eye_streaming = preprocess_streaming_eye_data(eye_in, source)
+
+    return eye_streaming
+
 def load_rt_lie_timeseries(subject, card_names,
                     source="frontiers",
                     tobii_input_template=tobii_in_temp,
@@ -144,7 +181,7 @@ def load_rt_lie_timeseries(subject, card_names,
                     sound_input_template=sound_in_temp):
 
     root, root_pilot, root_front = annot_var_init()
-    #print("LOAD s{} from {}".format(subject, source))
+    print("LOAD s{} from {}".format(subject, source))
 
     root = root_front
     if(source == "pilot"):

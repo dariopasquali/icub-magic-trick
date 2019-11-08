@@ -32,6 +32,9 @@ from sklearn.naive_bayes import GaussianNB
 
 from sklearn.model_selection import GridSearchCV
 
+import pickle
+from joblib import dump, load
+
 import sys
 
 
@@ -518,3 +521,44 @@ class GridSearchEngine:
         report = report[csv_cols]
         return report
 
+
+def train_random_forest(data, features, norm_by_subject=True, dropna=True, oversamp=True, \
+    oversamp_mode="minmax", save=True, output_filename="./RT/models/random_forest.bin"):
+
+    if(dropna):
+        print("drop NaN")
+        data = data.dropna()
+    else:
+        print("fill NaN with 0")
+        data = data.fillna(0)
+
+    temp_c = list(data.columns)
+    temp_c.remove('label')
+
+    if(norm_by_subject):
+        print("normalize whithin subject")
+        cols = temp_c.copy()
+        cols.remove('subject')
+        cols.remove('card_class')
+        cols.remove('source')
+        cols.remove('show_order')
+        data = normalizeWithinSubject(data, cols, mode=oversamp_mode)
+
+    y = data['label']
+    X = data[features]
+
+    print("Create the model")
+    random_forest = RandomForestClassifier(bootstrap=False, max_depth=10, max_features='auto', min_samples_leaf=1, min_samples_split=2, n_estimators=80)
+    
+    print("Oversample the dataset to balance the classes")
+    X, y = SMOTE().fit_resample(X, y)
+
+    print("Fit the model")
+    random_forest.fit(X, y)
+
+    if(save):
+        with open(output_filename, "wb") as output_file:
+            print("Save the model")
+            dump(random_forest, output_filename)
+
+    return random_forest

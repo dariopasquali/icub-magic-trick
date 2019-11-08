@@ -34,7 +34,6 @@ def preprocessAnnotations(annotation_file, card_names):
         
     return dfs
 
-
 def preprocessLieAnnotations(annotation_file, card_names):
     # read the eye file
     annot = pd.read_csv(annotation_file, sep=',', 

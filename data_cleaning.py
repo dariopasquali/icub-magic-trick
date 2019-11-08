@@ -125,7 +125,6 @@ def vad_rt_data_filtering(eyeDF, sound_annot, clean=True, clean_mode="MAD", smoo
 
     return robot_time, subject_time
 
-
 def rt_data_filtering(eyeDF, annot, annot_1, clean=True, clean_mode="MAD", smooth=False):
 
     annot = annot.reset_index()
@@ -156,8 +155,6 @@ def rt_data_filtering(eyeDF, annot, annot_1, clean=True, clean_mode="MAD", smoot
         subject_time = dataCleaner(subject_time, clean, clean_mode, smooth)
 
     return robot_time, subject_time
-
-
 
 def lieDataFiltering(eyeDF, annot, clean=True, clean_mode="MAD", smooth=False):
 

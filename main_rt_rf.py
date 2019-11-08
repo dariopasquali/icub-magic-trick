@@ -12,6 +12,10 @@ to_exclude = []
 output_filename="./RT/models/random_forest.joblib"
 card_names = ['unicorn', 'pepper', 'minion', 'pig', 'hedge', 'aliens']
 
+tobii_columns = ['timestamp', 'name', 'rec_date', 'start_time', 'diam_left', 'diam_right']
+feature_columns = ['subject', 'card', 'label', 'right_mean', 'right_std', 'right_min', 'right_max', 'left_mean', 'left_std', 'left_min', 'left_max']
+prediction_columns = ['subject', 'card', 'from', 'to', 'prediction', 'label']
+
 def train_random_forest_model(dataset, filename):
 
     random_forest_features = [
@@ -54,8 +58,9 @@ def load_dataset(filename):
 
 class RealTimePredictionSimulator:
 
-    def __init__(self, annotations, tobii_streaming, model, baseline_window_size_ms, window_size_ms):
+    def __init__(self, subject, annotations, tobii_streaming, model, baseline_window_size_ms, window_size_ms):
 
+        self.subject = subject
         self.annotations = annotations
         self.tobii_streaming = tobii_streaming
         self.model = model
@@ -85,41 +90,68 @@ class RealTimePredictionSimulator:
         self.is_first_pointing = True
 
         # Storage ==============================================
-        self.tobii_data = pd.DataFrame(columns=['timestamp', 'name', 'rec_date', 'start_time', 'diam_left', 'diam_right'])
+
+        self.predictions = pd.DataFrame(columns=prediction_columns)
+        self.features = pd.DataFrame(columns=feature_columns)
+        self.tobii_data = pd.DataFrame(columns=tobii_columns)
         self.bin = None
         
     def store_tobii_data(self, eye_data):        
-        new_row = pd.DataFrame(data=[eye_data], columns=['timestamp', 'name', 'rec_date', 'start_time', 'diam_left', 'diam_right'])
+        new_row = pd.DataFrame(data=[eye_data], columns=tobii_columns)
         self.tobii_data = self.tobii_data.append(new_row, ignore_index=True)
-        return True
+
 
     def store_tobii_data_bin(self, eye_data):
-        new_row = pd.DataFrame(data=[eye_data], columns=['timestamp', 'name', 'rec_date', 'start_time', 'diam_left', 'diam_right'])
+        new_row = pd.DataFrame(data=[eye_data], columns=tobii_columns)
         self.bin = self.bin.append(new_row, ignore_index=True)
-        return True
-
+ 
     def calc_baseline(self):
-        # TODO
-        return True
+        
+        start = self.start_p0 - self.baseline_window_size_ms
+        stop = self.start_p0
 
-    def refer_to_baseline(self):
-        # TODO
-        return True
+        baseline = self.tobii_data.loc[(self.tobii_data['timestamp'] >= start) & (self.tobii_data['timestamp'] <= stop)]
+        baseline = dataCleaner(baseline, clean=True, clean_mode="MAD", smooth=False)
 
-    def aggregate_bin(self):
-        # TODO
-        return True
+        self.baseline_left = baseline["diam_left"].mean(skipna = True)
+        self.baseline_right = baseline["diam_right"].mean(skipna = True)
 
-    def predict_lable_and_store(self):
-        # TODO
-        return True
+
+    def refer_bin_to_baseline(self):
+        self.bin['diam_left'] = self.bin['diam_left'] - self.baseline_left
+        self.bin['diam_right'] = self.bin['diam_right'] - self.baseline_right
+
+
+    def aggregate_bin(self, card, label):
+        right_mean = self.bin['diam_right'].mean(skipna = True)
+        right_std = self.bin['diam_right'].std(skipna = True)
+        right_max = self.bin['diam_right'].max(skipna = True)
+        right_min = self.bin['diam_right'].min(skipna = True)
+
+        left_mean = self.bin['diam_left'].mean(skipna = True)
+        left_std = self.bin['diam_left'].std(skipna = True)
+        left_max = self.bin['diam_left'].max(skipna = True)
+        left_min = self.bin['diam_left'].min(skipna = True)
+
+        feats = [self.subject, card, label, right_mean, right_std, right_min, right_max, left_mean, left_std, left_min, left_max]
+        feats_df = pd.DataFrame(data=[feats], columns=feature_columns)
+        self.features = self.features.append(feats_df, ignore_index=True)
+
+        return feats
+
+    def predict_label_and_store(self, feats, card, label):
+        pred = self.model.predict(feats)
+        prediction = [self.subject, card, self.stop_p0, self.start_p1, label, pred]
+        prediction_df = pd.DataFrame(data=[prediction], columns=prediction_columns)
+        self.predictions = self.predictions.append(prediction_df, ignore_index=True)
+
 
     def aggregate_and_store_predictions(self):
         # TODO
         return True
 
     
-    def read_from_streaming(self):
+    def read_from_streaming(self, card, label):
         
         eye_data = None
 
@@ -162,9 +194,9 @@ class RealTimePredictionSimulator:
             self.store_tobii_data_bin(eye_data)
         else:
             # process the bin
-            self.refer_to_baseline()
-            self.aggregate_bin()
-            self.predict_lable_and_store()
+            self.refer_bin_to_baseline()
+            feats = self.aggregate_bin(card, label)
+            self.predict_label_and_store(feats)
 
             # If I'm still in this pointing
             if(timestamp < self.start_p1):
@@ -195,6 +227,9 @@ class RealTimePredictionSimulator:
             self.stop_p0 = annot.at[0, 'stop_p']
             self.stop_d0 = annot.at[0, 'stop_d']
 
+            card = annot['card'].iloc[0]
+            label = annot['label'].iloc[0]
+
             if(i < len(self.annotations)-1):
                 annot_1 = self.annotations[i+1].reset_index()
                 self.start_p1 = annot_1.at[0, 'start_p']
@@ -204,7 +239,7 @@ class RealTimePredictionSimulator:
             self.keep_reading = True
 
             while(self.keep_reading):
-                self.read_from_streaming()
+                self.read_from_streaming(card, label)
 
             if(self.last_point_done):
                 self.tobii_streaming.close()
@@ -222,5 +257,5 @@ random_forest = load_model(output_filename)
 annotations = load_rt_annotations(0, card_names)
 with create_rt_eye_streaming(0) as eye_streaming:
 
-    simulator = RealTimePredictionSimulator(annotations[1:], eye_streaming, random_forest, 5000, 1000)
+    simulator = RealTimePredictionSimulator(0, annotations[1:], eye_streaming, random_forest, 5000, 1000)
     simulator.simulate()

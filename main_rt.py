@@ -83,9 +83,11 @@ take_max_heuristic(rt_heuristic_features, \
                  print_result=True, only_rel=True)
 """
 
+rt_heuristic_features = extract_rt_lie_features(subjects=[], subject_to_exclude=to_exclude, mode="div", ref_to_base="time", with_vad=False)
+rt_heuristic_features.to_csv("lie_features_real_time___8_features_div.csv", index=False)
 
 rt_features = ['right_mean', 'right_std', 'right_min', 'right_max', 'left_mean', 'left_std', 'left_min', 'left_max', 'mean_pupil']
-rt_heuristic_features = pd.read_csv("lie_features_real_time___8_features.csv", sep=',')
+#rt_heuristic_features = pd.read_csv("lie_features_real_time___8_features.csv", sep=',')
 
 rt_heuristic_features['source'] = ""
 rt_heuristic_features['show_order'] = 0
@@ -94,7 +96,7 @@ col_sets = {
     '8_features' : rt_features
 }
 
-sys.stdout = open("RT/reports/multiple_grid_search___whole_interv_8_features_nonorm.txt", "w")
+sys.stdout = open("RT/reports/multiple_grid_search___whole_interv_8_features_div_nonorm.txt", "w")
 gsEngine = GridSearchEngine()
 gsEngine.add_naive_bayes()
 gsEngine.add_knn()
@@ -105,4 +107,4 @@ gsEngine.add_random_forest()
 gsEngine.add_mlp()
 
 report = gsEngine.multiple_grid_search(rt_heuristic_features, col_sets=col_sets, norm_by_subject=False)
-report.to_csv("RT/reports/MGS_report___whole_interv_8_features_nonorm.csv", sep='\t')
+report.to_csv("RT/reports/MGS_report___whole_interv_8_features_div_nonorm.csv", sep='\t')

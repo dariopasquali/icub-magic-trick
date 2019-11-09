@@ -24,6 +24,8 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.ensemble import GradientBoostingClassifier
 
+from sklearn.preprocessing import Normalizer
+
 from sklearn.neural_network import MLPClassifier
 
 from sklearn.neighbors import KNeighborsClassifier

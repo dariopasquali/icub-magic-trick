@@ -311,15 +311,15 @@ col_sets = {
     '8_features' : rt_features
 }
 
-sys.stdout = open("RT/reports/multiple_grid_search___window1000_8features_nonorm.txt", "w")
+sys.stdout = open("RT/reports/multiple_grid_search___window1000_8features_2.txt", "w")
 gsEngine = GridSearchEngine()
-gsEngine.add_naive_bayes()
-gsEngine.add_knn()
-gsEngine.add_ada()
-gsEngine.add_svm()
-gsEngine.add_decision_tree()
+#gsEngine.add_naive_bayes()
+#gsEngine.add_knn()
+#gsEngine.add_ada()
+#gsEngine.add_svm()
+#gsEngine.add_decision_tree()
 gsEngine.add_random_forest()
 gsEngine.add_mlp()
 
-report = gsEngine.multiple_grid_search(rt_heuristic_features, col_sets=col_sets, norm_by_subject=False)
-report.to_csv("RT/reports/MGS_report___window1000_8features_nonorm.csv", sep='\t')
+report = gsEngine.multiple_grid_search(rt_heuristic_features, col_sets=col_sets, norm_by_subject=True)
+report.to_csv("RT/reports/MGS_report___window1000_8features_2.csv", sep='\t')

@@ -4,7 +4,7 @@ from pydub import AudioSegment
 from inaSpeechSegmenter import Segmenter, seg2csv
 import os
 
-seg = Segmenter()
+#seg = Segmenter()
 temp_audio_filename = "./VAD/temp.wav"
 
 def preprocess_vad_annotations(sound_in, annotations):

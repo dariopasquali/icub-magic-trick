@@ -304,7 +304,53 @@ rt_heuristic_cols = [
     'label'
 ]
 
-def extract_rt_lie_features(subjects=[], subject_to_exclude=[], cols=rt_heuristic_cols, cards=card_names, source="frontiers", ref_to_base="time", mode="sub", with_vad=False):
+rt_cols = [
+    'subject',
+    'card_class',
+    'right_mean',
+    'right_std',
+    'right_min',
+    'right_max',
+    'left_mean',
+    'left_std',
+    'left_min',
+    'left_max',
+    'mean_pupil',
+    'label'
+]
+
+
+def extract_rt_8_features_windowed(subjects=[], subject_to_exclude=[], cols=rt_cols, cards=card_names, \
+    source="frontiers", ref_to_base="time", mode="sub", window_size=1000):
+
+    features = pd.DataFrame(columns=cols)
+
+    if(len(subjects) == 0):
+        subjects = extractMinSubjectSet(source, annot_path=annotations_lie_in_temp)
+
+    ref_time = ref_to_base == 'time'
+    ref_features = ref_to_base == 'feat'
+
+    subjects = [s for s in subjects if s not in subject_to_exclude]
+
+    for sub in subjects:
+
+        eye_df, annot_dfs, baseline, overall_eye_df, filtered_interaction_dfs = load_rt_windowed_features(
+                    sub, card_names, window_size=window_size,
+                    source="frontiers", 
+                    refer_to_baseline=ref_time, refer_mode=mode,
+                    clean=True, clean_mode="MAD", smooth=False)
+
+        feats = RealTimeFeatures(sub, annot_dfs, filtered_interaction_dfs, cols)
+
+        features = features.append(feats.getDataFrame(), ignore_index=True)
+    
+    #features['subject'] = sub // 6
+    return features
+
+
+def extract_rt_lie_features(subjects=[], subject_to_exclude=[], cols=rt_cols, cards=card_names, \
+    source="frontiers", ref_to_base="time", mode="sub", with_vad=False):
 
     features = pd.DataFrame(columns=cols)
 
@@ -326,8 +372,7 @@ def extract_rt_lie_features(subjects=[], subject_to_exclude=[], cols=rt_heuristi
                     refer_to_baseline=ref_time, refer_mode=mode,
                     clean=True, clean_mode="MAD", smooth=False, with_vad=with_vad)
 
-
-        feats = RealTimeHeuristicFeatures(sub, annot_dfs, filtered_interaction_dfs, cols)
+        feats = RealTimeFeatures(sub, annot_dfs, filtered_interaction_dfs, cols)
 
         features = features.append(feats.getDataFrame(), ignore_index=True)
     

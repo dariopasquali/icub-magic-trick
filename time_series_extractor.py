@@ -169,6 +169,77 @@ def create_rt_eye_streaming(subject, source="frontiers", tobii_input_template=to
 
     return eye_streaming
 
+
+def load_rt_windowed_features(subject, card_names,
+                    source="frontiers",
+                    tobii_input_template=tobii_in_temp,
+                    annot_input_template=annotations_lie_in_temp,
+                    refer_to_baseline=True, refer_mode='sub',
+                    clean_mode="MAD",
+                    clean=True,
+                    smooth=False,
+                    window_size=1000):
+
+    root, root_pilot, root_front = annot_var_init()
+    print("LOAD s{} from {}".format(subject, source))
+
+    root = root_front
+    if(source == "pilot"):
+        root = root_pilot
+
+    # Complete the files
+    eye_in = tobii_input_template.format(root, subject)
+    annot_in = annot_input_template.format(root, subject)
+    
+    # vector with temporal filtered data for each card
+    filtered_interaction_dfs = []
+    
+    # load tobii data
+    eye = preprocessEye(eye_in, source)
+
+    # Load annotations
+    annotations = preprocessLieAnnotations(annot_in, card_names)
+
+
+    # filter eye data relative to the entire phase
+    overall = filterEyeData(eye, annotations[0], \
+        start_col="start", stop_col="stop", \
+        clean=clean, clean_mode=clean_mode, smooth=smooth)
+
+    # Extract the baseline to rescale the pupil dilation data
+    baseline = filterBaseline(eye, annotations[0], \
+        start_col="start", stop_col="stop", \
+        clean=clean, clean_mode=clean_mode, smooth=smooth, window=5000)
+
+    if(refer_to_baseline):
+        # Refer the Pupil data to the baseline
+        overall = referToBaseline(overall, baseline, mode=refer_mode,
+        source_cols=['diam_right'], baseline_col='diam_right')
+
+        overall = referToBaseline(overall, baseline, mode=refer_mode,
+        source_cols=['diam_left'], baseline_col='diam_left')
+
+    for i in range(1, len(annotations)):        
+
+        if(i < (len(annotations)-1)):
+            robot_interaction, subject_interaction_windows = rt_windowed_filtering(overall, annotations[i], annotations[i+1], window_size, clean=False, smooth=False)
+        else:
+            robot_interaction, subject_interaction_windows = rt_windowed_filtering(overall, annotations[i], pd.DataFrame(), window_size, clean=False, smooth=False)
+            
+        
+        robot_interaction['card'] = annotations[i]['card'].iloc[0]
+
+        for w in subject_interaction_windows:
+            w['card'] = annotations[i]['card'].iloc[0]
+            w['label'] = annotations[i]['label'].iloc[0]
+            filtered_interaction_dfs.append(
+                (robot_interaction, w)
+            )
+
+    return eye, annotations, baseline, overall, filtered_interaction_dfs
+
+
+
 def load_rt_lie_timeseries(subject, card_names,
                     source="frontiers",
                     tobii_input_template=tobii_in_temp,

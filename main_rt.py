@@ -42,7 +42,7 @@ def predict_take_max(features, col):
 
         return max_card, check
 
-#"""
+"""
 #subjects = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,24,25,26,27]
 subjects = [0,1,2,3,4,6,7,8,9,10,11,12,13,14,15,17,18,20,21,25,27]
 
@@ -67,5 +67,42 @@ for d in deltas:
 mean = mean/(len(subjects))
 
 print ("Mean Time %d" % mean)
-#"""
+"""
 
+"""
+#rt_heuristic_features = extract_rt_lie_features(subjects=[], subject_to_exclude=to_exclude, mode=mode, ref_to_base="time", with_vad=False)
+rt_heuristic_features.to_csv("lie_features_real_time___8_features.csv", index=False)
+
+# ============= HEURISTIC AND STATISTIC TESTS ===========================
+print("Evaluate Heuristic")
+# TAKE MAX HEURISIC
+sys.stdout = open("RT/reports/heuristic_annots___8features.txt", "w")
+print("======================================================")
+take_max_heuristic(rt_heuristic_features, \
+        ['right_mean', 'right_std', 'right_min', 'right_max', 'left_mean', 'left_std', 'left_min', 'left_max', 'mean_pupil'],\
+                 print_result=True, only_rel=True)
+"""
+
+
+rt_features = ['right_mean', 'right_std', 'right_min', 'right_max', 'left_mean', 'left_std', 'left_min', 'left_max', 'mean_pupil']
+rt_heuristic_features = pd.read_csv("lie_features_real_time___8_features.csv", sep=',')
+
+rt_heuristic_features['source'] = ""
+rt_heuristic_features['show_order'] = 0
+
+col_sets = {
+    '8_features' : rt_features
+}
+
+sys.stdout = open("RT/reports/multiple_grid_search___whole_interv_8_features_nonorm.txt", "w")
+gsEngine = GridSearchEngine()
+gsEngine.add_naive_bayes()
+gsEngine.add_knn()
+gsEngine.add_ada()
+gsEngine.add_svm()
+gsEngine.add_decision_tree()
+gsEngine.add_random_forest()
+gsEngine.add_mlp()
+
+report = gsEngine.multiple_grid_search(rt_heuristic_features, col_sets=col_sets, norm_by_subject=False)
+report.to_csv("RT/reports/MGS_report___whole_interv_8_features_nonorm.csv", sep='\t')

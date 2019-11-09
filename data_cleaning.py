@@ -125,6 +125,55 @@ def vad_rt_data_filtering(eyeDF, sound_annot, clean=True, clean_mode="MAD", smoo
 
     return robot_time, subject_time
 
+def rt_windowed_filtering(eyeDF, annot, annot_1, window_size=1000, clean=True, clean_mode="MAD", smooth=False):
+
+    annot = annot.reset_index()
+    start_point_0 = annot.at[0, 'start_p']
+    stop_point_0 = annot.at[0, 'stop_p']
+    stop_descr_0 = annot.at[0, 'stop_d']
+
+    # Find the temporal interval
+    if(not annot_1.empty):
+        annot_1 = annot_1.reset_index()
+        start_point_1 = annot_1.at[0, 'start_p']
+    else:
+        start_point_1 = stop_descr_0
+
+    # Extract the intervals
+    robot_time = eyeDF.loc[
+        (eyeDF['timestamp'] >= start_point_0) & (eyeDF['timestamp'] <= stop_point_0)
+    ]
+
+    subject_time = eyeDF.loc[
+        (eyeDF['timestamp'] >= stop_point_0) & (eyeDF['timestamp'] <= start_point_1)
+    ]
+
+    # Clean
+    if(clean or smooth):
+        robot_time = dataCleaner(robot_time, clean, clean_mode, smooth)
+        subject_time = dataCleaner(subject_time, clean, clean_mode, smooth)
+    
+    # Filter the Windows
+    subject_windows_dfs = []
+    window_start = stop_point_0
+    window_stop = min(stop_point_0 + window_size, start_point_1)
+
+    while(window_start < start_point_1):
+        window = subject_time.loc[
+            (subject_time['timestamp'] >= window_start) & (subject_time['timestamp'] <= window_stop)
+        ]
+
+        if(not window.empty):
+            subject_windows_dfs.append(window)
+
+        window_start = window_stop
+        window_stop = min(window_start + window_size, start_point_1)
+
+    return robot_time, subject_windows_dfs
+
+    
+
+
 def rt_data_filtering(eyeDF, annot, annot_1, clean=True, clean_mode="MAD", smooth=False):
 
     annot = annot.reset_index()

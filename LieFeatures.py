@@ -59,7 +59,57 @@ lie_feat_cols = [
     ]
 
 
+class RealTimeFeatures:
+    def __init__(self, subject, annot_dfs, filtered_interaction_dfs, cols):
 
+        self.features = pd.DataFrame(columns=cols)
+
+        for c, (robot_inter, sub_inter) in enumerate(filtered_interaction_dfs):
+
+            self.subject = subject
+            self.card_class = sub_inter['card'].iloc[0]
+            self.label = sub_inter['label'].iloc[0]
+
+            sub_inter = sub_inter[['diam_right', 'diam_left']]
+
+            self.right_mean = sub_inter['diam_right'].mean(skipna = True)
+            self.right_std = sub_inter['diam_right'].std(skipna = True)
+            self.right_min = sub_inter['diam_right'].min(skipna = True)
+            self.right_max = sub_inter['diam_right'].max(skipna = True)
+
+
+            self.left_mean = sub_inter['diam_left'].mean(skipna = True)
+            self.left_std = sub_inter['diam_left'].std(skipna = True)
+            self.left_min = sub_inter['diam_left'].min(skipna = True)
+            self.left_max = sub_inter['diam_left'].max(skipna = True)
+
+            self.mean = (self.right_mean + self.left_mean) / 2.0
+
+            self.column_names = cols            
+            self.features = self.features.append(self.aggregate(), ignore_index=True)
+            
+
+    def getDataFrame(self):
+        return self.features
+    
+    def aggregate(self):
+        return pd.DataFrame(
+            data=[[
+                self.subject,
+                self.card_class,
+                self.right_mean,
+                self.right_std,
+                self.right_min,
+                self.right_max,
+                self.left_mean,
+                self.left_std,
+                self.left_min,
+                self.left_max,
+                self.mean,
+                self.label,
+            ]],
+            columns=self.column_names
+        )
 
 
 class RealTimeHeuristicFeatures:

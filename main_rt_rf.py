@@ -13,8 +13,8 @@ output_filename="./RT/models/random_forest.joblib"
 card_names = ['unicorn', 'pepper', 'minion', 'pig', 'hedge', 'aliens']
 
 tobii_columns = ['timestamp', 'name', 'rec_date', 'start_time', 'diam_left', 'diam_right']
-feature_columns = ['subject', 'card', 'label', 'right_mean', 'right_std', 'right_min', 'right_max', 'left_mean', 'left_std', 'left_min', 'left_max']
-prediction_columns = ['subject', 'card', 'from', 'to', 'prediction', 'label']
+feature_columns = ['subject', 'card_class', 'label', 'right_mean', 'right_std', 'right_min', 'right_max', 'left_mean', 'left_std', 'left_min', 'left_max']
+prediction_columns = ['subject', 'card_class', 'from', 'to', 'prediction', 'label']
 
 def train_random_forest_model(dataset, filename):
 
@@ -96,13 +96,43 @@ class RealTimePredictionSimulator:
         self.tobii_data = pd.DataFrame(columns=tobii_columns)
         self.bin = None
         
-    def store_tobii_data(self, eye_data):        
-        new_row = pd.DataFrame(data=[eye_data], columns=tobii_columns)
+    def store_tobii_data(self, eye_data):
+
+        t = int(eye_data[0])
+        name = eye_data[1]
+        sd = eye_data[2]
+        st = eye_data[3]
+        if(eye_data[4] == ''):
+            left = 0.0
+        else:
+            left = float(eye_data[4])
+        
+        if(eye_data[5] == ''):
+            right = 0.0
+        else:
+            right = float(eye_data[5])
+
+        new_row = pd.DataFrame(data=[[t, name, sd, st, left, right]], columns=tobii_columns)
         self.tobii_data = self.tobii_data.append(new_row, ignore_index=True)
 
 
     def store_tobii_data_bin(self, eye_data):
-        new_row = pd.DataFrame(data=[eye_data], columns=tobii_columns)
+        
+        t = int(eye_data[0])
+        name = eye_data[1]
+        sd = eye_data[2]
+        st = eye_data[3]
+        if(eye_data[4] == ''):
+            left = 0.0
+        else:
+            left = float(eye_data[4])
+        
+        if(eye_data[5] == ''):
+            right = 0.0
+        else:
+            right = float(eye_data[5])        
+
+        new_row = pd.DataFrame(data=[[t, name, sd, st, left, right]], columns=tobii_columns)
         self.bin = self.bin.append(new_row, ignore_index=True)
  
     def calc_baseline(self):
@@ -166,6 +196,7 @@ class RealTimePredictionSimulator:
 
         # Extract timestamp
         timestamp = int(eye_data[0])
+        #print(timestamp)
 
         # if it's the first pointing I need to calculate the baseline
         if(self.is_first_pointing):
@@ -195,8 +226,8 @@ class RealTimePredictionSimulator:
         else:
             # process the bin
             self.refer_bin_to_baseline()
-            feats = self.aggregate_bin(card, label)
-            self.predict_label_and_store(feats)
+            self.aggregate_bin(card, label)
+            #self.predict_label_and_store(feats)
 
             # If I'm still in this pointing
             if(timestamp < self.start_p1):
@@ -206,14 +237,15 @@ class RealTimePredictionSimulator:
                 self.bin_start = self.bin_end
                 self.bin_end = min(self.start_p1, self.bin_start + self.window_size_ms)
             else:
-                # I finished this pointing
-                self.aggregate_and_store_predictions()
+                # I finished this pointing interval
+                # self.aggregate_and_store_predictions()
                 self.bin_end = None
                 self.bin_start = None
                 self.keep_reading = False
             
             if(self.is_first_pointing):
                 self.is_first_pointing = False
+
 
             return
 
@@ -241,8 +273,9 @@ class RealTimePredictionSimulator:
             while(self.keep_reading):
                 self.read_from_streaming(card, label)
 
-            if(self.last_point_done):
-                self.tobii_streaming.close()
+        # Save the file
+        filename = "./RT/features/features8_s{}_w{}.csv".format(self.subject, self.window_size_ms)
+        self.features.to_csv(filename, index=False)
 
 
 
@@ -252,10 +285,41 @@ class RealTimePredictionSimulator:
 #dumped = train_random_forest_model(dataset, output_filename)
 #print(dumped)
 
+"""
 random_forest = load_model(output_filename)
 
 annotations = load_rt_annotations(0, card_names)
-with create_rt_eye_streaming(0) as eye_streaming:
-
+#with create_rt_eye_streaming(0) as eye_streaming:
+with open("./RT/temp_tobii_stream.csv") as eye_streaming:
     simulator = RealTimePredictionSimulator(0, annotations[1:], eye_streaming, random_forest, 5000, 1000)
     simulator.simulate()
+"""
+
+
+#windowed_features = extract_rt_8_features_windowed(subjects=[], subject_to_exclude=to_exclude, mode=mode, ref_to_base="time", window_size=100)
+#windowed_features.to_csv("features8_w100.csv", index=False)
+
+
+
+rt_features = ['right_mean', 'right_std', 'right_min', 'right_max', 'left_mean', 'left_std', 'left_min', 'left_max', 'mean_pupil']
+rt_heuristic_features = pd.read_csv("features8_w1000.csv", sep=',')
+
+rt_heuristic_features['source'] = ""
+rt_heuristic_features['show_order'] = 0
+
+col_sets = {
+    '8_features' : rt_features
+}
+
+sys.stdout = open("RT/reports/multiple_grid_search___window1000_8features_nonorm.txt", "w")
+gsEngine = GridSearchEngine()
+gsEngine.add_naive_bayes()
+gsEngine.add_knn()
+gsEngine.add_ada()
+gsEngine.add_svm()
+gsEngine.add_decision_tree()
+gsEngine.add_random_forest()
+gsEngine.add_mlp()
+
+report = gsEngine.multiple_grid_search(rt_heuristic_features, col_sets=col_sets, norm_by_subject=False)
+report.to_csv("RT/reports/MGS_report___window1000_8features_nonorm.csv", sep='\t')

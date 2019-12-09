@@ -321,6 +321,14 @@ rt_cols = [
     'label'
 ]
 
+windowed_ts_cols = [
+    'subject',
+    'card_class',
+    'right',
+    'left',
+    'label'
+]
+
 
 def extract_rt_8_features_windowed(subjects=[], subject_to_exclude=[], cols=rt_cols, cards=card_names, \
     source="frontiers", ref_to_base="time", mode="sub", window_size=1000):
@@ -346,6 +354,41 @@ def extract_rt_8_features_windowed(subjects=[], subject_to_exclude=[], cols=rt_c
         feats = RealTimeFeatures(sub, annot_dfs, filtered_interaction_dfs, cols)
 
         features = features.append(feats.getDataFrame(), ignore_index=True)
+    
+    #features['subject'] = sub // 6
+    return features
+
+def extract_windowed_timeseries(subjects=[], subject_to_exclude=[], cols=windowed_ts_cols, cards=card_names, \
+    source="frontiers", ref_to_base="time", mode="sub", window_size=1000):
+
+    features = pd.DataFrame(columns=cols)
+
+    if(len(subjects) == 0):
+        subjects = extractMinSubjectSet(source, annot_path=annotations_lie_in_temp)
+
+    ref_time = ref_to_base == 'time'
+    ref_features = ref_to_base == 'feat'
+
+    subjects = [s for s in subjects if s not in subject_to_exclude]
+
+    for sub in subjects:
+
+        eye_df, annot_dfs, baseline, overall_eye_df, filtered_interaction_dfs = load_rt_windowed_features(
+                    sub, card_names, window_size=window_size,
+                    source="frontiers", 
+                    refer_to_baseline=ref_time, refer_mode=mode,
+                    clean=True, clean_mode="MAD", smooth=False)
+
+
+        for c, (robot_inter, sub_inter) in enumerate(filtered_interaction_dfs):
+            
+            subject = sub
+            card_class = sub_inter['card'].iloc[0]
+            label = sub_inter['label'].iloc[0]
+            right = sub_inter['diam_right'].toarray().tolist()
+            left = sub_inter['diam_left'].toarray().tolist()
+            df = pd.DataFrame(data=[[subject, card_class, right, left, label]], columns=rt_cols)
+            features = features.append(df, ignore_index=True)
     
     #features['subject'] = sub // 6
     return features

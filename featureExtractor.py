@@ -10,6 +10,8 @@ from LieFeatures import *
 from lie_plot_tools import *
 from evaluation import *
 from Machine_Learning import *
+from SubjectMagicFeatures import *
+from plot_tools import *
 
 import sys
 

@@ -523,6 +523,9 @@ def lie_plotComparBars(features, feat_cols=lie_feat_cols, scale=3, save_root="pl
                 color='#1eff8f',  
                 width=bar_width, label='non-target')
 
+        axs.text(1+(bar_width/2), T_react_mean+(T_react_ste/2), "*", fontsize=35*scale)
+        axs.text(2+(bar_width/2), T_descr_mean+(T_descr_ste/2), "**", fontsize=35*scale)
+
         axs.legend(loc="upper left", prop=legend_prop_size)
 
         axs.set_xticks(x_pos)
@@ -534,7 +537,7 @@ def lie_plotComparBars(features, feat_cols=lie_feat_cols, scale=3, save_root="pl
         axs.axhline(color='black', alpha=0.2, linewidth=10)
 
         if(save):
-            fig.savefig(save_root.format(whole), dpi=100)
+            fig.savefig(save_root.format(whole), dpi=100, format='svg', bbox_inches='tight')
 
 def lie_plotRLbars(features, feat_cols=lie_feat_cols, save_root="plots/LIE/Bars_{}.png", save=True):
 

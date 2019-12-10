@@ -5,7 +5,7 @@ seed(42)
 
 mode = "sub"
 
-to_exclude = [5, 16, 19, 22, 24 26]
+#to_exclude = [5, 16, 19, 22, 24 26]
 #to_exclude = []
 
 print("================== MODE SMOOTH {} =====================".format(mode))
@@ -20,7 +20,7 @@ print("================== MODE SMOOTH {} =====================".format(mode))
 
 #print(subject_to_exclude)
 
-
+lie_features = pd.read_csv("lie_features_clear_whole_35.csv", sep=',')
 
 
 #"""
@@ -81,7 +81,9 @@ points_cols = [
 
 """
 print("PLOT COMPARE BARS =================================================")
-lie_plotComparBars(lie_features, feat_cols=lie_feat_cols, save_root="V2_clear_35/plot/hd/bars_HD_{}.png", save=True)
+lie_plotComparBars(lie_features, feat_cols=lie_feat_cols, save_root="V2_clear_35/svg/bars_HD_{}.svg", save=True)
+
+
 print("PLOT POINTS FOR EACH SUBJECT =================================================")
 lie_plotPointsAllSubjects(lie_features, feat_cols=points_cols, save_root="V2_clear_35/plot/hd/HD_{}.png", mode=mode, save=True)
 """
@@ -106,14 +108,14 @@ normality_test(lie_features, 'react_right_mean', mode=1)
 normality_test(lie_features, 'react_left_mean', mode=1)
 """
 
-#"""
+"""
 # ============= HEURISTIC AND STATISTIC TESTS ===========================
 
 # TAKE MAX HEURISIC
 sys.stdout = open("RT/heuristic_legacy_fixed_24_all.txt", "w")
 print("======================================================")
 take_max_heuristic(lie_features, significant_cols, print_result=True, only_rel=True)
-#"""
+"""
 
 # ============= MAX BEST PUPIL HEURISTIC TESTS ===========================
 

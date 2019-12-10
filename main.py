@@ -79,11 +79,11 @@ points_cols = [
         ( 'descr_left_mean', "DESCR left mean pupil dilation" ) ,
     ]
 
-"""
 print("PLOT COMPARE BARS =================================================")
-lie_plotComparBars(lie_features, feat_cols=lie_feat_cols, save_root="V2_clear_35/svg/bars_HD_{}.svg", save=True)
+lie_plotComparBars(lie_features, feat_cols=lie_feat_cols, save_root="V2_clear_35/svg/bars_SVG_{}.svg", save=True)
 
 
+"""
 print("PLOT POINTS FOR EACH SUBJECT =================================================")
 lie_plotPointsAllSubjects(lie_features, feat_cols=points_cols, save_root="V2_clear_35/plot/hd/HD_{}.png", mode=mode, save=True)
 """

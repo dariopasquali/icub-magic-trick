@@ -533,7 +533,8 @@ def lie_plotComparBars(features, feat_cols=lie_feat_cols, scale=3, save_root="pl
         axs.set_ylabel("{} [mm]".format(title), fontsize=label_font_size)
         #axs.set_title('{}'.format(whole))
 
-        axs.tick_params(axis='both', which='major', labelsize=label_font_size)
+        axs.label_params()
+        axs.tick_params(axis='both', which='major', labelsize=label_font_size, pad=30)
         axs.axhline(color='black', alpha=0.2, linewidth=10)
 
         if(save):

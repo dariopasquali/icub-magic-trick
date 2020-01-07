@@ -470,14 +470,14 @@ def lie_plotComparBars(features, feat_cols=lie_feat_cols, scale=3, save_root="pl
         #('right_std', 'point_right_std', 'react_right_std', 'descr_right_std', "Right STD Pupil Dilation"),
         #('right_min', 'point_right_min', 'react_right_min', 'descr_right_min', "Right Min Pupil Dilation"),
         #('right_max', 'point_right_max', 'react_right_max', 'descr_right_max', "Right Max Pupil Dilation"),
-        ('left_mean', 'point_left_mean', 'react_left_mean', 'descr_left_mean', "Left mean pupil dilation"),
+        #('left_mean', 'point_left_mean', 'react_left_mean', 'descr_left_mean', "Left mean pupil dilation"),
         #('left_std', 'point_left_std', 'react_left_std', 'descr_left_std', "Left STD Pupil Dilation" ),
         #('left_min', 'point_left_min', 'react_left_min', 'descr_left_min',  "Left Min Pupil Dilation" ),
         #('left_max', 'point_left_max', 'react_left_max', 'descr_left_max',  "Left Max Pupil Dilation" )
     ]
 
-    label_font_size = 25*scale
-    legend_prop_size = {'size': 20*scale}
+    label_font_size = 30*scale
+    legend_prop_size = {'size': 30*scale}
 
     nonTargets, targets, TnT = aggregate_target_nontarget(features, feat_cols)
 
@@ -515,30 +515,31 @@ def lie_plotComparBars(features, feat_cols=lie_feat_cols, scale=3, save_root="pl
         x_pos = np.arange(len(labels))
         axs.bar(x_pos, y_values_T,
                 yerr=T_errors,
+                error_kw=dict(lw=5),
                 color='#1E90FF', 
                 width=bar_width, label='target')
 
         axs.bar(x_pos+bar_width, y_values_nT,
                 yerr=nT_errors,
+                error_kw=dict(lw=5),
                 color='#1eff8f',  
                 width=bar_width, label='non-target')
 
-        axs.text(1+(bar_width/2), T_react_mean+(T_react_ste/2), "*", fontsize=35*scale)
-        axs.text(2+(bar_width/2), T_descr_mean+(T_descr_ste/2), "**", fontsize=35*scale)
+        axs.text(1+(bar_width/2), T_react_mean+(T_react_ste/2), "*", fontsize=50*scale)
+        axs.text(2+(bar_width/2), T_descr_mean+(T_descr_ste/2), "**", fontsize=50*scale)
 
         axs.legend(loc="upper left", prop=legend_prop_size)
 
-        axs.set_xticks(x_pos)
+        axs.set_xticks(x_pos + (bar_width/2))
         axs.set_xticklabels(labels)
         axs.set_ylabel("{} [mm]".format(title), fontsize=label_font_size)
         #axs.set_title('{}'.format(whole))
 
-        axs.label_params()
-        axs.tick_params(axis='both', which='major', labelsize=label_font_size, pad=30)
-        axs.axhline(color='black', alpha=0.2, linewidth=10)
+        axs.tick_params(axis='both', which='major', labelsize=label_font_size, pad=50)
+        axs.axhline(color='black', alpha=0.5, linewidth=10)
 
         if(save):
-            fig.savefig(save_root.format(whole), dpi=100, format='svg', bbox_inches='tight')
+            fig.savefig(save_root.format(whole), dpi=300, format='svg', bbox_inches='tight')
 
 def lie_plotRLbars(features, feat_cols=lie_feat_cols, save_root="plots/LIE/Bars_{}.png", save=True):
 

@@ -80,7 +80,7 @@ points_cols = [
     ]
 
 print("PLOT COMPARE BARS =================================================")
-lie_plotComparBars(lie_features, feat_cols=lie_feat_cols, save_root="V2_clear_35/svg/bars_SVG_{}.svg", save=True)
+lie_plotComparBars(lie_features, feat_cols=lie_feat_cols, save_root="HRI_camera_ready/bars_SVG_300_{}.svg", save=True)
 
 
 """

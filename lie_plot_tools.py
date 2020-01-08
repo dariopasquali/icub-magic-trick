@@ -539,7 +539,7 @@ def lie_plotComparBars(features, feat_cols=lie_feat_cols, scale=3, save_root="pl
         axs.axhline(color='black', alpha=0.5, linewidth=10)
 
         if(save):
-            fig.savefig(save_root.format(whole), dpi=300, format='svg', bbox_inches='tight')
+            fig.savefig(save_root.format(whole), dpi=600, format='png', bbox_inches='tight')
 
 def lie_plotRLbars(features, feat_cols=lie_feat_cols, save_root="plots/LIE/Bars_{}.png", save=True):
 

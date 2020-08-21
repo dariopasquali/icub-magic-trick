@@ -1,5 +1,0 @@
-======================================================
-===== TAKE MAX RESULTS =====
-mean_pupil acc:0.5555555555555556   True
-right_mean acc:0.5925925925925926   True
-left_mean acc:0.6296296296296297   True

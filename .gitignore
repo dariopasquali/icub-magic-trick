@@ -3,5 +3,6 @@ __pycache__/
 .vscode/
 data/
 *.pyc
-WRITING
-features
+WRITING/
+features/
+*features*

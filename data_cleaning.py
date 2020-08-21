@@ -171,9 +171,6 @@ def rt_windowed_filtering(eyeDF, annot, annot_1, window_size=1000, clean=True, c
 
     return robot_time, subject_windows_dfs
 
-    
-
-
 def rt_data_filtering(eyeDF, annot, annot_1, clean=True, clean_mode="MAD", smooth=False):
 
     annot = annot.reset_index()
